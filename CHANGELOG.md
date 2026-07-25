@@ -1,3 +1,9 @@
+## [3.8.5](https://github.com/Rhdevs71/dududu/compare/v3.8.4...v3.8.5) (2026-07-25)
+
+### 🐛 Bug Fixes
+
+* **instagram:** update InboxActionBarBuilderFingerprint for v439 ([66d7299](https://github.com/Rhdevs71/dududu/commit/66d72999f03b5346abee83c3af7a94a8bbef2451))
+
 ## [3.8.4](https://github.com/Rhdevs71/dududu/compare/v3.8.3...v3.8.4) (2026-07-25)
 
 ### 🐛 Bug Fixes
