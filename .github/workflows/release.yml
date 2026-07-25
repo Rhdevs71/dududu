@@ -50,7 +50,4 @@ jobs:
           tag_name: "v3.8.1-dev"
           name: "Piko v3.8.1-dev"
           files: |
-            patches/build/libs/patches-*.mpp
-            patches/build/libs/*.json
-            extensions/instagram/build/outputs/apk/release/*.apk
-            extensions/twitter/build/outputs/apk/release/*.apk
+            patches/build/libs/patches-3.8.1.mpp
