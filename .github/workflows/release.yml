@@ -38,7 +38,7 @@ jobs:
         run: npm install
 
       - name: Build Patches and Extensions
-        run: ./gradlew assemble :extensions:instagram:assembleRelease :extensions:twitter:assembleRelease
+        run: ./gradlew assemble generatePatchesList :extensions:instagram:assembleRelease :extensions:twitter:assembleRelease
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -51,5 +51,6 @@ jobs:
           name: "Piko v3.8.1-dev"
           files: |
             patches/build/libs/patches-*.mpp
-            extensions/instagram/build/outputs/apk/release/instagram-release.apk
-            extensions/twitter/build/outputs/apk/release/twitter-release.apk
+            patches/build/libs/*.json
+            extensions/instagram/build/outputs/apk/release/*.apk
+            extensions/twitter/build/outputs/apk/release/*.apk
