@@ -37,17 +37,21 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Patches and Extensions
-        run: ./gradlew assemble generatePatchesList :extensions:instagram:assembleRelease :extensions:twitter:assembleRelease
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v7
+        with:
+          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+      - name: Release
+        uses: cycjimmy/semantic-release-action@v5
+        id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Attest
+        if: steps.release.outputs.new_release_published == 'true'
+        uses: actions/attest-build-provenance@v3
         with:
-          tag_name: "v3.8.2"
-          name: "Piko v3.8.2"
-          files: |
-            patches/build/libs/patches-3.8.2.mpp
+          subject-name: 'Piko Patches ${{ steps.release.outputs.new_release_git_tag }}'
+          subject-path: patches/build/libs/patches-*.mpp
