@@ -1,3 +1,9 @@
+## [3.8.3](https://github.com/Rhdevs71/dududu/compare/v3.8.2...v3.8.3) (2026-07-25)
+
+### 🐛 Bug Fixes
+
+* force trigger semantic release for fresh build ([dab4ebf](https://github.com/Rhdevs71/dududu/commit/dab4ebf58e418bbd6d5a30043adf80a7397696e5))
+
 ## [3.8.0](https://github.com/crimera/piko/compare/v3.7.0...v3.8.0) (2026-07-24)
 
 ### 🐛 Bug Fixes
