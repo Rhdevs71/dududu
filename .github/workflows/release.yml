@@ -47,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: "v3.8.2-dev"
-          name: "Piko v3.8.2-dev"
+          tag_name: "v3.8.2"
+          name: "Piko v3.8.2"
           files: |
-            patches/build/libs/patches-3.8.2-dev.mpp
+            patches/build/libs/patches-3.8.2.mpp
