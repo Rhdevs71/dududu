@@ -29,17 +29,20 @@ val themePatch =
             key = "amoled",
             default = false,
             title = "Pure-black AMOLED theme",
-            description = "By default this patch applies a Material You dynamic theme that " +
-                "follows your device's light/dark setting. Turn this on to override it " +
-                "with a pure-black AMOLED theme instead. " +
-                "Note: a few server-driven pages (notifications, DM inbox, " +
-                "About-this-account) and full-screen media/Reels keep Instagram's own " +
-                "colours in both modes.",
+            description = "By default this patch applies a Material You dynamic theme. Turn this on to override it with a pure-black AMOLED theme instead.",
+        )
+
+        val goldTheme by booleanOption(
+            key = "goldTheme",
+            default = false,
+            title = "Gold Text Theme",
+            description = "Applies a Gold text color theme. Can be enabled on its own (Material You + Gold) or combined with AMOLED (AMOLED + Gold).",
         )
 
         execute {
             forceWhiteOnMediaChrome()
             if (amoled == true) applyAmoledTheme() else applyMaterialYouTheme()
+            if (goldTheme == true) applyGoldTextTheme()
         }
     }
 
@@ -507,3 +510,33 @@ private val materialYouNamedMappings =
         materialYouAccentMappings +
         materialYouThemeMappings +
         materialYouSurfaceBaselineMappings
+
+private fun ResourcePatchContext.applyGoldTextTheme() {
+    val goldOverrides = mapOf(
+        "igds_primary_text" to "#ffffd700",
+        "igds_secondary_text" to "#ffdaa520",
+        "igds_primary_icon" to "#ffffd700",
+        "igds_secondary_icon" to "#ffdaa520",
+        "igds_primary_button" to "#ffffd700",
+        "igds_link" to "#ffdaa520",
+        "fds_blue_60" to "#ffffd700",
+        "emphasized_action_color" to "#ffffd700",
+        "badge_color" to "#ffffd700"
+    )
+
+    listOf(
+        "res/values/colors.xml",
+        "res/values-night/colors.xml",
+        "res/values-v31/colors.xml",
+        "res/values-night-v31/colors.xml",
+    ).forEach { colorsFile ->
+        try {
+            if (!get(colorsFile).exists()) return@forEach
+            document(colorsFile).use { document ->
+                goldOverrides.forEach { (name, value) ->
+                    document.upsertColor(name, value)
+                }
+            }
+        } catch (_: Exception) {}
+    }
+}
