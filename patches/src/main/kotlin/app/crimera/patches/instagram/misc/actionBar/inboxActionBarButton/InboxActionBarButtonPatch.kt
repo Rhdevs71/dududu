@@ -9,19 +9,22 @@ package app.crimera.patches.instagram.misc.actionBar.inboxActionBarButton
 import app.crimera.patches.instagram.utils.Constants.ACTIONBAR_DESCRIPTOR
 import app.crimera.patches.instagram.utils.Constants.COMPATIBILITY_INSTAGRAM
 import app.morphe.patcher.Fingerprint
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
-import app.morphe.patcher.literal
+import app.morphe.patcher.opcode
 import app.morphe.patcher.patch.bytecodePatch
-import app.morphe.patcher.string
+import app.morphe.patches.all.misc.resources.ResourceType
+import app.morphe.patches.all.misc.resources.resourceLiteral
 import app.morphe.patches.all.misc.resources.resourceMappingPatch
+import app.morphe.util.indexOfFirstInstruction
 import app.morphe.util.registersUsed
+import com.android.tools.smali.dexlib2.Opcode
 
 object InboxActionBarBuilderFingerprint : Fingerprint(
     filters =
         listOf(
-            literal(147457),
-            string("PrebindActionBar"),
+            resourceLiteral(ResourceType.ID, "direct_inbox_action_bar"),
+            opcode(Opcode.CHECK_CAST),
         ),
 )
 
@@ -33,14 +36,14 @@ val inboxActionBarButtonPatch =
         dependsOn(resourceMappingPatch)
 
         execute {
-
             InboxActionBarBuilderFingerprint.apply {
-                val literalIndex = instructionMatches.first().index
+                val idIndex = instructionMatches.first().index
 
                 method.apply {
-                    val viewGroupRegister = getInstruction(literalIndex - 1).registersUsed[0]
-                    addInstructions(
-                        literalIndex,
+                    val checkCastIndex = indexOfFirstInstruction(idIndex, Opcode.CHECK_CAST)
+                    val viewGroupRegister = getInstruction(checkCastIndex).registersUsed[0]
+                    addInstruction(
+                        checkCastIndex + 1,
                         """
                         invoke-static {v$viewGroupRegister}, $ACTIONBAR_DESCRIPTOR->inboxActionBarButton(Landroid/view/ViewGroup;)V
                         """.trimIndent(),
