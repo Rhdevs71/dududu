@@ -200,7 +200,7 @@
 
 ### 🚀 Updated App Support
 
-* **Instagram:** Bump support for `435.0.0.37.76` ([d53a75a](https://github.com/crimera/piko/commit/d53a75a22ab99e2dbeb647bbe428face2037b16b))
+* **Instagram:** Bump support for `439.0.0.37.89` ([d53a75a](https://github.com/crimera/piko/commit/d53a75a22ab99e2dbeb647bbe428face2037b16b))
 * **Twitter:** Bump support for `12.2.0-release.0` ([70865fe](https://github.com/crimera/piko/commit/70865fee9c1b10a1fef078e449e44f28aa55f2fb))
 
 ### 🔧 Improvements
@@ -282,7 +282,7 @@
 
 ### 🚀 Updated App Support
 
-* **Instagram:** Bump support for `435.0.0.37.76` ([d53a75a](https://github.com/crimera/piko/commit/d53a75a22ab99e2dbeb647bbe428face2037b16b))
+* **Instagram:** Bump support for `439.0.0.37.89` ([d53a75a](https://github.com/crimera/piko/commit/d53a75a22ab99e2dbeb647bbe428face2037b16b))
 * **Twitter:** Bump support for `12.2.0-release.0` ([70865fe](https://github.com/crimera/piko/commit/70865fee9c1b10a1fef078e449e44f28aa55f2fb))
 
 ### 🔧 Improvements

@@ -167,7 +167,7 @@ To patch with Twitter/X version 11.88 and above, you must include patches from a
 
 **🎯 Supported versions:**
 
-| 435.0.0.37.76 |
+| 439.0.0.37.89 |
 | :---: |
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
