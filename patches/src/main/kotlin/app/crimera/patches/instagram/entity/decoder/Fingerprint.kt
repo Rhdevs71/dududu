@@ -8,6 +8,8 @@ package app.crimera.patches.instagram.entity.decoder
 
 import app.crimera.patches.instagram.utils.Constants.EDIT_MEDIA_INFO_FRAGMENT_CLASS
 import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.opcode
+import com.android.tools.smali.dexlib2.Opcode
 
 // Also used to in description extraction in MediaEntity
 object EditMediaInfoGetCurrentMediaIdFingerprint : Fingerprint(
@@ -28,4 +30,5 @@ internal object UserTagInfoDictInitFingerprint : Fingerprint(
 
 object ReelsInlineQualitySurveyRelatedFingerprint : Fingerprint(
     strings = listOf("reels_inline_quality_survey"),
+    filters = listOf(opcode(Opcode.INVOKE_INTERFACE)),
 )
