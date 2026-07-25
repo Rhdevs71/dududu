@@ -1,3 +1,9 @@
+## [3.8.6](https://github.com/Rhdevs71/dududu/compare/v3.8.5...v3.8.6) (2026-07-25)
+
+### 🐛 Bug Fixes
+
+* **instagram:** update ReelsInlineQualitySurveyRelatedFingerprint for v439 ([401fcca](https://github.com/Rhdevs71/dududu/commit/401fccaef001c99079e1dfaf7be3b67854f963cb))
+
 ## [3.8.5](https://github.com/Rhdevs71/dududu/compare/v3.8.4...v3.8.5) (2026-07-25)
 
 ### 🐛 Bug Fixes
