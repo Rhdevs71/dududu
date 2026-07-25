@@ -1,0 +1,28 @@
+name: Generate GPG Key
+on:
+  workflow_dispatch:
+
+jobs:
+  generate-gpg:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GPG Key
+        run: |
+          cat > gen-key-script <<EOF
+          %echo Generating a basic OpenPGP key
+          Key-Type: RSA
+          Key-Length: 3072
+          Subkey-Type: RSA
+          Subkey-Length: 3072
+          Name-Real: Dududu Bot
+          Name-Email: dududu@example.com
+          Expire-Date: 0
+          Passphrase: dududupassword
+          %commit
+          %echo done
+          EOF
+          gpg --batch --generate-key gen-key-script
+          echo "================ GPG PRIVATE KEY ================"
+          gpg --pinentry-mode loopback --passphrase dududupassword --export-secret-keys -a dududu@example.com
+          echo "================================================="
+          echo "Passphrase: dududupassword"
