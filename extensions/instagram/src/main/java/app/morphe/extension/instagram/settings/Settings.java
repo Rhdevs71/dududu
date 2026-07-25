@@ -89,4 +89,8 @@ public class Settings {
 
     public static final StringSetting FILTER_STORY_MIN_STORY_ITEMS = new StringSetting("filter_story_min_story_items", "1");
     public static final StringSetting FILTER_STORY_MAX_STORY_ITEMS = new StringSetting("filter_story_max_story_items", "9999");
+
+    public static final BooleanSetting ENABLE_MORE_OPTIONS_ON_PROFILE_QUICK_TOGGLE = new BooleanSetting("enable_more_options_on_profile_quick_toggle", false);
+    public static final BooleanSetting ENABLE_GHOST_MODE_QUICK_TOGGLE = new BooleanSetting("enable_ghost_mode_quick_toggle", false);
+    public static final BooleanSetting PIKO_SETTINGS_ON_ACTION_BAR = new BooleanSetting("piko_settings_on_action_bar", false);
 }

@@ -321,5 +321,17 @@ public class Pref {
         return Integer.valueOf(SharedPref.getStringPref(Settings.FILTER_STORY_MAX_STORY_ITEMS));
     }
 
+    public static boolean enableMoreOptionsOnProfileQuickToggle() {
+        return SharedPref.getBooleanPref(Settings.ENABLE_MORE_OPTIONS_ON_PROFILE_QUICK_TOGGLE);
+    }
+
+    public static boolean enableGhostModeQuickToggle() {
+        return SharedPref.getBooleanPref(Settings.ENABLE_GHOST_MODE_QUICK_TOGGLE);
+    }
+
+    public static boolean pikoSettingsOnActionBar() {
+        return SharedPref.getBooleanPref(Settings.PIKO_SETTINGS_ON_ACTION_BAR);
+    }
+
     //end
 }
