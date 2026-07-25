@@ -1,3 +1,9 @@
+## [3.8.4](https://github.com/Rhdevs71/dududu/compare/v3.8.3...v3.8.4) (2026-07-25)
+
+### 🐛 Bug Fixes
+
+* chat action bar button patch IndexOutOfBoundsException ([576ee81](https://github.com/Rhdevs71/dududu/commit/576ee817ddea66a143989b11ca0fb97272d625ba))
+
 ## [3.8.3](https://github.com/Rhdevs71/dududu/compare/v3.8.2...v3.8.3) (2026-07-25)
 
 ### 🐛 Bug Fixes

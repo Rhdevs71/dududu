@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-25T21:32:14",
-  "description": "## [3.8.3](https://github.com/Rhdevs71/dududu/compare/v3.8.2...v3.8.3) (2026-07-25)\n\n### 🐛 Bug Fixes\n\n* force trigger semantic release for fresh build ([dab4ebf](https://github.com/Rhdevs71/dududu/commit/dab4ebf58e418bbd6d5a30043adf80a7397696e5))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.3/patches-3.8.3.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.3/patches-3.8.3.mpp.asc",
-  "version": "3.8.3"
+  "created_at": "2026-07-25T22:08:59",
+  "description": "## [3.8.4](https://github.com/Rhdevs71/dududu/compare/v3.8.3...v3.8.4) (2026-07-25)\n\n### 🐛 Bug Fixes\n\n* chat action bar button patch IndexOutOfBoundsException ([576ee81](https://github.com/Rhdevs71/dududu/commit/576ee817ddea66a143989b11ca0fb97272d625ba))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.4/patches-3.8.4.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.4/patches-3.8.4.mpp.asc",
+  "version": "3.8.4"
 }
