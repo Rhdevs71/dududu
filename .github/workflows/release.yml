@@ -37,22 +37,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Import GPG key
-        uses: crazy-max/ghaction-import-gpg@v7
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          fingerprint: ${{ vars.GPG_FINGERPRINT }}
+      - name: Build Patches
+        run: ./gradlew assemble
 
-      - name: Release
-        uses: cycjimmy/semantic-release-action@v5
-        id: release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Attest
-        if: steps.release.outputs.new_release_published == 'true'
-        uses: actions/attest-build-provenance@v3
+      - name: Upload patches artifact
+        uses: actions/upload-artifact@v4
         with:
-          subject-name: 'Piko Patches ${{ steps.release.outputs.new_release_git_tag }}'
-          subject-path: patches/build/libs/patches-*.mpp
+          name: piko-patches
+          path: patches/build/libs/patches-*.mpp
