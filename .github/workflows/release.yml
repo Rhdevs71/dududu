@@ -39,6 +39,8 @@ jobs:
 
       - name: Build Patches
         run: ./gradlew assemble
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload patches artifact
         uses: actions/upload-artifact@v4
