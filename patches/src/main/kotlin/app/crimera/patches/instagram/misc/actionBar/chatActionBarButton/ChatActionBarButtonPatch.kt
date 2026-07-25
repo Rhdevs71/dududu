@@ -19,10 +19,15 @@ import app.morphe.util.indexOfFirstInstruction
 import app.morphe.util.registersUsed
 import com.android.tools.smali.dexlib2.Opcode
 
+import app.morphe.patcher.opcode
+
 object ChatActionBarBuilderFingerprint : Fingerprint(
     returnType = "V",
     filters =
-        listOf(resourceLiteral(ResourceType.LAYOUT, "layout_direct_thread_header")),
+        listOf(
+            resourceLiteral(ResourceType.LAYOUT, "layout_direct_thread_header"),
+            opcode(Opcode.CHECK_CAST)
+        ),
 )
 
 val chatActionBarButtonPatch =
