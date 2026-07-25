@@ -37,13 +37,19 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Build Patches
-        run: ./gradlew assemble
+      - name: Build Patches and Extensions
+        run: ./gradlew assemble :extensions:instagram:assembleRelease :extensions:twitter:assembleRelease
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload patches artifact
-        uses: actions/upload-artifact@v4
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: piko-patches
-          path: patches/build/libs/patches-*.mpp
+          tag_name: "v3.8.1-dev"
+          name: "Piko v3.8.1-dev"
+          files: |
+            patches/build/libs/patches-*.mpp
+            extensions/instagram/build/outputs/apk/release/instagram-release.apk
+            extensions/twitter/build/outputs/apk/release/twitter-release.apk
