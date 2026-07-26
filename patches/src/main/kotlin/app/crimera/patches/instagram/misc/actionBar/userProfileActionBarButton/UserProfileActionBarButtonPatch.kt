@@ -106,17 +106,19 @@ val userProfileActionBarButtonPatch =
                             val freeRegister = findFreeRegister(index, viewGroupRegister)
 
                             var invokeStaticInst: com.android.tools.smali.dexlib2.iface.instruction.Instruction? = null
+                            var invokeStaticIndex = -1
                             for (i in index until instructions.size) {
                                 val inst = getInstruction(i)
                                 if (inst.opcode == Opcode.INVOKE_STATIC || inst.opcode == Opcode.INVOKE_STATIC_RANGE) {
                                     invokeStaticInst = inst
+                                    invokeStaticIndex = i
                                     break
                                 }
                             }
 
                             val targetReg = invokeStaticInst!!.registersUsed[2]
                             var sourceReg = targetReg
-                            for (i in index until invokeStaticInst.location.index) {
+                            for (i in index until invokeStaticIndex) {
                                 val inst = getInstruction(i)
                                 if ((inst.opcode == Opcode.MOVE_OBJECT || inst.opcode == Opcode.MOVE_OBJECT_FROM16 || inst.opcode == Opcode.MOVE_OBJECT_16) && inst.registersUsed[0] == targetReg) {
                                     sourceReg = inst.registersUsed[1]
