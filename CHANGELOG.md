@@ -1,3 +1,11 @@
+## [3.8.12](https://github.com/Rhdevs71/dududu/compare/v3.8.11...v3.8.12) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** prevent invalid register STDIO warning in HookReelOverflowMenuButton ([5c765ec](https://github.com/Rhdevs71/dududu/commit/5c765ec81579e9ee0f7d4b1d76f353c3efbb09df))
+* **instagram:** resolve compilation error due to missing findFreeRegister import in HookReelOverflowMenuButton ([453583c](https://github.com/Rhdevs71/dududu/commit/453583c05818b51e2d1418591e0db8df86a95b74))
+* **instagram:** resolve ProfileActionBarFingerprint method selection failing to find removeAllViews ([6e6bca8](https://github.com/Rhdevs71/dududu/commit/6e6bca8098738d8f609df8ab9a110eed3565d882))
+
 ## [3.8.11](https://github.com/Rhdevs71/dududu/compare/v3.8.10...v3.8.11) (2026-07-26)
 
 ### 🐛 Bug Fixes
