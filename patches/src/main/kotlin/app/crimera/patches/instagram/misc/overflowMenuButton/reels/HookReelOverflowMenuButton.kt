@@ -39,13 +39,17 @@ val hookReelOverflowMenuButton =
                 val mediaObjectFromParameterIndex = indexOfFirstInstruction(sPutIndex, Opcode.MOVE_OBJECT_FROM16)
                 val mediaObjectRegister = instructions[mediaObjectFromParameterIndex].registersUsed[0]
 
-                val freeRegisterOne = instructions[indexOfFirstInstruction(mediaObjectFromParameterIndex, Opcode.CONST_4)].registersUsed[0]
+                val tempReg1 = findFreeRegister(mediaObjectFromParameterIndex + 1, selfClassRegister, buttonAdderInstanceRegister, mediaObjectRegister)
+                val tempReg2 = findFreeRegister(mediaObjectFromParameterIndex + 1, selfClassRegister, buttonAdderInstanceRegister, mediaObjectRegister, tempReg1)
+                val tempReg3 = findFreeRegister(mediaObjectFromParameterIndex + 1, selfClassRegister, buttonAdderInstanceRegister, mediaObjectRegister, tempReg1, tempReg2)
 
                 addInstructions(
                     mediaObjectFromParameterIndex + 1,
                     """
-                    iget-object v$freeRegisterOne, v$selfClassRegister, $appActivityField
-                    invoke-static {v$freeRegisterOne,v$buttonAdderInstanceRegister,v$mediaObjectRegister},$ADD_REEL_BTN_OVERFLOW_MENU_BUTTON_CLASS->includeCustomReelOverflowButtons(Landroid/content/Context;Ljava/lang/Object;Ljava/lang/Object;)V
+                    iget-object v$tempReg1, v$selfClassRegister, $appActivityField
+                    move-object/from16 v$tempReg2, v$buttonAdderInstanceRegister
+                    move-object/from16 v$tempReg3, v$mediaObjectRegister
+                    invoke-static {v$tempReg1,v$tempReg2,v$tempReg3},$ADD_REEL_BTN_OVERFLOW_MENU_BUTTON_CLASS->includeCustomReelOverflowButtons(Landroid/content/Context;Ljava/lang/Object;Ljava/lang/Object;)V
                     """.trimIndent(),
                 )
             }
