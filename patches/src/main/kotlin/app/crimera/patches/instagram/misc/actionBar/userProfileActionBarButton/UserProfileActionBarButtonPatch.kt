@@ -41,9 +41,13 @@ internal object ProfileHeaderRelatedFingerprint : Fingerprint(
 )
 
 internal object ProfileActionBarFingerprint : Fingerprint(
-    definingClass = "Lcom/instagram/profile/actionbar/ProfileActionBar;",
-    strings = listOf("IG_PROFILE"),
+    strings = listOf("ProfileActionBarViewBinder"),
     accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
+    custom = { methodDef, _ ->
+        methodDef.implementation?.instructions?.any {
+            it.opcode == Opcode.INVOKE_VIRTUAL && it.methodExtractor().name == "removeAllViews"
+        } == true
+    }
 )
 
 val userProfileActionBarButtonPatch =
