@@ -34,7 +34,10 @@ internal object ProfileActionBarRelatedFingerprint : Fingerprint(
 )
 
 internal object ProfileHeaderRelatedFingerprint : Fingerprint(
-    strings = listOf("user_profile_header", "threads_profile_glyph_tapped"),
+    strings = listOf("user_profile_header"),
+    custom = { _, classDef ->
+        classDef.fields.any { it.type == app.crimera.patches.instagram.utils.Constants.USER_DETAIL_VIEW_MODEL_CLASS }
+    }
 )
 
 internal object ProfileActionBarFingerprint : Fingerprint(
