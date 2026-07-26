@@ -77,27 +77,29 @@ fun addButtonAttribute(
         val buttonInvokeRelatedClass = bundleParameters[3]
         val buttonInvokeRelatedRegister = bundleRegisters[4]
 
+        val freeReg = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, compareButtonRegister, ourButtonRegister, buttonStyleRegister, bundleRegister, drawableInitRegister, stringInitRegister, buttonInvokeRelatedRegister)
+
         addInstructionsWithLabels(
             existingButtonSGetObjectInstruction.location.index + 1,
             """
             sget-object v$ourButtonRegister, ${button2CheckFingerprint.classDef.fields.first()}
             invoke-static {v$compareButtonRegister, v$ourButtonRegister}, $isEqualsClass->areEqual(Ljava/lang/Object;Ljava/lang/Object;)Z
-            move-result v$ourButtonRegister
-            
-            if-eqz v$ourButtonRegister, :next_button
-            const v$ourButtonRegister, $stringLateral
+            move-result v$freeReg
+
+            if-eqz v$freeReg, :next_button
+            const v$freeReg, $stringLateral
             new-instance v$stringInitRegister, $stringInitClass
-            invoke-direct {v$stringInitRegister, v$ourButtonRegister}, $stringInitClass-><init>(I)V
-            
-            const v$ourButtonRegister, $drawableLateral
+            invoke-direct {v$stringInitRegister, v$freeReg}, $stringInitClass-><init>(I)V
+
+            const v$freeReg, $drawableLateral
             new-instance v$drawableInitRegister, $drawableInitClass
-            invoke-direct {v$drawableInitRegister, v$ourButtonRegister}, $drawableInitClass-><init>(I)V
-            
+            invoke-direct {v$drawableInitRegister, v$freeReg}, $drawableInitClass-><init>(I)V
+
             sget-object v$buttonStyleRegister, $buttonStyleClass->A00:$buttonStyleClass
-            
+
             new-instance v$bundleRegister, ${buttonInstanceFingerprint.definingClass}
             invoke-direct {v$bundleRegister, v$buttonStyleRegister, v$drawableInitRegister, v$stringInitRegister, v$buttonInvokeRelatedRegister}, $bundleClass-><init>($buttonStyleParentClass $drawableInitClass $stringInitClass $buttonInvokeRelatedClass)V
-            
+
             goto :array_add
             :next_button
             sget-object v0, $existingButtonClass->A00:$existingButtonClass
