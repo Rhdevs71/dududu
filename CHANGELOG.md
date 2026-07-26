@@ -1,3 +1,13 @@
+## [3.8.18](https://github.com/Rhdevs71/dududu/compare/v3.8.17...v3.8.18) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** change move-object/from16 to move-object/16 to fix Invalid Register warnings ([1a6d592](https://github.com/Rhdevs71/dududu/commit/1a6d592341564bb25982d9b9e1ae7224a06377e7))
+* **instagram:** exclude early registers in findFreeRegister to prevent VerifyError in HideNotesTrayPatch and RemoveEmptyBottomSpacePatch ([f1aa7e7](https://github.com/Rhdevs71/dududu/commit/f1aa7e781d0e26a84afea63e0d634b1915d8a0cf))
+* **instagram:** prevent VerifyError in CopyCommentPatch caused by register reuse ([087b193](https://github.com/Rhdevs71/dududu/commit/087b1931ae7219527728b86fb56d95b4ccce5b05))
+* **instagram:** resolve ART verifier error in AddCommentButtonAttributesPatch on Android 15 ([0e31a33](https://github.com/Rhdevs71/dududu/commit/0e31a33cb3d1eca681fe98bac8c181e1ab67513d))
+* **instagram:** resolve Unresolved reference 'findFreeRegister' compilation error in AddCommentButtonAttributesPatch ([1ac3949](https://github.com/Rhdevs71/dududu/commit/1ac3949b004ab0f34fd4a00a5ecf9a29e326961b))
+
 ## [3.8.17](https://github.com/Rhdevs71/dududu/compare/v3.8.16...v3.8.17) (2026-07-26)
 
 ### 🐛 Bug Fixes
