@@ -40,8 +40,12 @@ internal object ProfileHeaderRelatedFingerprint : Fingerprint(
     }
 )
 
-internal object ProfileActionBarFingerprint : Fingerprint(
+internal object ProfileActionBarViewBinderClassFingerprint : Fingerprint(
     strings = listOf("ProfileActionBarViewBinder"),
+)
+
+internal object ProfileActionBarFingerprint : Fingerprint(
+    classFingerprint = ProfileActionBarViewBinderClassFingerprint,
     accessFlags = listOf(AccessFlags.PUBLIC, AccessFlags.FINAL),
     custom = { methodDef, _ ->
         methodDef.implementation?.instructions?.any {
@@ -91,11 +95,12 @@ val userProfileActionBarButtonPatch =
                             val nextInstruction = getInstruction(index + 1)
                             val freeRegister = findFreeRegister(index, viewGroupRegister)
 
-                            val gotoIndexAfterTarget = indexOfFirstInstruction(index, Opcode.GOTO)
-                            val invokeStaticAfterGoto = indexOfFirstInstruction(gotoIndexAfterTarget, Opcode.INVOKE_STATIC)
+                            val invokeStaticWithParams = instructions
+                                .subList(index, instructions.size)
+                                .first { inst -> inst.opcode == Opcode.INVOKE_STATIC && inst.registersUsed.size >= 3 }
 
-                            val actionBarRelatedObjectParameterRegister = getInstruction(invokeStaticAfterGoto).registersUsed[2]
-                            val userSessionRegister = getInstruction(invokeStaticAfterGoto).registersUsed[1]
+                            val actionBarRelatedObjectParameterRegister = invokeStaticWithParams.registersUsed[2]
+                            val userSessionRegister = invokeStaticWithParams.registersUsed[1]
 
                             val CODE =
                                 """
