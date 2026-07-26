@@ -52,7 +52,7 @@ val removeEmptyBottomSpacePatch =
 
                     val firstSPutIndexAfterStr = indexOfFirstInstruction(strIndex, Opcode.SPUT)
 
-                    val freeRegister = findFreeRegister(index + 1)
+                    val freeRegister = findFreeRegister(index + 1, 0, 1, 2, 3, 4, 5, 6, 7)
 
                     addInstructionsWithLabels(
                         index + 1,

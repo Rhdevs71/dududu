@@ -47,7 +47,7 @@ val hideNotesTrayPatch =
                     val notesRecyclerViewIndex = indexOfFirstInstruction(notesRecyclerViewIDIndex, Opcode.IPUT_OBJECT)
                     val notesRecyclerViewInstruction = getInstruction(notesRecyclerViewIndex)
                     val notesTrayRegister = notesRecyclerViewInstruction.registersUsed[0]
-                    val freeRegister = findFreeRegister(notesRecyclerViewIndex)
+                    val freeRegister = findFreeRegister(notesRecyclerViewIndex, 0, 1, 2, 3, 4, 5, 6, 7, notesTrayRegister)
 
                     val iPutObjectInstruction = getInstruction(notesRecyclerViewIndex)
 
