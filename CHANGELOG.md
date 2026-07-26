@@ -1,3 +1,9 @@
+## [3.8.15](https://github.com/Rhdevs71/dududu/compare/v3.8.14...v3.8.15) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** update StoryItemUrlResponseImpl and LiveItemLinkUrlResponseImpl defining classes to v439 schema paths ([e1fa765](https://github.com/Rhdevs71/dududu/commit/e1fa7653429c992b0ff3a57cd4e30ce9c32ae396))
+
 ## [3.8.14](https://github.com/Rhdevs71/dududu/compare/v3.8.13...v3.8.14) (2026-07-26)
 
 ### 🐛 Bug Fixes
