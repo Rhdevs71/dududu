@@ -19,10 +19,9 @@ internal object PermalinkResponseJsonParserFingerprint : Fingerprint(
     strings = listOf(TARGET_STRING_ARRAY[0]),
     custom = { methodDef, _ ->
         methodDef.name.lowercase().contains("parsefromjson") &&
-            methodDef.implementation
+            (methodDef.implementation
                 ?.instructions
-                ?.filter { it.opcode == Opcode.CONST_STRING }!!
-                .size < 3
+                ?.count { it.opcode == Opcode.CONST_STRING || it.opcode == Opcode.CONST_STRING_JUMBO } ?: 0) < 3
     },
 )
 

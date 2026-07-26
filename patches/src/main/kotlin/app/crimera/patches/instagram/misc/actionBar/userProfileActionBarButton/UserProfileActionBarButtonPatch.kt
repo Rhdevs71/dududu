@@ -34,8 +34,7 @@ internal object ProfileActionBarRelatedFingerprint : Fingerprint(
 )
 
 internal object ProfileHeaderRelatedFingerprint : Fingerprint(
-    strings = listOf("user_profile_header", "profile_search_igid_extra", "profile_search_display_name_extra"),
-    returnType = "V",
+    strings = listOf("user_profile_header", "threads_profile_glyph_tapped"),
 )
 
 internal object ProfileActionBarFingerprint : Fingerprint(
