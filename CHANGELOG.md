@@ -1,3 +1,9 @@
+## [3.8.7](https://github.com/Rhdevs71/dududu/compare/v3.8.6...v3.8.7) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve patch crashes on v439 due to fingerprint matching failures ([7a6fc00](https://github.com/Rhdevs71/dududu/commit/7a6fc002baf80a44d5360abe10ebe20d3f5c4fc0))
+
 ## [3.8.6](https://github.com/Rhdevs71/dududu/compare/v3.8.5...v3.8.6) (2026-07-25)
 
 ### 🐛 Bug Fixes
