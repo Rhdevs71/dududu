@@ -1,3 +1,9 @@
+## [3.8.19](https://github.com/Rhdevs71/dududu/compare/v3.8.18...v3.8.19) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** handle LiveTreeMediaDict object safely in MediaData entity across all getters ([3a4eeac](https://github.com/Rhdevs71/dududu/commit/3a4eeacc857febb0dd854b7e87f0fd4f7c5b946a))
+
 ## [3.8.18](https://github.com/Rhdevs71/dududu/compare/v3.8.17...v3.8.18) (2026-07-26)
 
 ### 🐛 Bug Fixes
