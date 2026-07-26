@@ -1,3 +1,9 @@
+## [3.8.16](https://github.com/Rhdevs71/dududu/compare/v3.8.15...v3.8.16) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve VerifyError in X.08PF (RemoveEmptyBottomSpace) caused by polluted register types ([083487a](https://github.com/Rhdevs71/dududu/commit/083487a811df663b6f6a7900a1aa1138e401d908))
+
 ## [3.8.15](https://github.com/Rhdevs71/dududu/compare/v3.8.14...v3.8.15) (2026-07-26)
 
 ### 🐛 Bug Fixes
