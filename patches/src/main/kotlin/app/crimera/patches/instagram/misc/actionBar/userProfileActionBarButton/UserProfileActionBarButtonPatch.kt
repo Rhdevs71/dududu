@@ -114,20 +114,30 @@ val userProfileActionBarButtonPatch =
                                 }
                             }
 
-                            val actionBarRelatedObjectParameterRegister = invokeStaticInst!!.registersUsed[2]
+                            val targetReg = invokeStaticInst!!.registersUsed[2]
+                            var sourceReg = targetReg
+                            for (i in index until invokeStaticInst.location.index) {
+                                val inst = getInstruction(i)
+                                if ((inst.opcode == Opcode.MOVE_OBJECT || inst.opcode == Opcode.MOVE_OBJECT_FROM16 || inst.opcode == Opcode.MOVE_OBJECT_16) && inst.registersUsed[0] == targetReg) {
+                                    sourceReg = inst.registersUsed[1]
+                                }
+                            }
+
+                            val actionBarRelatedObjectParameterRegister = sourceReg
                             val userSessionRegister = invokeStaticInst.registersUsed[1]
 
                             val CODE =
                                 """
-                                if-eqz v$actionBarRelatedObjectParameterRegister, :piko
-                                iget-object v$freeRegister, v$actionBarRelatedObjectParameterRegister, $profileHeaderFieldInActionBarRelatedClass
-                                
+                                move-object/from16 v$freeRegister, v$actionBarRelatedObjectParameterRegister
+                                if-eqz v$freeRegister, :piko
+                                iget-object v$freeRegister, v$freeRegister, $profileHeaderFieldInActionBarRelatedClass
+
                                 if-eqz v$freeRegister, :piko
                                 iget-object v$freeRegister,v$freeRegister, $userDetailViewModelFieldInProfileHeaderRelatedClass
-                                
+
                                 if-eqz v$freeRegister, :piko
                                 iget-object v$freeRegister,v$freeRegister, $userDataFieldInUserDetailClass
-                                
+
                                 invoke-static {v$viewGroupRegister, v$userSessionRegister, v$freeRegister}, $ACTIONBAR_DESCRIPTOR->userProfileActionBarButton(Landroid/view/ViewGroup;${USER_SESSION_CLASS}Ljava/lang/Object;)V
                                 """.trimIndent()
 
