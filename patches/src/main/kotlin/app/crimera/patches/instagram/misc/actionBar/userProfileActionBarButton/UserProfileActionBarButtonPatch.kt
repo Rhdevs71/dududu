@@ -64,23 +64,21 @@ val userProfileActionBarButtonPatch =
         execute {
 
             val actionBarRelatedClass: String
-            val profileHeaderFieldInActionBarRelatedClass: MutableField
+            val profileHeaderFieldInActionBarRelatedClass = ProfileActionBarRelatedFingerprint.classDef.fields.first { field ->
+                try {
+                    classDefBy { it.type == field.type }.fields.any { it.type == USER_DETAIL_VIEW_MODEL_CLASS }
+                } catch (e: Exception) {
+                    false
+                }
+            }
 
             ProfileActionBarRelatedFingerprint.apply {
                 actionBarRelatedClass = classDef.type
-                profileHeaderFieldInActionBarRelatedClass =
-                    classDef.fields.first { field ->
-                        try {
-                            classDefBy { it.type == field.type }.fields.any { it.type == USER_DETAIL_VIEW_MODEL_CLASS }
-                        } catch (e: Exception) {
-                            false
-                        }
-                    }
             }
 
             val profileHeaderClassDef = classDefBy { it.type == profileHeaderFieldInActionBarRelatedClass.type }
 
-            val userDetailViewModelFieldInProfileHeaderRelatedClass: MutableField =
+            val userDetailViewModelFieldInProfileHeaderRelatedClass =
                 profileHeaderClassDef.fields.first {
                     it.type == USER_DETAIL_VIEW_MODEL_CLASS
                 }
