@@ -17,6 +17,7 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.smali.ExternalLabel
+import app.morphe.util.findFreeRegister
 import app.morphe.util.indexOfFirstInstruction
 import app.morphe.util.registersUsed
 import com.android.tools.smali.dexlib2.Opcode
@@ -51,7 +52,7 @@ val removeEmptyBottomSpacePatch =
 
                     val firstSPutIndexAfterStr = indexOfFirstInstruction(strIndex, Opcode.SPUT)
 
-                    val freeRegister = getInstruction(index + 1).registersUsed[0]
+                    val freeRegister = findFreeRegister(index + 1)
 
                     addInstructionsWithLabels(
                         index + 1,
