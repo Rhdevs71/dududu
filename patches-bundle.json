@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-26T06:36:05",
-  "description": "## [3.8.9](https://github.com/Rhdevs71/dududu/compare/v3.8.8...v3.8.9) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve ProfileHeaderRelatedFingerprint match failure on v439 ([e9eed86](https://github.com/Rhdevs71/dududu/commit/e9eed869d960cbad340865f4afb285e6aaeafc29))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.9/patches-3.8.9.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.9/patches-3.8.9.mpp.asc",
-  "version": "3.8.9"
+  "created_at": "2026-07-26T07:30:13",
+  "description": "## [3.8.10](https://github.com/Rhdevs71/dududu/compare/v3.8.9...v3.8.10) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve ProfileActionBarFingerprint removeAllViews match failure on v439 ([5350146](https://github.com/Rhdevs71/dududu/commit/5350146d2d50b4b456e6c4338ad4022f4bf991f1))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.10/patches-3.8.10.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.10/patches-3.8.10.mpp.asc",
+  "version": "3.8.10"
 }

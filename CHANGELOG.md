@@ -1,3 +1,9 @@
+## [3.8.10](https://github.com/Rhdevs71/dududu/compare/v3.8.9...v3.8.10) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve ProfileActionBarFingerprint removeAllViews match failure on v439 ([5350146](https://github.com/Rhdevs71/dududu/commit/5350146d2d50b4b456e6c4338ad4022f4bf991f1))
+
 ## [3.8.9](https://github.com/Rhdevs71/dududu/compare/v3.8.8...v3.8.9) (2026-07-26)
 
 ### 🐛 Bug Fixes
