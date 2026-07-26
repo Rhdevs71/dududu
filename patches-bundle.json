@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-26T11:23:06",
-  "description": "## [3.8.13](https://github.com/Rhdevs71/dududu/compare/v3.8.12...v3.8.13) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve compilation errors due to type inference mismatch in UserProfileActionBarButtonPatch ([64caf67](https://github.com/Rhdevs71/dududu/commit/64caf67f3a164638fa7eacda3dd9f8a66d3c7a67))\n* **instagram:** resolve NoSuchElementException by avoiding unstable ProfileHeaderRelatedFingerprint and subList.first on v439 ([9347098](https://github.com/Rhdevs71/dududu/commit/93470983d5f040baeb29e2aea4a3f9c5a78d0b34))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.13/patches-3.8.13.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.13/patches-3.8.13.mpp.asc",
-  "version": "3.8.13"
+  "created_at": "2026-07-26T11:42:31",
+  "description": "## [3.8.14](https://github.com/Rhdevs71/dududu/compare/v3.8.13...v3.8.14) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve SanitizeShareLinksPatch match error on v439 and ensure all overflow button injections use low registers (v0..v15) ([03e6f00](https://github.com/Rhdevs71/dududu/commit/03e6f009fbc224f6a061f096ba4fcc68451fa47b))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.14/patches-3.8.14.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.14/patches-3.8.14.mpp.asc",
+  "version": "3.8.14"
 }

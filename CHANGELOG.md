@@ -1,3 +1,9 @@
+## [3.8.14](https://github.com/Rhdevs71/dududu/compare/v3.8.13...v3.8.14) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve SanitizeShareLinksPatch match error on v439 and ensure all overflow button injections use low registers (v0..v15) ([03e6f00](https://github.com/Rhdevs71/dududu/commit/03e6f009fbc224f6a061f096ba4fcc68451fa47b))
+
 ## [3.8.13](https://github.com/Rhdevs71/dududu/compare/v3.8.12...v3.8.13) (2026-07-26)
 
 ### 🐛 Bug Fixes
