@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-26T06:17:56",
-  "description": "## [3.8.8](https://github.com/Rhdevs71/dududu/compare/v3.8.7...v3.8.8) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve MusicAudioTypeEnumStringFingerprint crash on v439 ([85b4c90](https://github.com/Rhdevs71/dududu/commit/85b4c90c8b95df7a8ff0dfb0e07288b129a9b5fb))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.8/patches-3.8.8.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.8/patches-3.8.8.mpp.asc",
-  "version": "3.8.8"
+  "created_at": "2026-07-26T06:36:05",
+  "description": "## [3.8.9](https://github.com/Rhdevs71/dududu/compare/v3.8.8...v3.8.9) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve ProfileHeaderRelatedFingerprint match failure on v439 ([e9eed86](https://github.com/Rhdevs71/dududu/commit/e9eed869d960cbad340865f4afb285e6aaeafc29))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.9/patches-3.8.9.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.9/patches-3.8.9.mpp.asc",
+  "version": "3.8.9"
 }

@@ -1,3 +1,9 @@
+## [3.8.9](https://github.com/Rhdevs71/dududu/compare/v3.8.8...v3.8.9) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve ProfileHeaderRelatedFingerprint match failure on v439 ([e9eed86](https://github.com/Rhdevs71/dududu/commit/e9eed869d960cbad340865f4afb285e6aaeafc29))
+
 ## [3.8.8](https://github.com/Rhdevs71/dududu/compare/v3.8.7...v3.8.8) (2026-07-26)
 
 ### 🐛 Bug Fixes
