@@ -69,11 +69,19 @@ val userProfileActionBarButtonPatch =
             ProfileActionBarRelatedFingerprint.apply {
                 actionBarRelatedClass = classDef.type
                 profileHeaderFieldInActionBarRelatedClass =
-                    classDef.fields.first { it.type == ProfileHeaderRelatedFingerprint.classDef.type }
+                    classDef.fields.first { field ->
+                        try {
+                            classDefBy { it.type == field.type }.fields.any { it.type == USER_DETAIL_VIEW_MODEL_CLASS }
+                        } catch (e: Exception) {
+                            false
+                        }
+                    }
             }
 
+            val profileHeaderClassDef = classDefBy { it.type == profileHeaderFieldInActionBarRelatedClass.type }
+
             val userDetailViewModelFieldInProfileHeaderRelatedClass: MutableField =
-                ProfileHeaderRelatedFingerprint.classDef.fields.first {
+                profileHeaderClassDef.fields.first {
                     it.type == USER_DETAIL_VIEW_MODEL_CLASS
                 }
 
@@ -99,12 +107,17 @@ val userProfileActionBarButtonPatch =
                             val nextInstruction = getInstruction(index + 1)
                             val freeRegister = findFreeRegister(index, viewGroupRegister)
 
-                            val invokeStaticWithParams = instructions
-                                .subList(index, instructions.size)
-                                .first { inst -> inst.opcode == Opcode.INVOKE_STATIC && inst.registersUsed.size >= 3 }
+                            var invokeStaticInst: com.android.tools.smali.dexlib2.iface.instruction.Instruction? = null
+                            for (i in index until instructions.size) {
+                                val inst = getInstruction(i)
+                                if (inst.opcode == Opcode.INVOKE_STATIC || inst.opcode == Opcode.INVOKE_STATIC_RANGE) {
+                                    invokeStaticInst = inst
+                                    break
+                                }
+                            }
 
-                            val actionBarRelatedObjectParameterRegister = invokeStaticWithParams.registersUsed[2]
-                            val userSessionRegister = invokeStaticWithParams.registersUsed[1]
+                            val actionBarRelatedObjectParameterRegister = invokeStaticInst!!.registersUsed[2]
+                            val userSessionRegister = invokeStaticInst.registersUsed[1]
 
                             val CODE =
                                 """
