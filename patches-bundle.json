@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-26T07:30:13",
-  "description": "## [3.8.10](https://github.com/Rhdevs71/dududu/compare/v3.8.9...v3.8.10) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve ProfileActionBarFingerprint removeAllViews match failure on v439 ([5350146](https://github.com/Rhdevs71/dududu/commit/5350146d2d50b4b456e6c4338ad4022f4bf991f1))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.10/patches-3.8.10.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.10/patches-3.8.10.mpp.asc",
-  "version": "3.8.10"
+  "created_at": "2026-07-26T07:48:57",
+  "description": "## [3.8.11](https://github.com/Rhdevs71/dududu/compare/v3.8.10...v3.8.11) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve register lookup out of bounds in UserProfileActionBarButtonPatch on v439 ([6ff244d](https://github.com/Rhdevs71/dududu/commit/6ff244d2f5ba69880496ef8866c50dda5d526d81))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.11/patches-3.8.11.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.11/patches-3.8.11.mpp.asc",
+  "version": "3.8.11"
 }

@@ -1,3 +1,9 @@
+## [3.8.11](https://github.com/Rhdevs71/dududu/compare/v3.8.10...v3.8.11) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve register lookup out of bounds in UserProfileActionBarButtonPatch on v439 ([6ff244d](https://github.com/Rhdevs71/dududu/commit/6ff244d2f5ba69880496ef8866c50dda5d526d81))
+
 ## [3.8.10](https://github.com/Rhdevs71/dududu/compare/v3.8.9...v3.8.10) (2026-07-26)
 
 ### 🐛 Bug Fixes
