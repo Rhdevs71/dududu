@@ -83,11 +83,15 @@ val userProfileActionBarButtonPatch =
 
             val userSessionFieldInUserDetailClass = userDetailsClassFields.first { it.type == USER_SESSION_CLASS }
 
-            ProfileActionBarFingerprint
-                .method
-                .apply {
+            val profileActionBarMethod = ProfileActionBarViewBinderClassFingerprint.classDef.methods.first { methodDef ->
+                methodDef.implementation?.instructions?.any {
+                    it.opcode == Opcode.INVOKE_VIRTUAL && it.methodExtractor().name == "removeAllViews"
+                } == true
+            }
 
-                    instructions.filter { it.opcode == Opcode.INVOKE_VIRTUAL }.first {
+            profileActionBarMethod.apply {
+
+                instructions.filter { it.opcode == Opcode.INVOKE_VIRTUAL }.first {
                         val methodExt = it.methodExtractor()
                         if (methodExt.name == "removeAllViews") {
                             val index = it.location.index + 1
