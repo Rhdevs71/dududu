@@ -77,31 +77,61 @@ fun addButtonAttribute(
         val buttonInvokeRelatedClass = bundleParameters[3]
         val buttonInvokeRelatedRegister = bundleRegisters[4]
 
-        val freeReg = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, compareButtonRegister, ourButtonRegister, buttonStyleRegister, bundleRegister, drawableInitRegister, stringInitRegister, buttonInvokeRelatedRegister)
+        val b0 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1)
+        val b1 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0)
+        val b2 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0, b1)
+        val b3 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0, b1, b2)
+        val b4 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0, b1, b2, b3)
 
         addInstructionsWithLabels(
             existingButtonSGetObjectInstruction.location.index + 1,
             """
-            sget-object v$ourButtonRegister, ${button2CheckFingerprint.classDef.fields.first()}
-            invoke-static {v$compareButtonRegister, v$ourButtonRegister}, $isEqualsClass->areEqual(Ljava/lang/Object;Ljava/lang/Object;)Z
-            move-result v$freeReg
+            move-object/16 v$b0, v0
+            move-object/16 v$b1, v1
+            move-object/16 v$b2, v2
+            move-object/16 v$b3, v3
+            move-object/16 v$b4, v4
 
-            if-eqz v$freeReg, :next_button
-            const v$freeReg, $stringLateral
-            new-instance v$stringInitRegister, $stringInitClass
-            invoke-direct {v$stringInitRegister, v$freeReg}, $stringInitClass-><init>(I)V
+            sget-object v0, ${button2CheckFingerprint.classDef.fields.first()}
+            move-object/16 v1, v$compareButtonRegister
+            invoke-static {v1, v0}, $isEqualsClass->areEqual(Ljava/lang/Object;Ljava/lang/Object;)Z
+            move-result v0
 
-            const v$freeReg, $drawableLateral
-            new-instance v$drawableInitRegister, $drawableInitClass
-            invoke-direct {v$drawableInitRegister, v$freeReg}, $drawableInitClass-><init>(I)V
+            if-eqz v0, :next_button
 
-            sget-object v$buttonStyleRegister, $buttonStyleClass->A00:$buttonStyleClass
+            const v0, $stringLateral
+            new-instance v1, $stringInitClass
+            invoke-direct {v1, v0}, $stringInitClass-><init>(I)V
+            move-object/16 v$stringInitRegister, v1
 
-            new-instance v$bundleRegister, ${buttonInstanceFingerprint.definingClass}
-            invoke-direct {v$bundleRegister, v$buttonStyleRegister, v$drawableInitRegister, v$stringInitRegister, v$buttonInvokeRelatedRegister}, $bundleClass-><init>($buttonStyleParentClass $drawableInitClass $stringInitClass $buttonInvokeRelatedClass)V
+            const v0, $drawableLateral
+            new-instance v2, $drawableInitClass
+            invoke-direct {v2, v0}, $drawableInitClass-><init>(I)V
+            move-object/16 v$drawableInitRegister, v2
 
+            sget-object v3, $buttonStyleClass->A00:$buttonStyleClass
+            move-object/16 v$buttonStyleRegister, v3
+
+            move-object/16 v4, v$buttonInvokeRelatedRegister
+
+            new-instance v0, ${buttonInstanceFingerprint.definingClass}
+            invoke-direct {v0, v3, v2, v1, v4}, $bundleClass-><init>($buttonStyleParentClass $drawableInitClass $stringInitClass $buttonInvokeRelatedClass)V
+            move-object/16 v$bundleRegister, v0
+
+            move-object/16 v0, v$b0
+            move-object/16 v1, v$b1
+            move-object/16 v2, v$b2
+            move-object/16 v3, v$b3
+            move-object/16 v4, v$b4
             goto :array_add
+
             :next_button
+            move-object/16 v0, v$b0
+            move-object/16 v1, v$b1
+            move-object/16 v2, v$b2
+            move-object/16 v3, v$b3
+            move-object/16 v4, v$b4
+
             sget-object v0, $existingButtonClass->A00:$existingButtonClass
             """.trimIndent(),
             ExternalLabel("array_add", arrayAddInstruction),
