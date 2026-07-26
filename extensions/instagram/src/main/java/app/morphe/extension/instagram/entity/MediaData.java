@@ -41,7 +41,11 @@ public class MediaData extends Entity {
     }
 
     private Object getExtendedData() throws Exception {
-        return super.getField("fieldName");
+        try {
+            return super.getField("fieldName");
+        } catch (Exception e) {
+            return this.obj;
+        }
     }
 
     public String getShortcode() {
@@ -112,11 +116,23 @@ public class MediaData extends Entity {
     }
 
     public String getMediaPkId() throws Exception {
-        return (String) super.getMethod("methodName");
+        try {
+            return (String) super.getMethod("methodName");
+        } catch (Exception e) {
+            return this.getPostID();
+        }
     }
 
     public boolean isVideo() throws Exception {
-        return (boolean) super.getMethod(this.obj, "methodName");
+        try {
+            return (boolean) super.getMethod(this.obj, "methodName");
+        } catch (Exception e) {
+            try {
+                return (boolean) super.getMethod(this.getExtendedData(), "methodName");
+            } catch (Exception e2) {
+                return false;
+            }
+        }
     }
 
     public boolean hasAudio() throws Exception {
@@ -162,15 +178,24 @@ public class MediaData extends Entity {
     }
 
     public UserData getUserDataWithUserSession() throws Exception {
-        Class<?> helperClass = this.getHelperClass();
-        Object result = super.getMethod(helperClass, "methodname", this.userSession, this.obj);
-        return result != null ? new UserData(result) : null;
+        try {
+            Class<?> helperClass = this.getHelperClass();
+            Object result = super.getMethod(helperClass, "methodname", this.userSession, this.obj);
+            if (result != null) return new UserData(result);
+        } catch (Exception e) {
+            // Fall back if this.obj is LiveTreeMediaDict or incompatible with helper method
+        }
+        return this.getUserDataWithoutUserSession();
     }
 
     public UserData getUserData() throws Exception {
         UserSession userSession = this.userSession;
         if(userSession!=null){
-            return this.getUserDataWithUserSession();
+            try {
+                UserData data = this.getUserDataWithUserSession();
+                if (data != null) return data;
+            } catch (Exception e) {
+            }
         }
         return this.getUserDataWithoutUserSession();
     }
@@ -272,19 +297,35 @@ public class MediaData extends Entity {
     }
 
     private OriginalSoundDataIntf getOriginalSoundDataIntf() throws Exception {
-        Class<?> helperClass = this.getHelperClass();
-        Object result = super.getMethod(helperClass, "A06", this.obj);
-        if (result != null) {
-            return new OriginalSoundDataIntf(result);
+        try {
+            Class<?> helperClass = this.getHelperClass();
+            Object result = super.getMethod(helperClass, "A06", this.obj);
+            if (result != null) {
+                return new OriginalSoundDataIntf(result);
+            }
+        } catch (Exception e) {
+            try {
+                Object result = super.getMethod(this.obj, "Cld");
+                if (result != null) return new OriginalSoundDataIntf(result);
+            } catch (Exception e2) {
+            }
         }
         return null;
     }
 
     private TrackDataIntf getTrackDataIntf() throws Exception {
-        Class<?> helperClass = this.getHelperClass();
-        Object result = super.getMethod(helperClass, "A0F", this.obj);
-        if (result != null) {
-            return new TrackDataIntf(result);
+        try {
+            Class<?> helperClass = this.getHelperClass();
+            Object result = super.getMethod(helperClass, "A0F", this.obj);
+            if (result != null) {
+                return new TrackDataIntf(result);
+            }
+        } catch (Exception e) {
+            try {
+                Object result = super.getMethod(this.obj, "Ce1");
+                if (result != null) return new TrackDataIntf(result);
+            } catch (Exception e2) {
+            }
         }
         return null;
     }
