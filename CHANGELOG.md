@@ -1,3 +1,10 @@
+## [3.8.13](https://github.com/Rhdevs71/dududu/compare/v3.8.12...v3.8.13) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve compilation errors due to type inference mismatch in UserProfileActionBarButtonPatch ([64caf67](https://github.com/Rhdevs71/dududu/commit/64caf67f3a164638fa7eacda3dd9f8a66d3c7a67))
+* **instagram:** resolve NoSuchElementException by avoiding unstable ProfileHeaderRelatedFingerprint and subList.first on v439 ([9347098](https://github.com/Rhdevs71/dududu/commit/93470983d5f040baeb29e2aea4a3f9c5a78d0b34))
+
 ## [3.8.12](https://github.com/Rhdevs71/dududu/compare/v3.8.11...v3.8.12) (2026-07-26)
 
 ### 🐛 Bug Fixes
