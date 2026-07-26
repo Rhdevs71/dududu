@@ -162,7 +162,7 @@ internal object MusicAudioTypeEnumStringFingerprint : Fingerprint(
         listOf(
             opcode(
                 opcode = Opcode.IF_EQZ,
-                location = MatchAfterWithin(4),
+                location = MatchAfterWithin(15),
             ),
         ),
 )
