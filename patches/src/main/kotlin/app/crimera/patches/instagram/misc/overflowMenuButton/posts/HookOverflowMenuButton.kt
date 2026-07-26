@@ -15,6 +15,7 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.util.findFreeRegister
 import app.morphe.util.getReference
 import app.morphe.util.indexOfFirstInstruction
 import app.morphe.util.registersUsed
@@ -69,10 +70,19 @@ val hookOverflowMenuButton =
                 }
 
                 if (arrayListRegister != -1 && checkCastRegister != -1 && checkCastIndex != -1) {
+                    val tempReg1 = findFreeRegister(checkCastIndex + 1, arrayListRegister, checkCastRegister)
+                    val tempReg2 = findFreeRegister(checkCastIndex + 1, arrayListRegister, checkCastRegister, tempReg1)
+
                     addInstructions(
                         checkCastIndex + 1,
                         """
-                        invoke-static {v$checkCastRegister,v$arrayListRegister},$FEED_OVERFLOW_MENU_BUTTON_CLASS->addFeedOverflowButton(Ljava/lang/Object;Ljava/util/ArrayList;)V
+                        move-object/from16 v$tempReg1, v0
+                        move-object/from16 v$tempReg2, v1
+                        move-object/from16 v0, v$checkCastRegister
+                        move-object/from16 v1, v$arrayListRegister
+                        invoke-static {v0, v1}, $FEED_OVERFLOW_MENU_BUTTON_CLASS->addFeedOverflowButton(Ljava/lang/Object;Ljava/util/ArrayList;)V
+                        move-object/from16 v0, v$tempReg1
+                        move-object/from16 v1, v$tempReg2
                         """.trimIndent(),
                     )
                 }

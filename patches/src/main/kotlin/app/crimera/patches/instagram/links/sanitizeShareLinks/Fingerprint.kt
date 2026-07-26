@@ -21,7 +21,7 @@ internal object PermalinkResponseJsonParserFingerprint : Fingerprint(
         methodDef.name.lowercase().contains("parsefromjson") &&
             (methodDef.implementation
                 ?.instructions
-                ?.count { it.opcode == Opcode.CONST_STRING || it.opcode == Opcode.CONST_STRING_JUMBO } ?: 0) < 3
+                ?.count { it.opcode == Opcode.CONST_STRING || it.opcode == Opcode.CONST_STRING_JUMBO } ?: 0) < 10
     },
 )
 
