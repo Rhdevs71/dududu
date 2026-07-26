@@ -1,3 +1,10 @@
+## [3.8.17](https://github.com/Rhdevs71/dududu/compare/v3.8.16...v3.8.17) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** handle out-of-order uninitialized register loading in UserProfileActionBarButtonPatch ([76533de](https://github.com/Rhdevs71/dududu/commit/76533de7d80678c556304cdb799e2a80ee9bd46e))
+* **instagram:** resolve Unresolved reference 'location' compilation error in UserProfileActionBarButtonPatch ([397a886](https://github.com/Rhdevs71/dududu/commit/397a8866a14b09c7f13045c3e187ca8f2b8b7663))
+
 ## [3.8.16](https://github.com/Rhdevs71/dududu/compare/v3.8.15...v3.8.16) (2026-07-26)
 
 ### 🐛 Bug Fixes

@@ -72,7 +72,7 @@ To patch with Twitter/X version 11.88 and above, you must include patches from a
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v3.8.16](https://github.com/Rhdevs71/dududu/releases/tag/v3.8.16)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;129 patches total
+> **[v3.8.17](https://github.com/Rhdevs71/dududu/releases/tag/v3.8.17)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;129 patches total
 <details>
 <summary>📦 X&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>

@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-26T12:48:19",
-  "description": "## [3.8.16](https://github.com/Rhdevs71/dududu/compare/v3.8.15...v3.8.16) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve VerifyError in X.08PF (RemoveEmptyBottomSpace) caused by polluted register types ([083487a](https://github.com/Rhdevs71/dududu/commit/083487a811df663b6f6a7900a1aa1138e401d908))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.16/patches-3.8.16.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.16/patches-3.8.16.mpp.asc",
-  "version": "3.8.16"
+  "created_at": "2026-07-26T13:10:32",
+  "description": "## [3.8.17](https://github.com/Rhdevs71/dududu/compare/v3.8.16...v3.8.17) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** handle out-of-order uninitialized register loading in UserProfileActionBarButtonPatch ([76533de](https://github.com/Rhdevs71/dududu/commit/76533de7d80678c556304cdb799e2a80ee9bd46e))\n* **instagram:** resolve Unresolved reference 'location' compilation error in UserProfileActionBarButtonPatch ([397a886](https://github.com/Rhdevs71/dududu/commit/397a8866a14b09c7f13045c3e187ca8f2b8b7663))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.17/patches-3.8.17.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.17/patches-3.8.17.mpp.asc",
+  "version": "3.8.17"
 }
