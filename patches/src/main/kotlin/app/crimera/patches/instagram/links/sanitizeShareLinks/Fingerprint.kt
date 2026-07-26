@@ -34,10 +34,10 @@ internal object ProfileUrlResponseJsonParserFingerprint : Fingerprint(
 
 internal object StoryUrlResponseImplFingerprint : Fingerprint(
     returnType = "Ljava/lang/String;",
-    definingClass = "Lcom/instagram/request/StoryItemUrlResponseImpl;",
+    definingClass = "Lcom/instagram/api/schemas/StoryItemThirdPartySharingUrlResponseImpl;",
 )
 
 internal object LiveUrlResponseImplFingerprint : Fingerprint(
     returnType = "Ljava/lang/String;",
-    definingClass = "Lcom/instagram/request/LiveItemLinkUrlResponseImpl;",
+    definingClass = "Lcom/instagram/api/schemas/LiveThirdPartySharingUrlResponseImpl;",
 )
