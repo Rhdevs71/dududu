@@ -1,3 +1,9 @@
+## [3.8.8](https://github.com/Rhdevs71/dududu/compare/v3.8.7...v3.8.8) (2026-07-26)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve MusicAudioTypeEnumStringFingerprint crash on v439 ([85b4c90](https://github.com/Rhdevs71/dududu/commit/85b4c90c8b95df7a8ff0dfb0e07288b129a9b5fb))
+
 ## [3.8.7](https://github.com/Rhdevs71/dududu/compare/v3.8.6...v3.8.7) (2026-07-26)
 
 ### 🐛 Bug Fixes
