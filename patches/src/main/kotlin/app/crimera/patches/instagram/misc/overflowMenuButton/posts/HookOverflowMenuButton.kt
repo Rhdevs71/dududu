@@ -76,13 +76,13 @@ val hookOverflowMenuButton =
                     addInstructions(
                         checkCastIndex + 1,
                         """
-                        move-object/from16 v$tempReg1, v0
-                        move-object/from16 v$tempReg2, v1
-                        move-object/from16 v0, v$checkCastRegister
-                        move-object/from16 v1, v$arrayListRegister
+                        move-object/16 v$tempReg1, v0
+                        move-object/16 v$tempReg2, v1
+                        move-object/16 v0, v$checkCastRegister
+                        move-object/16 v1, v$arrayListRegister
                         invoke-static {v0, v1}, $FEED_OVERFLOW_MENU_BUTTON_CLASS->addFeedOverflowButton(Ljava/lang/Object;Ljava/util/ArrayList;)V
-                        move-object/from16 v0, v$tempReg1
-                        move-object/from16 v1, v$tempReg2
+                        move-object/16 v0, v$tempReg1
+                        move-object/16 v1, v$tempReg2
                         """.trimIndent(),
                     )
                 }
