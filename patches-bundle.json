@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-07-26T20:17:05",
-  "description": "## [3.8.19](https://github.com/Rhdevs71/dududu/compare/v3.8.18...v3.8.19) (2026-07-26)\n\n### 🐛 Bug Fixes\n\n* **instagram:** handle LiveTreeMediaDict object safely in MediaData entity across all getters ([3a4eeac](https://github.com/Rhdevs71/dududu/commit/3a4eeacc857febb0dd854b7e87f0fd4f7c5b946a))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.19/patches-3.8.19.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.19/patches-3.8.19.mpp.asc",
-  "version": "3.8.19"
+  "created_at": "2026-07-31T18:13:30",
+  "description": "## [3.8.20](https://github.com/Rhdevs71/dududu/compare/v3.8.19...v3.8.20) (2026-07-31)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve compilation errors in AddCommentButtonAttributesPatch ([f62cc1f](https://github.com/Rhdevs71/dududu/commit/f62cc1f7ec16272e91efe55f47735fc7c02ea3b3))\n* **instagram:** resolve register allocation exception in AddCommentButtonAttributesPatch ([e204d96](https://github.com/Rhdevs71/dududu/commit/e204d96124a723463279a41655c51eb6956f1661))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.20/patches-3.8.20.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v3.8.20/patches-3.8.20.mpp.asc",
+  "version": "3.8.20"
 }

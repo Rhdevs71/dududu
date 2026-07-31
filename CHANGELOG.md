@@ -1,3 +1,10 @@
+## [3.8.20](https://github.com/Rhdevs71/dududu/compare/v3.8.19...v3.8.20) (2026-07-31)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve compilation errors in AddCommentButtonAttributesPatch ([f62cc1f](https://github.com/Rhdevs71/dududu/commit/f62cc1f7ec16272e91efe55f47735fc7c02ea3b3))
+* **instagram:** resolve register allocation exception in AddCommentButtonAttributesPatch ([e204d96](https://github.com/Rhdevs71/dududu/commit/e204d96124a723463279a41655c51eb6956f1661))
+
 ## [3.8.19](https://github.com/Rhdevs71/dududu/compare/v3.8.18...v3.8.19) (2026-07-26)
 
 ### 🐛 Bug Fixes
