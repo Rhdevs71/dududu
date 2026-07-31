@@ -95,13 +95,13 @@ fun addButtonAttribute(
         try {
             allocateRegisters()
         } catch (e: Exception) {
-            val m = patchContext.method
             try {
-                val getImpl = m.javaClass.methods.find { it.name == "getImplementation" }
+                val m = this
+                val getImpl = m::class.java.methods.find { it.name == "getImplementation" }
                 val impl = getImpl?.invoke(m)
                 if (impl != null) {
-                    val getRegs = impl.javaClass.methods.find { it.name == "getRegisterCount" }
-                    val setRegs = impl.javaClass.methods.find { it.name == "setRegisterCount" }
+                    val getRegs = impl::class.java.methods.find { it.name == "getRegisterCount" }
+                    val setRegs = impl::class.java.methods.find { it.name == "setRegisterCount" }
                     if (getRegs != null && setRegs != null) {
                         val current = getRegs.invoke(impl) as Int
                         setRegs.invoke(impl, current + 5)
