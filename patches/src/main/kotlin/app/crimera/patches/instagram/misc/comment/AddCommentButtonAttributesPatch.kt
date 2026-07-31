@@ -78,11 +78,40 @@ fun addButtonAttribute(
         val buttonInvokeRelatedClass = bundleParameters[3]
         val buttonInvokeRelatedRegister = bundleRegisters[4]
 
-        val b0 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1)
-        val b1 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0)
-        val b2 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0, b1)
-        val b3 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0, b1, b2)
-        val b4 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0, b1, b2, b3)
+        var b0 = -1
+        var b1 = -1
+        var b2 = -1
+        var b3 = -1
+        var b4 = -1
+
+        fun allocateRegisters() {
+            b0 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1)
+            b1 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0)
+            b2 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0, b1)
+            b3 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0, b1, b2)
+            b4 = findFreeRegister(existingButtonSGetObjectInstruction.location.index + 1, b0, b1, b2, b3)
+        }
+
+        try {
+            allocateRegisters()
+        } catch (e: Exception) {
+            val m = patchContext.method
+            try {
+                val getImpl = m.javaClass.methods.find { it.name == "getImplementation" }
+                val impl = getImpl?.invoke(m)
+                if (impl != null) {
+                    val getRegs = impl.javaClass.methods.find { it.name == "getRegisterCount" }
+                    val setRegs = impl.javaClass.methods.find { it.name == "setRegisterCount" }
+                    if (getRegs != null && setRegs != null) {
+                        val current = getRegs.invoke(impl) as Int
+                        setRegs.invoke(impl, current + 5)
+                    }
+                }
+            } catch (ex: Exception) {
+                // Ignore reflection errors and let the second attempt throw
+            }
+            allocateRegisters()
+        }
 
         addInstructionsWithLabels(
             existingButtonSGetObjectInstruction.location.index + 1,
