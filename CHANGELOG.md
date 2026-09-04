@@ -1,3 +1,9 @@
+## [1.0.2](https://github.com/Rhdevs71/dududu/compare/v1.0.1...v1.0.2) (2026-09-04)
+
+### 🐛 Bug Fixes
+
+* **instagram:** update developerOptions entity and fingerprint for Instagram v444 ([1524f17](https://github.com/Rhdevs71/dududu/commit/1524f1767490cfd00d1e9702dcf65605228fbf0b))
+
 ## [1.0.1](https://github.com/Rhdevs71/dududu/compare/v1.0.0...v1.0.1) (2026-09-04)
 
 ### 🐛 Bug Fixes
