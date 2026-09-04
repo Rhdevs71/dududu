@@ -51,18 +51,7 @@ jobs:
             echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
           else
             echo "Generating automated GPG key for signing..."
-            cat <<EOF > /tmp/gpg_batch
-            %no-protection
-            Key-Type: RSA
-            Key-Length: 4096
-            Subkey-Type: RSA
-            Subkey-Length: 4096
-            Name-Real: Rhdevs71
-            Name-Email: drahmanhakim71@gmail.com
-            Expire-Date: 0
-            %commit
-            EOF
-            gpg --batch --generate-key /tmp/gpg_batch
+            gpg --batch --passphrase '' --quick-generate-key "Rhdevs71 <drahmanhakim71@gmail.com>" default default never
           fi
           KEY_ID=$(gpg --list-secret-keys --keyid-format=long | awk '/sec/{split($2,a,"/"); print a[2]; exit}')
           git config --global user.signingkey "$KEY_ID"
