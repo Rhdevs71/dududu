@@ -4,6 +4,18 @@
 
 * **ci:** grant executable permissions to gradlew (chmod +x) ([4fc74cf](https://github.com/Rhdevs71/dududu/commit/4fc74cf48ccfaaa12d43e63bad62ff4750177b05))
 * **ci:** replace heredoc with gpg --quick-generate-key to fix syntax error in bash ([4e2be32](https://github.com/Rhdevs71/dududu/commit/4e2be3243cc13aa8afdfc0e1173e58d31758c303))
+* **ci:** set tag.gpgsign to false to prevent git tag error in semantic-release ([563dd76](https://github.com/Rhdevs71/dududu/commit/563dd762b17b169a1e201f88052f655fb01cbe5d))
+
+### ✨ New Features
+
+* update Instagram support to v444.0.0.46.85 and configure for Rhdevs71/dududu ([d9937b6](https://github.com/Rhdevs71/dududu/commit/d9937b607d26bc4c3b8f7c7c99b5649d2528bee6))
+
+## 1.0.0 (2026-09-04)
+
+### 🐛 Bug Fixes
+
+* **ci:** grant executable permissions to gradlew (chmod +x) ([4fc74cf](https://github.com/Rhdevs71/dududu/commit/4fc74cf48ccfaaa12d43e63bad62ff4750177b05))
+* **ci:** replace heredoc with gpg --quick-generate-key to fix syntax error in bash ([4e2be32](https://github.com/Rhdevs71/dududu/commit/4e2be3243cc13aa8afdfc0e1173e58d31758c303))
 
 ### ✨ New Features
 
