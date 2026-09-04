@@ -9,9 +9,7 @@ package app.crimera.patches.instagram.entity.developerOptions
 import app.crimera.utils.changeFirstString
 import app.crimera.utils.classNameToExtension
 import app.crimera.utils.methodExtractor
-import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.bytecodePatch
-import app.morphe.util.indexOfFirstInstruction
 import com.android.tools.smali.dexlib2.Opcode
 
 val developerOptionsEntity =
@@ -22,15 +20,30 @@ val developerOptionsEntity =
             ExperimentsValueBuilderFingerprint.apply {
                 GetQuickExperimentHelperClassExtension.changeFirstString(classNameToExtension(classDef.type))
 
-                val getAllExperimentsMethodName = classDef.methods.first { it.returnType == "Ljava/util/List;" }.name
-                GetAllExperimentsClassExtension.changeFirstString(getAllExperimentsMethodName)
+                val getAllExperimentsMethod = classDef.methods.first { it.returnType == "Ljava/util/List;" }
+                GetAllExperimentsClassExtension.changeFirstString(getAllExperimentsMethod.name)
+
+                val experimentItemClass =
+                    getAllExperimentsMethod.implementation?.instructions
+                        ?.filter { it.opcode == Opcode.INVOKE_DIRECT }
+                        ?.mapNotNull { runCatching { it.methodExtractor() }.getOrNull() }
+                        ?.firstOrNull { it.name == "<init>" && !it.definingClass.startsWith("java.") }
+                        ?.definingClass
+                if (experimentItemClass != null) {
+                    GetExperimentItemHelperClassExtension.changeFirstString(experimentItemClass)
+                }
             }
 
             ExperimentsGetMobileConfigSpecifier.apply {
-                GetExperimentItemHelperClassExtension.changeFirstString(classNameToExtension(classDef.type))
                 method.apply {
-                    val getUniversalIdInstructionData = getInstruction(indexOfFirstInstruction(Opcode.INVOKE_STATIC)).methodExtractor()
-                    GetUniversalIdHelperClassExtension.changeFirstString(getUniversalIdInstructionData.definingClass)
+                    val getUniversalIdInstructionData =
+                        implementation?.instructions
+                            ?.filter { it.opcode == Opcode.INVOKE_STATIC }
+                            ?.mapNotNull { runCatching { it.methodExtractor() }.getOrNull() }
+                            ?.firstOrNull { !it.definingClass.startsWith("java.") }
+                    if (getUniversalIdInstructionData != null) {
+                        GetUniversalIdHelperClassExtension.changeFirstString(getUniversalIdInstructionData.definingClass)
+                    }
                 }
             }
         }
