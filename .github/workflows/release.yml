@@ -59,7 +59,7 @@ jobs:
           KEY_ID=$(gpg --list-secret-keys --keyid-format=long | awk '/sec/{split($2,a,"/"); print a[2]; exit}')
           git config --global user.signingkey "$KEY_ID"
           git config --global commit.gpgsign true
-          git config --global tag.gpgsign true
+          git config --global tag.gpgsign false
           git config --global user.name "Rhdevs71"
           git config --global user.email "drahmanhakim71@gmail.com"
           echo "GPG key setup completed with Key ID: $KEY_ID"
