@@ -44,15 +44,33 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Import GPG key
-        if: env.GPG_PRIVATE_KEY != ''
-        uses: crazy-max/ghaction-import-gpg@v7
-        with:
-          gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
-          passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          fingerprint: ${{ vars.GPG_FINGERPRINT }}
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+      - name: Setup GPG key
+        run: |
+          if [ -n "${{ secrets.GPG_PRIVATE_KEY }}" ]; then
+            echo "Importing existing GPG key from secrets..."
+            echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          else
+            echo "Generating automated GPG key for signing..."
+            cat <<EOF > /tmp/gpg_batch
+            %no-protection
+            Key-Type: RSA
+            Key-Length: 4096
+            Subkey-Type: RSA
+            Subkey-Length: 4096
+            Name-Real: Rhdevs71
+            Name-Email: drahmanhakim71@gmail.com
+            Expire-Date: 0
+            %commit
+            EOF
+            gpg --batch --generate-key /tmp/gpg_batch
+          fi
+          KEY_ID=$(gpg --list-secret-keys --keyid-format=long | awk '/sec/{split($2,a,"/"); print a[2]; exit}')
+          git config --global user.signingkey "$KEY_ID"
+          git config --global commit.gpgsign true
+          git config --global tag.gpgsign true
+          git config --global user.name "Rhdevs71"
+          git config --global user.email "drahmanhakim71@gmail.com"
+          echo "GPG key setup completed with Key ID: $KEY_ID"
 
       - name: Release
         uses: cycjimmy/semantic-release-action@v5
