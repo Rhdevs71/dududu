@@ -8,11 +8,7 @@ package app.crimera.patches.instagram.entity.profileinfo
 
 import app.crimera.patches.instagram.utils.Constants.USER_DETAIL_VIEW_MODEL_CLASS
 import app.crimera.utils.changeFirstString
-import app.crimera.utils.fieldExtractor
-import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.bytecodePatch
-import app.morphe.util.indexOfFirstInstruction
-import com.android.tools.smali.dexlib2.Opcode
 
 @Suppress("unused")
 val profileInfoEntity =
@@ -35,17 +31,6 @@ val profileInfoEntity =
                             .name
                     GetUserDetailViewModelExtensionFingerprint.changeFirstString(userDetailViewModelFieldName)
 
-                    GetUsernameFromUserDetailViewModelFingerprint.apply {
-                        val strIndex = stringMatches.first().index
-                        method.apply {
-                            val userObjectFieldName =
-                                getInstruction(
-                                    indexOfFirstInstruction(strIndex, Opcode.IGET_OBJECT),
-                                ).fieldExtractor().name
-                            GetUserDataExtensionFingerprint.changeFirstString(userObjectFieldName)
-                        }
-                    }
-
                     val isSelfProfileFieldName =
                         profileRelatedDetailsClass.fields
                             .last { it.type == "Z" }
@@ -53,5 +38,13 @@ val profileInfoEntity =
                     IsSelfProfileExtensionFingerprint.changeFirstString(isSelfProfileFieldName)
                 }
             }
+
+            val userDetailViewModelClass = mutableClassDefBy(USER_DETAIL_VIEW_MODEL_CLASS)
+            val userObjectFieldName =
+                userDetailViewModelClass.fields
+                    .firstOrNull { it.type.endsWith("/User;") }
+                    ?.name
+                    ?: userDetailViewModelClass.fields.first { it.type.contains("User") }.name
+            GetUserDataExtensionFingerprint.changeFirstString(userObjectFieldName)
         }
     }
