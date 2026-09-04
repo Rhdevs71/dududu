@@ -1,3 +1,9 @@
+## [1.0.1](https://github.com/Rhdevs71/dududu/compare/v1.0.0...v1.0.1) (2026-09-04)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve User field directly from UserDetailViewModel in ProfileInfoEntity ([ca44966](https://github.com/Rhdevs71/dududu/commit/ca44966571bf01a14f2f00a07aa0cfcfbb205d76))
+
 ## 1.0.0 (2026-09-04)
 
 ### 🐛 Bug Fixes
