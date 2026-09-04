@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "3.9.0",
+  "version": "1.0.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -56,6 +56,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -86,6 +95,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -233,6 +251,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -277,6 +304,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -348,6 +384,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -431,6 +476,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -580,6 +634,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -668,6 +731,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -697,6 +769,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1035,6 +1116,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1066,6 +1156,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1096,6 +1195,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1185,6 +1293,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1215,6 +1332,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1250,6 +1376,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1280,6 +1415,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1312,6 +1456,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1343,6 +1496,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1372,6 +1534,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1404,6 +1575,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1434,6 +1614,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1463,6 +1652,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1497,6 +1695,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1526,6 +1733,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1568,6 +1784,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1627,6 +1852,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1827,6 +2061,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -1858,6 +2101,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -1919,6 +2171,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -2287,6 +2548,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -2374,6 +2644,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -2404,6 +2683,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -2550,6 +2838,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -2581,6 +2878,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -2610,6 +2916,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -2700,6 +3015,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -2759,6 +3083,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -2817,6 +3150,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -2849,6 +3191,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -2878,6 +3229,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -2945,6 +3305,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -2976,6 +3345,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -3133,6 +3511,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -3193,6 +3580,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -3252,6 +3648,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -3281,6 +3686,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -3426,6 +3840,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -3458,6 +3881,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -3494,6 +3926,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -3699,6 +4140,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -3763,6 +4213,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -3803,6 +4262,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -3834,6 +4302,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -3867,6 +4344,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -3896,6 +4382,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -3928,6 +4423,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -3962,6 +4466,15 @@
           "signatures": null,
           "targets": [
             {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
@@ -3994,6 +4507,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
@@ -4029,6 +4551,15 @@
           "appIconColor": "#FC483C",
           "signatures": null,
           "targets": [
+            {
+              "version": "444.0.0.46.85",
+              "versionCodes": {
+                "ARM64_V8A": 385010800
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
             {
               "version": "439.0.0.37.89",
               "versionCodes": {
