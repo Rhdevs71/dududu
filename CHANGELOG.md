@@ -1,3 +1,9 @@
+## [1.0.8](https://github.com/Rhdevs71/dududu/compare/v1.0.7...v1.0.8) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** handle non-consecutive legacy radio items and multiple id reads in Theme patch ([da88ad3](https://github.com/Rhdevs71/dududu/commit/da88ad3a0e68393cba22ad8474a67ddf89f5260d))
+
 ## [1.0.7](https://github.com/Rhdevs71/dududu/compare/v1.0.6...v1.0.7) (2026-09-05)
 
 ### 🐛 Bug Fixes
