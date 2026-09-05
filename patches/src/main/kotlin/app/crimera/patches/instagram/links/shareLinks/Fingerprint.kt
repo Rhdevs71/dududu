@@ -10,8 +10,8 @@ import app.morphe.patcher.Fingerprint
 
 internal val TARGET_STRING_ARRAY =
     arrayOf(
-        "XDTPermalinkResponse",
-        "profile_to_share_url",
+        "PermalinkResponseImpl",
+        "ProfileThirdPartySharingUrlResponseImpl",
     )
 
 private const val HIGHLIGHT_SHARE_ENDPOINT_STRING =

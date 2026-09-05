@@ -57,7 +57,7 @@ internal fun hookShareLinks(
     ).forEach { fingerprint ->
         fingerprint.method.apply {
             val iPutObjectIndex =
-                indexOfFirstInstructionOrThrow(fingerprint.stringMatches[0].index, Opcode.IPUT_OBJECT)
+                indexOfFirstInstructionOrThrow(Opcode.IPUT_OBJECT)
 
             addInstructions(iPutObjectIndex, hook(instructions[iPutObjectIndex].registersUsed[0]))
         }
