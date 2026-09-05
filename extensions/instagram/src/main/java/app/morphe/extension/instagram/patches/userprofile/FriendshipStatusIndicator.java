@@ -112,21 +112,22 @@ public class FriendshipStatusIndicator {
             int indicatorColor = indicatorColorHex == null
                     ? primaryTextColor
                     : Color.parseColor(indicatorColorHex);
-            Drawable statusIcon = ResourceUtils
-                    .getDrawable(indicatorIconDrawable)
-                    .mutate();
-            statusIcon.setColorFilter(
-                    new PorterDuffColorFilter(indicatorColor, PorterDuff.Mode.SRC_ATOP)
-            );
-            statusIcon.setBounds(0, 0, indicatorTextSizePx, indicatorTextSizePx);
+            Drawable rawIcon = ResourceUtils.getDrawable(indicatorIconDrawable);
+            if (rawIcon != null) {
+                Drawable statusIcon = rawIcon.mutate();
+                statusIcon.setColorFilter(
+                        new PorterDuffColorFilter(indicatorColor, PorterDuff.Mode.SRC_ATOP)
+                );
+                statusIcon.setBounds(0, 0, indicatorTextSizePx, indicatorTextSizePx);
 
-            friendshipStatusTextView.setCompoundDrawablePadding(Dim.dp4);
-            friendshipStatusTextView.setCompoundDrawablesRelative(
-                    statusIcon,
-                    null,
-                    null,
-                    null
-            );
+                friendshipStatusTextView.setCompoundDrawablePadding(Dim.dp4);
+                friendshipStatusTextView.setCompoundDrawablesRelative(
+                        statusIcon,
+                        null,
+                        null,
+                        null
+                );
+            }
             GradientDrawable background = new GradientDrawable();
             background.setColor(Color.TRANSPARENT);
             background.setStroke(
@@ -185,7 +186,7 @@ public class FriendshipStatusIndicator {
                 Boolean following = userFriendshipStatus.getFollowingStatus();
 
                 Entity entity = new Entity(badgeObject);
-                TextView badgeView = (TextView) entity.getMethod("getView");
+                View badgeView = (View) entity.getMethod("getView");
 
                 String indicatorText;
                 String indicatorIconDrawable;
@@ -193,15 +194,15 @@ public class FriendshipStatusIndicator {
                 boolean useStatusColor = Pref.followBackColorIndicator();
                 if (followed_by && following) {
                     indicatorText = str("piko_fbi_following_each_other");
-                    indicatorIconDrawable = "fb_ic_friend_confirm_outline_20";
+                    indicatorIconDrawable = "fb_ic_friend_confirm_20";
                     indicatorColorHex = useStatusColor ? "#3389DF" : null;
                 } else if (followed_by) {
                     indicatorText = str("piko_fbi_follows_you");
-                    indicatorIconDrawable = "fb_ic_friend_add_outline_20";
+                    indicatorIconDrawable = "fb_ic_friend_add_20";
                     indicatorColorHex = useStatusColor ? "#3CC176" : null;
                 } else {
                     indicatorText = str("piko_fbi_doesnt_follows_you");
-                    indicatorIconDrawable = "fb_ic_friend_remove_outline_20";
+                    indicatorIconDrawable = "fb_ic_friend_remove_20";
                     indicatorColorHex = useStatusColor ? "#EB4941" : null;
                 }
 
