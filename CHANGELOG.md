@@ -1,3 +1,11 @@
+## [1.0.15](https://github.com/Rhdevs71/dududu/compare/v1.0.14...v1.0.15) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** add missing PikoUtils import in ButtonPref ([38b8fa6](https://github.com/Rhdevs71/dududu/commit/38b8fa695544314596230044a380b91b4b7bbbda))
+* **instagram:** fix variable references in DownloadUtils and ButtonPref ([226d425](https://github.com/Rhdevs71/dududu/commit/226d425f39d077697c28c2f4ec93b5d375ad5f93))
+* **instagram:** route all feature errors, toasts, and crashes to unified debug log ([4ea2a49](https://github.com/Rhdevs71/dududu/commit/4ea2a491e606177af8e9bcca3fa1bfb76a89c7b1))
+
 ## [1.0.14](https://github.com/Rhdevs71/dududu/compare/v1.0.13...v1.0.14) (2026-09-05)
 
 ### 🐛 Bug Fixes
