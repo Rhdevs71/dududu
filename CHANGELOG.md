@@ -1,3 +1,9 @@
+## [1.0.14](https://github.com/Rhdevs71/dududu/compare/v1.0.13...v1.0.14) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve downloadPost reflection error and add unified debug file logger ([e251308](https://github.com/Rhdevs71/dududu/commit/e251308869b10f766cb7b0fc189fd6e484f5b698))
+
 ## [1.0.13](https://github.com/Rhdevs71/dududu/compare/v1.0.12...v1.0.13) (2026-09-05)
 
 ### 🐛 Bug Fixes
