@@ -50,7 +50,7 @@ public class InstaUtils {
             }
             return file.delete();
         } catch (RuntimeException e) {
-            PikoUtils.logger(e);
+            PikoLog.e("InstaUtils", "deleteRecursive failed", e);
         }
         return false;
     }
@@ -124,7 +124,7 @@ public class InstaUtils {
                 });
 
             } catch (Exception e) {
-                PikoUtils.logger(e);
+                PikoLog.e("InstaUtils", "downloadToFileAsync failed", e);
                 PikoUtils.toast(str("piko_download_failed_media") + outputFile.getName());
             }
         });

@@ -32,6 +32,7 @@ public class CustomCrashHandler implements Thread.UncaughtExceptionHandler {
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {
         String stackTrace = Log.getStackTraceString(throwable);
+        PikoUtils.logger("UNCAUGHT_CRASH", "Thread: " + (thread != null ? thread.getName() : "unknown"), throwable);
         saveCrashToFile(stackTrace);
 
         // Pass to original handler to handle OS-level crash cleanup

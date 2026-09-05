@@ -14,6 +14,7 @@ import java.util.Set;
 import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.instagram.entity.DeveloperOptions;
 import app.morphe.extension.instagram.entity.DeveloperOptionsItem;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.instagram.utils.Pref;
 import app.morphe.extension.instagram.settings.SettingsStatus;
 
@@ -102,7 +103,7 @@ public class HookFlags {
             String configId = developerOptionsItem.getConfigId();
             return BOOL_FLAGS.getOrDefault(configId, null);
         } catch (Exception e) {
-            PikoUtils.logger(e);
+            PikoLog.e("HookFlags", e);
         }
         return null;
     }

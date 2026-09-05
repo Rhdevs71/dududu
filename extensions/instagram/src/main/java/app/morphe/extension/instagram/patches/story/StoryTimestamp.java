@@ -12,6 +12,7 @@ import java.util.Locale;
 
 import app.morphe.extension.instagram.utils.Pref;
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 public class StoryTimestamp {
     private static String CUSTOMISE_STORY_TIMESTAMP;
@@ -57,7 +58,7 @@ public class StoryTimestamp {
             }
 
         } catch (Exception e) {
-            Logger.printException(() -> "customiseStoryTimestamp failure", e);
+            PikoLog.e("StoryTimestamp", "customiseStoryTimestamp failure", e);
         }
 
         return formatedTS;

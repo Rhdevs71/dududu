@@ -17,6 +17,7 @@ import java.lang.ref.WeakReference;
 
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.instagram.settings.ActivityHook;
 import app.morphe.extension.instagram.constants.Constants;
 import app.morphe.extension.instagram.settings.preference.fragments.FragmentHook;
@@ -94,8 +95,8 @@ public class ButtonPref extends Preference {
                         );
                     }
                 } catch (Exception e) {
+                    PikoLog.e("ButtonPref", "Preference button onclick failure: " + key, e);
                     Utils.showToastShort(e.getMessage());
-                    Logger.printException(() -> "Preference button onclick failure", e);
                 }
                 return true;
             }

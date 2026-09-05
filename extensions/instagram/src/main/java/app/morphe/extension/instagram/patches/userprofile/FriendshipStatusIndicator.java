@@ -37,6 +37,7 @@ import app.morphe.extension.instagram.entity.Entity;
 import app.morphe.extension.instagram.entity.ProfileInfo;
 import app.morphe.extension.instagram.entity.InstagramDialogBox;
 import app.morphe.extension.instagram.constants.UI;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.ResourceUtils;
@@ -235,7 +236,7 @@ public class FriendshipStatusIndicator {
                 );
 
             } catch (Exception ex) {
-                Logger.printException(() -> "Failed follow back indicator: " + ex.getMessage(), ex);
+                PikoLog.e("FriendshipStatusIndicator", "Failed follow back indicator", ex);
             }
         }
     }

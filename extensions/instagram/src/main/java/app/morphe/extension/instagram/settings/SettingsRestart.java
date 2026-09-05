@@ -18,6 +18,7 @@ import java.util.Objects;
 
 import app.morphe.extension.crimera.sharedPreference.SharedPref;
 import app.morphe.extension.instagram.patches.devFlags.FlagsSharedPref;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.shared.Utils;
 
 public final class SettingsRestart {
@@ -49,7 +50,7 @@ public final class SettingsRestart {
                     () -> Process.killProcess(Process.myPid())
             );
         } catch (RuntimeException exception) {
-            Log.e(TAG, "Failed to prepare the process restart; keeping it pending", exception);
+            PikoLog.e(TAG, "Failed to prepare the process restart; keeping it pending", exception);
         }
     }
 
@@ -78,7 +79,7 @@ public final class SettingsRestart {
             }
         } catch (RuntimeException exception) {
             taskServiceStartFailed();
-            Log.e(TAG, "Failed to start the task service; the next setting change can retry", exception);
+            PikoLog.e(TAG, "Failed to start the task service; the next setting change can retry", exception);
         }
     }
 

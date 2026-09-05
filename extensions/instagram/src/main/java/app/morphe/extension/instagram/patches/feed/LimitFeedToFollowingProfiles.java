@@ -12,6 +12,8 @@ import java.util.Map;
 import app.morphe.extension.instagram.settings.SettingsStatus;
 import app.morphe.extension.instagram.utils.Pref;
 
+import app.morphe.extension.instagram.utils.PikoLog;
+
 @SuppressWarnings("unused")
 public final class LimitFeedToFollowingProfiles {
     private static final boolean LIMIT_FOLLOWING_FEED;
@@ -24,19 +26,24 @@ public final class LimitFeedToFollowingProfiles {
      * Injection point.
      */
     public static Map<String, String> setFollowingHeader(Map<String, String> requestHeaderMap) {
-        if (!LIMIT_FOLLOWING_FEED) return requestHeaderMap;
+        try {
+            if (!LIMIT_FOLLOWING_FEED || requestHeaderMap == null) return requestHeaderMap;
 
-        String paginationHeaderName = "pagination_source";
+            String paginationHeaderName = "pagination_source";
 
-        // Patch the header only if it's trying to fetch the default feed
-        String currentHeader = requestHeaderMap.get(paginationHeaderName);
-        if (currentHeader != null && !currentHeader.equals("feed_recs")) {
+            // Patch the header only if it's trying to fetch the default feed
+            String currentHeader = requestHeaderMap.get(paginationHeaderName);
+            if (currentHeader != null && !currentHeader.equals("feed_recs")) {
+                return requestHeaderMap;
+            }
+
+            // Create new map as original is unmodifiable.
+            Map<String, String> patchedRequestHeaderMap = new HashMap<>(requestHeaderMap);
+            patchedRequestHeaderMap.put(paginationHeaderName, "following");
+            return patchedRequestHeaderMap;
+        } catch (Exception e) {
+            PikoLog.e("LimitFeedToFollowingProfiles", e);
             return requestHeaderMap;
         }
-
-        // Create new map as original is unmodifiable.
-        Map<String, String> patchedRequestHeaderMap = new HashMap<>(requestHeaderMap);
-        patchedRequestHeaderMap.put(paginationHeaderName, "following");
-        return patchedRequestHeaderMap;
     }
 }

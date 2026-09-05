@@ -19,6 +19,8 @@ import app.morphe.extension.instagram.constants.Constants;
 
 import app.morphe.extension.crimera.ObjectBrowser;
 import app.morphe.extension.crimera.downloader.MediaType;
+import app.morphe.extension.crimera.PikoUtils;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 public class MessageUtils {
     private static boolean DEBUG;
@@ -49,11 +51,11 @@ public class MessageUtils {
                 return false;
 
             } else {
-                Utils.showToastShort(messageType+" doesnt support downloading");
+                PikoUtils.toast(messageType + " doesnt support downloading");
             }
 
         } catch (Exception e) {
-            app.morphe.extension.crimera.PikoUtils.logger(e);
+            PikoLog.e("MessageUtils", e);
         }
         return false;
     }

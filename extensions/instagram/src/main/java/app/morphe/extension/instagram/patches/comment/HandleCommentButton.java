@@ -26,6 +26,7 @@ import app.morphe.extension.instagram.entity.UserData;
 import app.morphe.extension.instagram.utils.Pref;
 import app.morphe.extension.instagram.constants.Constants;
 import app.morphe.extension.instagram.patches.download.DownloadUtils;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.instagram.patches.comment.copyTextButton.CopyTextButton;
 import app.morphe.extension.instagram.patches.comment.debugButton.DebugButton;
 import app.morphe.extension.instagram.patches.comment.saveMediaButton.SaveMediaButton;
@@ -48,7 +49,7 @@ public class HandleCommentButton {
                 list.add(SaveMediaButton.A00);
             }
         } catch (Exception e) {
-            PikoUtils.logger(e);
+            PikoLog.e("Comment", "Failed to add comment buttons", e);
         }
     }
 
@@ -102,7 +103,7 @@ public class HandleCommentButton {
             }
 
         } catch (Exception e) {
-            PikoUtils.logger(e);
+            PikoLog.e("Comment", "Error on comment button click", e);
             PikoUtils.toast(e.getMessage());
             // If exception happens, we need not check Instagram's button.
             return true;

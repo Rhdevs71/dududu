@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.preference.PreferenceFragment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
 import org.json.JSONObject;
@@ -31,6 +32,7 @@ public class PikoSharedPrefCategory {
     }
 
     private void removeConflictingPreferenceKeyValue(@NonNull String key) {
+        PikoUtils.logger("PikoSharedPrefCategory", "Found conflicting preference: " + key);
         Logger.printException(() -> "Found conflicting preference: " + key);
         removeKey(key);
     }
@@ -71,7 +73,8 @@ public class PikoSharedPrefCategory {
             preferences.edit().clear().commit();
             return true;
         }catch(Exception e){
-            Utils.showToastShort(e.toString());
+            PikoUtils.logger("PikoSharedPrefCategory", "clearAll failed", e);
+            PikoUtils.toast(e.toString());
             return false;
         }
     }

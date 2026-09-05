@@ -144,6 +144,7 @@ public class PikoUtils {
     }
 
     public static void toast(String msg) {
+        logToFile("TOAST", msg);
         app.morphe.extension.shared.Utils.showToastShort(msg);
     }
 
@@ -158,6 +159,22 @@ public class PikoUtils {
             Log.e(logName, "[" + tag + "] StackTrace: ", (Throwable) e);
         }
         logToFile(tag, e);
+    }
+
+    public static void logger(String tag, String msg, Throwable t) {
+        String logName = "piko";
+        Log.e(logName, "[" + tag + "] " + msg, t);
+        if (t != null) {
+            try {
+                java.io.StringWriter sw = new java.io.StringWriter();
+                t.printStackTrace(new java.io.PrintWriter(sw));
+                logToFile(tag, (msg != null ? msg + "\n" : "") + "Exception: " + t.getClass().getName() + ": " + t.getMessage() + "\nStack trace:\n" + sw.toString());
+            } catch (Exception ex) {
+                logToFile(tag, (msg != null ? msg + ": " : "") + t);
+            }
+        } else {
+            logToFile(tag, msg);
+        }
     }
 
     public static synchronized void logToFile(String tag, Object e) {

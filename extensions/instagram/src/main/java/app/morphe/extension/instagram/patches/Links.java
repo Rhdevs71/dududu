@@ -23,6 +23,7 @@ import app.morphe.extension.instagram.utils.Pref;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.ShareLinkSanitizer;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.instagram.constants.PostType;
 import app.morphe.extension.instagram.constants.Constants;
 import app.morphe.extension.crimera.PikoUtils;
@@ -105,7 +106,7 @@ public class Links {
                 }
             }
         } catch (Exception ex) {
-            Logger.printException(() -> "openExternally failure", ex);
+            PikoLog.e("Links", "openExternally failure", ex);
         }
         return false;
     }
@@ -156,7 +157,7 @@ public class Links {
             }
 
         } catch (Exception ex) {
-            Logger.printException(() -> "intercept URI failed: ", ex);
+            PikoLog.e("Links", "intercept URI failed", ex);
         }
         // Exception is hanndled at call.
         if(shouldBlockUri) {
@@ -168,7 +169,7 @@ public class Links {
         try{
             return SHARE_LINK_SANITIZER.sanitize(url, Pref.sanitizeShareLinks());
         } catch (Exception e) {
-            Logger.printException(() -> "sanitizeUrl failed: ", e);
+            PikoLog.e("Links", "sanitizeUrl failed", e);
         }
         return url;
     }
@@ -189,7 +190,7 @@ public class Links {
 
             return uri.buildUpon().encodedAuthority(domain).build().toString();
         } catch (Exception e) {
-            Logger.printException(() -> "changeDomain failed: ", e);
+            PikoLog.e("Links", "changeDomain failed", e);
         }
         return url;
     }
@@ -233,7 +234,7 @@ public class Links {
                 }
             }
         } catch (Exception e) {
-            Logger.printException(() -> "Handle signature failed: ", e);
+            PikoLog.e("Links", "Handle signature failed", e);
         }
         return false;
     }

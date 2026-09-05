@@ -42,6 +42,7 @@ import app.morphe.extension.instagram.patches.download.DownloadUtils;
 import app.morphe.extension.instagram.settings.ActivityHook;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 import com.instagram.igds.components.button.IgdsButton;
 
@@ -96,7 +97,7 @@ public class ProfilePictureViewer {
                     String subFolder = DownloadUtils.getSubfolderName(username);
                     DownloadUtils.downloadMediaUrl(context, imageUrl, subFolder, filename);
                 } catch (Exception e) {
-                    Logger.printException(() -> "Error downloading profile picture", e);
+                    PikoLog.e("ProfilePictureViewer", "Error downloading profile picture", e);
                     Utils.showToastShort(e.getMessage());
                 }
                 dialog.dismiss();
@@ -120,7 +121,7 @@ public class ProfilePictureViewer {
 
             dialog.show();
         } catch (Exception e) {
-            Logger.printException(() -> "Error at ProfilePictureViewer.show", e);
+            PikoLog.e("ProfilePictureViewer", "Error at ProfilePictureViewer.show", e);
             Utils.showToastShort(e.getMessage());
         }
     }
@@ -225,7 +226,7 @@ public class ProfilePictureViewer {
                 }
                 connection.disconnect();
             } catch (Exception e) {
-                Logger.printException(() -> "Failed to load profile picture", e);
+                PikoLog.e("ProfilePictureViewer", "Failed to load profile picture", e);
             }
             Bitmap result = bitmap;
             mainHandler.post(() -> callback.onLoaded(result));

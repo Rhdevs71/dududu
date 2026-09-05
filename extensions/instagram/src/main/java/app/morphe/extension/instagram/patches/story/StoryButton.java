@@ -17,6 +17,7 @@ import app.morphe.extension.instagram.settings.SettingsStatus;
 import app.morphe.extension.instagram.entity.MediaData;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.instagram.patches.download.DownloadUtils;
 import app.morphe.extension.crimera.ObjectBrowser;
 import app.morphe.extension.instagram.entity.MediaData;
@@ -74,7 +75,7 @@ public class StoryButton {
                 return true;
             }
         } catch (Exception ex) {
-            Logger.printException(() -> "Failed storyButtonAction", ex);
+            PikoLog.e("StoryButton", "Failed storyButtonAction", ex);
         }
         return false;
     }

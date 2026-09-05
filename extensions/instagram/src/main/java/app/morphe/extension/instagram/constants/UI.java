@@ -29,6 +29,7 @@ import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.ResourceType;
 import app.morphe.extension.shared.ResourceUtils;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.shared.ui.Dim;
 import app.morphe.extension.crimera.constants.TooltipHelper;
 import app.morphe.extension.instagram.entity.InstagramButton;
@@ -80,7 +81,7 @@ public class UI {
                 }
             }
         } catch (Exception e) {
-            Logger.printException(() -> "Failed getThemedColour: " + attrName, e);
+            PikoLog.e("UI", "Failed getThemedColour: " + attrName, e);
         }
         return Color.WHITE;
     }
@@ -107,7 +108,7 @@ public class UI {
             ));
 
         } catch (Exception ex) {
-            Logger.printException(() -> "Failed setThemedIcon: ", ex);
+            PikoLog.e("UI", "Failed setThemedIcon: " + drawableAttr, ex);
         }
     }
 
@@ -133,7 +134,7 @@ public class UI {
                         try {
                             action.run();
                         } catch (Exception ex) {
-                            Logger.printException(() -> "addImageViewToViewGroup click failed: ", ex);
+                            PikoLog.e("UI", "addImageViewToViewGroup click failed", ex);
                         }
                     }
                 });
@@ -150,7 +151,7 @@ public class UI {
             viewGroup.addView(imageView, insertIndex);
             return imageView;
         } catch (Exception e) {
-            Logger.printException(() -> "Failed addImageViewToViewGroup: ", e);
+            PikoLog.e("UI", "Failed addImageViewToViewGroup", e);
         }
         return null;
     }
@@ -173,7 +174,7 @@ public class UI {
                 Pref.setFirstTimePiko(false);
             }
         } catch (Exception e) {
-            Logger.printException(() -> "Failed pikoSettingsGear: ", e);
+            PikoLog.e("UI", "Failed pikoSettingsGear", e);
         }
     }
 
@@ -196,7 +197,7 @@ public class UI {
 
                     }
                 } catch (Exception e) {
-                    Logger.printException(() -> "Error at restartDialogBox", e);
+                    PikoLog.e("UI", "Error at restartDialogBox", e);
                     Utils.showToastShort(e.getMessage());
                 }
             }
@@ -230,7 +231,7 @@ public class UI {
                     }
 
                 } catch (Exception e) {
-                    Logger.printException(() -> "Error at welcomeDialogBox", e);
+                    PikoLog.e("UI", "Error at welcomeDialogBox", e);
                     Utils.showToastShort(e.getMessage());
                 }
             }

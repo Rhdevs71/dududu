@@ -25,6 +25,7 @@ import app.morphe.extension.instagram.constants.UI;
 import app.morphe.extension.instagram.constants.Constants;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 public class RestorePrefActivity extends AppCompatActivity {
 
@@ -87,7 +88,7 @@ public class RestorePrefActivity extends AppCompatActivity {
 
         } catch (Exception e) {
             toast(str("piko_import_fail"));
-            Logger.printException(() -> "import failure", e);
+            PikoLog.e("RestorePref", "import failure", e);
         }
     }
 
@@ -110,6 +111,6 @@ public class RestorePrefActivity extends AppCompatActivity {
 
 
     private static void toast(String msg) {
-        Utils.showToastShort(msg);
+        PikoLog.toast("RestorePref", msg);
     }
 }

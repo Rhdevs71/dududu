@@ -30,6 +30,7 @@ import app.morphe.extension.instagram.constants.Constants;
 import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 import com.instagram.common.session.UserSession;
 
@@ -62,7 +63,7 @@ public class ActionBarPatch {
                         String toastStr = ghostModeToggle ? str("piko_ghost_modes_on") : str("piko_ghost_modes_default");
                         Utils.showToastShort(toastStr);
                     } catch (Exception ex) {
-                        Logger.printException(() -> "ghost icon click failed: ", ex);
+                        PikoLog.e("ActionBarPatch", "ghost icon click failed", ex);
                     }
                 }
             });
@@ -87,8 +88,7 @@ public class ActionBarPatch {
             }
 
         } catch (Exception e) {
-            Logger.printException(() -> "mainFeedActionBarButton failure", e);
-            PikoUtils.logger(e);
+            PikoLog.e("ActionBarPatch", "mainFeedActionBarButton failure", e);
         }
     }
 
@@ -117,8 +117,7 @@ public class ActionBarPatch {
 
 
         } catch (Exception e) {
-            Logger.printException(() -> "userProfileActionBarButton: ", e);
-            PikoUtils.logger(e);
+            PikoLog.e("ActionBarPatch", "userProfileActionBarButton failure", e);
         }
     }
 
@@ -145,7 +144,7 @@ public class ActionBarPatch {
             }
 
         } catch (Exception e) {
-            Logger.printException(() -> "chatActionBarButton:", e);
+            PikoLog.e("ActionBarPatch", "chatActionBarButton failure", e);
         }
     }
 
@@ -166,7 +165,7 @@ public class ActionBarPatch {
             }
 
         } catch (Exception e) {
-            Logger.printException(() -> "inboxActionBarButton:", e);
+            PikoLog.e("ActionBarPatch", "inboxActionBarButton failure", e);
         }
     }
 

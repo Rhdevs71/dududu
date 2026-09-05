@@ -14,6 +14,7 @@ import app.morphe.extension.instagram.utils.Pref;
 import app.morphe.extension.instagram.entity.ReelResponseItem;
 import app.morphe.extension.instagram.entity.UserData;
 
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.crimera.PikoUtils;
 
 @SuppressWarnings("unused")
@@ -47,7 +48,7 @@ public class FilterStory {
             if(mediaCount > MAX_STORY_ITEM) return null;
 
         } catch (Exception e) {
-            PikoUtils.logger(e.toString());
+            PikoLog.e("FilterStory", e);
         }
         return itemObject;
     }

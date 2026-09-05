@@ -32,6 +32,7 @@ import app.morphe.extension.instagram.patches.download.DownloadUtils;
 import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.ui.Dim;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 public class DeletedMessagesActivity extends Activity {
 
@@ -265,12 +266,12 @@ public class DeletedMessagesActivity extends Activity {
                             }
                         }
                     } catch (Exception e) {
-                        android.util.Log.e("piko", "showMediaOptions action: " + e);
+                        PikoLog.e("DeletedMessages", "showMediaOptions action failed", e);
                     }
                 })
                 .show();
         } catch (Exception e) {
-            android.util.Log.e("piko", "showMediaOptions: " + e);
+            PikoLog.e("DeletedMessages", "showMediaOptions failed", e);
         }
     }
 

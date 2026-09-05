@@ -10,6 +10,7 @@ package app.morphe.extension.instagram.patches.feed;
 import app.morphe.extension.instagram.entity.Entity;
 import app.morphe.extension.instagram.utils.Pref;
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 public class ChangeLikeAnimationPatch {
     private static String CHANGE_LIKE_ANIMATION;
@@ -38,7 +39,7 @@ public class ChangeLikeAnimationPatch {
             return likeAnimation;
 
         } catch (Exception e) {
-            Logger.printException(() -> "changeLikeAnimation failure", e);
+            PikoLog.e("ChangeLikeAnimation", "changeLikeAnimation failure", e);
         }
         return defaultAnimation;
     }

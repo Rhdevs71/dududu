@@ -18,6 +18,7 @@ import app.morphe.extension.instagram.settings.preference.fragments.BackupPrefAc
 import app.morphe.extension.instagram.settings.preference.fragments.RestorePrefActivity;
 import app.morphe.extension.crimera.downloader.FolderPickerActivity;
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.instagram.constants.Constants;
 
 @SuppressWarnings("deprecation")
@@ -29,8 +30,7 @@ public class ActivityHook {
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         } catch (Exception e) {
-            Logger.printException(() -> "launchActivity failure", e);
-            PikoUtils.logger(e);
+            PikoLog.e("ActivityHook", "launchActivity failure", e);
         }
     }
 

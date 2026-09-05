@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import java.util.Set;
 
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.instagram.entity.ProfileInfo;
 import app.morphe.extension.instagram.utils.Pref;
 import app.morphe.extension.instagram.constants.UI;
@@ -47,7 +48,7 @@ public class UserProfileButton {
                 ProfileMoreOption.addProfileMoreOptionsButton(viewGroup, profileInfo);
             }
         } catch (Exception e) {
-            Logger.printException(() -> "Failed to add piko button: ", e);
+            PikoLog.e("UserProfileButton", "Failed to add piko button", e);
         }
 
     }

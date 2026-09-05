@@ -16,6 +16,7 @@ import app.morphe.extension.shared.Utils;
 import app.morphe.extension.crimera.settings.BooleanSetting;
 import app.morphe.extension.crimera.settings.StringSetting;
 import app.morphe.extension.shared.settings.preference.PikoSharedPrefCategory;
+import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.crimera.constants.ExtensionStrings;
 
 public abstract class BaseSharedPref {
@@ -46,7 +47,8 @@ public abstract class BaseSharedPref {
                 return true;
             }
         } catch (Exception ex) {
-            Utils.showToastShort(ex.toString());
+            PikoUtils.logger("BaseSharedPref", "setBoolean failed", ex);
+            PikoUtils.toast(ex.toString());
         }
         return false;
     }
@@ -58,7 +60,8 @@ public abstract class BaseSharedPref {
                 return true;
             }
         } catch (Exception ex) {
-            Utils.showToastShort(ex.toString());
+            PikoUtils.logger("BaseSharedPref", "setString failed", ex);
+            PikoUtils.toast(ex.toString());
         }
         return false;
     }
@@ -92,7 +95,8 @@ public abstract class BaseSharedPref {
                 return true;
             }
         } catch (Exception ex) {
-            Utils.showToastShort(ex.toString());
+            PikoUtils.logger("BaseSharedPref", "setSet failed", ex);
+            PikoUtils.toast(ex.toString());
         }
         return false;
     }
@@ -104,7 +108,8 @@ public abstract class BaseSharedPref {
                 return true;
             }
         } catch (Exception ex) {
-            Utils.showToastShort(ex.toString());
+            PikoUtils.logger("BaseSharedPref", "clear failed", ex);
+            PikoUtils.toast(ex.toString());
         }
         return false;
     }
@@ -115,7 +120,8 @@ public abstract class BaseSharedPref {
                 return sp.preferences.edit().commit();
             }
         } catch (Exception ex) {
-            Utils.showToastShort(ex.toString());
+            PikoUtils.logger("BaseSharedPref", "flushPreferences failed", ex);
+            PikoUtils.toast(ex.toString());
         }
         return false;
     }
@@ -126,7 +132,8 @@ public abstract class BaseSharedPref {
                 return sp.getAll();
             }
         } catch (Exception ex) {
-            Utils.showToastShort(ex.toString());
+            PikoUtils.logger("BaseSharedPref", "all failed", ex);
+            PikoUtils.toast(ex.toString());
         }
         return null;
     }

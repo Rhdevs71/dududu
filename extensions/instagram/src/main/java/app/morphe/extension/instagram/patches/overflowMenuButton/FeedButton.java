@@ -19,6 +19,7 @@ import java.util.HashMap;
 
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.shared.Utils;
+import app.morphe.extension.instagram.utils.PikoLog;
 import app.morphe.extension.shared.ResourceType;
 import app.morphe.extension.shared.ResourceUtils;
 import app.morphe.extension.crimera.ObjectBrowser;
@@ -142,7 +143,7 @@ public class FeedButton {
                 addButton(MediaOption$Option.PIKO_MORE_POST_OPTION, str("piko_more_options"), buttonAdderObject, buttonlist);
             }
         } catch (Exception e) {
-            Logger.printException(() -> "Error at addReelButton",e);
+            PikoLog.e("FeedButton", "Error at addFeedButton", e);
         }
     }
 
@@ -172,7 +173,7 @@ public class FeedButton {
             }
 
         } catch (Exception e) {
-            Logger.printException(() -> "Error at customButtonOnClick",e);
+            PikoLog.e("FeedButton", "Error at customButtonOnClick", e);
         }
     }
 

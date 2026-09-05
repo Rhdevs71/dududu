@@ -461,23 +461,25 @@ public class ObjectBrowser {
                 if (isVoid) {
                     try {
                         method.invoke(obj);
-                        Utils.showToastShort("Executed: " + methodName + "()");
+                        PikoUtils.toast("Executed: " + methodName + "()");
                     } catch (Exception e) {
-                        Utils.showToastShort("Error: " + e.getMessage());
+                        PikoUtils.logger("ObjectBrowser", "Failed to invoke method " + methodName, e);
+                        PikoUtils.toast("Error: " + e.getMessage());
                     }
                 } else {
                     try {
                         Object result = method.invoke(obj);
                         if (result == null) {
-                            Utils.showToastShort(methodName + "() = null");
+                            PikoUtils.toast(methodName + "() = null");
                         } else if (isPrimitiveOrWrapper(result.getClass())) {
-                            Utils.showToastShort(methodName + "() = " + result);
+                            PikoUtils.toast(methodName + "() = " + result);
                             Utils.setClipboard(String.valueOf(result));
                         } else {
                             browseObject(context, result, methodPath + "()");
                         }
                     } catch (Exception e) {
-                        Utils.showToastShort("Error: " + e.getMessage());
+                        PikoUtils.logger("ObjectBrowser", "Failed to invoke method " + methodName, e);
+                        PikoUtils.toast("Error: " + e.getMessage());
                     }
                 }
             });

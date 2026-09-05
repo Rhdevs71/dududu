@@ -37,6 +37,7 @@ import app.morphe.extension.crimera.downloader.MediaDownloader;
 import app.morphe.extension.crimera.downloader.DownloadRequest;
 import app.morphe.extension.crimera.downloader.MediaType;
 import app.morphe.extension.crimera.PikoUtils;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 import com.instagram.common.session.UserSession;
 
@@ -75,9 +76,8 @@ public class DownloadUtils {
                     String subFolder = getSubfolderName(username);
                     downloadMediaUrl(context,mediaUrl,subFolder,filename);
                 } catch (Exception e) {
-                    PikoUtils.logger(e);
-                    Logger.printException(() -> "Error at buildVariantDialogBox", e);
-                    Utils.showToastShort(e.getMessage());
+                    PikoLog.e("DownloadUtils", "Error at buildVariantDialogBox", e);
+                    PikoUtils.toast(e.getMessage());
                 }
 
             }
@@ -97,12 +97,14 @@ public class DownloadUtils {
         try {
             carouselSize = mediaInfo.getCarouselSize();
         } catch (Exception ignored) {
+            PikoLog.e("DownloadUtils", "getCarouselSize failed", ignored);
         }
 
         MediaData currentMediaData = null;
         try {
             currentMediaData = mediaInfo.getMediaAt(position);
         } catch (Exception ignored) {
+            PikoLog.e("DownloadUtils", "getMediaAt failed for pos " + position, ignored);
         }
         if (currentMediaData == null) {
             currentMediaData = mediaInfo;
@@ -116,18 +118,21 @@ public class DownloadUtils {
                 if (u != null && !u.isEmpty()) username = u;
             }
         } catch (Exception ignored) {
+            PikoLog.e("DownloadUtils", "getUserData failed", ignored);
         }
 
         boolean isCurrentMediaVideo = false;
         try {
             isCurrentMediaVideo = currentMediaData.isVideo();
         } catch (Exception ignored) {
+            PikoLog.e("DownloadUtils", "isVideo check failed", ignored);
         }
 
         boolean currentMediaHasAudio = false;
         try {
             currentMediaHasAudio = currentMediaData.hasAudio();
         } catch (Exception ignored) {
+            PikoLog.e("DownloadUtils", "hasAudio check failed", ignored);
         }
 
         InstagramDialogBox dialog = new InstagramDialogBox(context);
@@ -166,11 +171,11 @@ public class DownloadUtils {
                         downloadMedia(context, mediaInfo, position, MediaType.IMAGE);
 
                     } else if (selectedOption.equals(str("piko_copy_media_link"))) {
-                        Utils.setClipboard(finalMediaData.getMediaLink());
-                        Utils.showToastShort(str("piko_copied_media_link"));
+                        Utils.setClipboard(currentMediaDataFinal.getMediaLink());
+                        PikoUtils.toast(str("piko_copied_media_link"));
 
                     } else if (selectedOption.equals(str("piko_open_video_externally")) || selectedOption.equals(str("piko_open_image_externally"))) {
-                        ActivityHook.handleUrlIntent(isVideoFinal, finalMediaData.getMediaLink());
+                        ActivityHook.handleUrlIntent(isVideoFinal, currentMediaDataFinal.getMediaLink());
 
                     } else if (selectedOption.equals(str("piko_download_all"))) {
                         downloadMedia(context, mediaInfo, -1, MediaType.ANY);
@@ -179,16 +184,15 @@ public class DownloadUtils {
                         downloadMedia(context, mediaInfo, position, MediaType.AUDIO);
 
                     } else if (selectedOption.equals(str("piko_video_variants"))) {
-                        buildVariantDialogBox(context, finalMediaData, MediaType.VIDEO);
+                        buildVariantDialogBox(context, currentMediaDataFinal, MediaType.VIDEO);
 
                     } else if (selectedOption.equals(str("piko_image_variants"))) {
-                        buildVariantDialogBox(context, finalMediaData, MediaType.IMAGE);
+                        buildVariantDialogBox(context, currentMediaDataFinal, MediaType.IMAGE);
 
                     }
                 } catch (Exception e) {
-                    PikoUtils.logger("DownloadUtils.downloadDialogBox", e);
-                    Logger.printException(() -> "Error at downloadDialogBox", e);
-                    Utils.showToastShort(e.getMessage());
+                    PikoLog.e("DownloadUtils", "Error at downloadDialogBox", e);
+                    PikoUtils.toast(e.getMessage());
                 }
             }
         });
@@ -218,15 +222,15 @@ public class DownloadUtils {
             }
 
         } catch (Exception e) {
-            PikoUtils.logger("DownloadUtils.downloadPost", e);
-            Logger.printException(() -> "Error at downloadPost", e);
+            PikoLog.e("DownloadUtils", "Error at downloadPost", e);
+            PikoUtils.toast("Error at downloadPost: " + e.getMessage());
         }
     }
 
     // Position is set to -1 if we want to download all medias from the media info object.
     public static void downloadMedia(Context context, MediaData mediaInfo, int position, MediaType mediaType) throws Exception {
         if(!Utils.isNetworkConnected()){
-            Utils.showToastShort(str("piko_no_internet"));
+            PikoUtils.toast(str("piko_no_internet"));
             return;
         }
         MediaDownloader downloader = new MediaDownloader(context);
@@ -261,7 +265,7 @@ public class DownloadUtils {
                 downloader.enqueue(new DownloadRequest(mediaUrl, subFolder, fileName));
             }
         } else {
-            Utils.showToastShort("There is nothing to download");
+            PikoUtils.toast("There is nothing to download");
         }
 
     }
@@ -269,7 +273,7 @@ public class DownloadUtils {
 
     public static void downloadMediaUrl(Context context, String mediaUrl, String subFolder, String fileName) throws Exception {
         if(!Utils.isNetworkConnected()){
-            Utils.showToastShort(str("piko_no_internet"));
+            PikoUtils.toast(str("piko_no_internet"));
             return;
         }
         MediaDownloader downloader = new MediaDownloader(context);
@@ -291,8 +295,7 @@ public class DownloadUtils {
             String link = Links.generatePostLink(mediaObject, currentMediaIndex);
             PikoUtils.shareTextToPackageName(link, packageName);
         } catch (Exception e){
-            PikoUtils.logger(e);
-            Logger.printException(() -> "Error at externalDownloader", e);
+            PikoLog.e("DownloadUtils", "Error at externalDownloader", e);
         }
     }
 }

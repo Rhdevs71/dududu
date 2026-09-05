@@ -13,6 +13,7 @@ import android.content.Context;
 import app.morphe.extension.instagram.utils.Pref;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.instagram.constants.UI;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 @SuppressWarnings("unused")
 public class WelcomeMessage {
@@ -23,7 +24,7 @@ public class WelcomeMessage {
                 UI.welcomeDialogBox(context);
             }
         } catch (Exception ex) {
-            Logger.printException(() -> "openWelcomeMessage failure", ex);
+            PikoLog.e("WelcomeMessage", "openWelcomeMessage failure", ex);
         }
     }
 

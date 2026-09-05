@@ -21,6 +21,7 @@ import app.morphe.extension.instagram.settings.Settings;
 import app.morphe.extension.instagram.theme.MaterialYouTheme;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.Logger;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 import app.morphe.extension.crimera.sharedPreference.SharedPref;
 import app.morphe.extension.crimera.settings.BooleanSetting;
@@ -128,8 +129,8 @@ public class Helper {
             }
             return true;
         } catch (Exception ex) {
+            PikoLog.e("Helper", "Failed setting pref: " + key, ex);
             Utils.showToastShort(ex.toString());
-            Logger.printException(() -> "Failed setting pref: ", ex);
             return false;
         }
     }

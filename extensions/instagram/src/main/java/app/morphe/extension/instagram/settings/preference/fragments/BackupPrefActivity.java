@@ -25,6 +25,7 @@ import java.util.Date;
 
 import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.instagram.constants.Constants;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 public class BackupPrefActivity extends AppCompatActivity {
 
@@ -104,7 +105,7 @@ public class BackupPrefActivity extends AppCompatActivity {
 
             toast(str("piko_export_fail"));
 
-            app.morphe.extension.shared.Logger.printException(() -> "export failure", e);
+            PikoLog.e("BackupPref", "export failure", e);
         }
     }
 

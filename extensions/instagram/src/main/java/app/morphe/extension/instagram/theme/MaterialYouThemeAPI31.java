@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import app.morphe.extension.instagram.utils.PikoLog;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -165,6 +166,7 @@ final class MaterialYouThemeAPI31 {
             }
             return true;
         } catch (Exception exception) {
+            PikoLog.e("MaterialYouThemeAPI31", "Failed to apply overlay theme", exception);
             rollbackResources(changedResources, previousModes);
             return false;
         }
@@ -280,6 +282,7 @@ final class MaterialYouThemeAPI31 {
                 }
             } catch (Exception ignored) {
                 // Keep the last successful state if Android rejects rollback.
+                PikoLog.e("MaterialYouThemeAPI31", "Rollback rejected by Android", ignored);
             }
         }
     }
