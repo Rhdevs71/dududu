@@ -16,10 +16,19 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.smali.ExternalLabel
 
+import com.android.tools.smali.dexlib2.AccessFlags
+
+internal object ActiveBenefitCheckerClassFingerprint : Fingerprint(
+    strings = listOf("is_benefit_active"),
+)
+
 internal object ActiveBenefitCheckerFingerprint : Fingerprint(
+    classFingerprint = ActiveBenefitCheckerClassFingerprint,
     parameters = listOf("Ljava/lang/String;"),
     returnType = "Z",
-    strings = listOf("is_benefit_active"),
+    custom = { methodDef, _ ->
+        AccessFlags.PUBLIC.isSet(methodDef.accessFlags)
+    },
 )
 
 @Suppress("unused")

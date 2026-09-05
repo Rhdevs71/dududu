@@ -270,43 +270,67 @@ internal fun composeSearchRowSurfaceWrites(
                 ((instruction as? ReferenceInstruction)?.reference as? FieldReference)
                     ?.type == "J"
         }
-    if (paletteWrites.size != 1) {
+    if (paletteWrites.isEmpty()) {
         throw PatchException(
-            "Expected one Compose search-row palette surface read, found ${paletteWrites.size}",
+            "Expected at least one Compose search-row palette surface read, found 0",
         )
     }
-    val paletteWrite = paletteWrites.single()
-    val register =
-        (paletteWrite.value as? OneRegisterInstruction)?.registerA
+
+    if (paletteWrites.size == 1) {
+        val paletteWrite = paletteWrites.single()
+        val register =
+            (paletteWrite.value as? OneRegisterInstruction)?.registerA
+                ?: throw PatchException(
+                    "Compose search-row palette surface read has no destination register",
+                )
+
+        val alternateWrites =
+            instructions.withIndex().filter { (index, instruction) ->
+                if (
+                    index == 0 ||
+                    instruction.opcode != Opcode.MOVE_RESULT_WIDE ||
+                    (instruction as? OneRegisterInstruction)?.registerA != register
+                ) {
+                    return@filter false
+                }
+                val source = instructions[index - 1]
+                source.opcode == Opcode.INVOKE_STATIC &&
+                    ((source as? ReferenceInstruction)?.reference as? MethodReference)
+                        ?.returnType == "J"
+            }
+        if (alternateWrites.size != 1) {
+            throw PatchException(
+                "Expected one alternate Compose search-row surface result, found " +
+                    alternateWrites.size,
+            )
+        }
+
+        return listOf(
+            ComposeSearchRowSurfaceWrite(paletteWrite.index, register),
+            ComposeSearchRowSurfaceWrite(alternateWrites.single().index, register),
+        )
+    }
+
+    val firstRegister =
+        (paletteWrites.first().value as? OneRegisterInstruction)?.registerA
             ?: throw PatchException(
-                "Compose search-row palette surface read has no destination register",
+                "First Compose search-row palette surface read has no destination register",
             )
 
-    val alternateWrites =
-        instructions.withIndex().filter { (index, instruction) ->
-            if (
-                index == 0 ||
-                instruction.opcode != Opcode.MOVE_RESULT_WIDE ||
-                (instruction as? OneRegisterInstruction)?.registerA != register
-            ) {
-                return@filter false
-            }
-            val source = instructions[index - 1]
-            source.opcode == Opcode.INVOKE_STATIC &&
-                ((source as? ReferenceInstruction)?.reference as? MethodReference)
-                    ?.returnType == "J"
+    val relevantWrites =
+        paletteWrites.filter {
+            (it.value as? OneRegisterInstruction)?.registerA == firstRegister
         }
-    if (alternateWrites.size != 1) {
+
+    if (relevantWrites.isEmpty()) {
         throw PatchException(
-            "Expected one alternate Compose search-row surface result, found " +
-                alternateWrites.size,
+            "Could not find relevant Compose search-row palette surface reads for register $firstRegister",
         )
     }
 
-    return listOf(
-        ComposeSearchRowSurfaceWrite(paletteWrite.index, register),
-        ComposeSearchRowSurfaceWrite(alternateWrites.single().index, register),
-    )
+    return relevantWrites.map {
+        ComposeSearchRowSurfaceWrite(it.index, firstRegister)
+    }
 }
 
 internal fun composeSearchRowOverrideInstructions(register: Int): String {

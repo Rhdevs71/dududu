@@ -44,53 +44,73 @@ val loopStoryPatch =
 
         execute {
             StoryProgressCompletedFingerprint.method.apply {
-                val entryCast = getInstruction(indexOfFirstInstructionOrThrow(Opcode.CHECK_CAST))
-                val reelItemRegister = entryCast.registersUsed[0]
-                val reelItemType = entryCast.getReference<TypeReference>()!!.type
-
-                val restartIndex =
-                    indexOfFirstInstructionReversedOrThrow(
-                        indexOfFirstStringInstructionOrThrow("resume"),
-                        Opcode.INVOKE_STATIC,
-                    )
-
-                val seekInstruction =
-                    getInstruction(
-                        indexOfFirstInstructionOrThrow(restartIndex) {
-                            opcode == Opcode.INVOKE_INTERFACE &&
-                                getReference<MethodReference>()?.let { reference ->
-                                    reference.returnType == "V" &&
-                                        reference.parameterTypes.map(CharSequence::toString) ==
-                                        listOf("I", "Z")
-                                } == true
-                        },
-                    )
-                val positionRegister = seekInstruction.registersUsed[1]
-                val playingRegister = seekInstruction.registersUsed[2]
-
-                check(
-                    p0Register > 0 &&
-                        reelItemRegister > 0 &&
-                        positionRegister < p0Register &&
-                        playingRegister < p0Register,
-                ) {
-                    "Story restart block does not keep its state in local registers"
+                val seekMethod = classDef.methods.firstOrNull {
+                    it.parameterTypes.map(CharSequence::toString) == listOf("I", "Z") && it.returnType == "V"
                 }
 
-                addInstructionsWithLabels(
-                    0,
-                    """
-                    ${PREF_CALL_DESCRIPTOR}->loopStory()Z
-                    move-result v0
-                    if-eqz v0, :piko
-                    check-cast v$reelItemRegister, $reelItemType
-                    const/4 v$playingRegister, 0x1
-                    const/4 v$positionRegister, 0x0
-                    goto :piko_loop
-                    """.trimIndent(),
-                    ExternalLabel("piko", getInstruction(0)),
-                    ExternalLabel("piko_loop", getInstruction(restartIndex)),
-                )
+                if (seekMethod != null) {
+                    addInstructionsWithLabels(
+                        0,
+                        """
+                        ${PREF_CALL_DESCRIPTOR}->loopStory()Z
+                        move-result v0
+                        if-eqz v0, :piko_exit
+                        const/4 v0, 0x0
+                        const/4 v1, 0x1
+                        invoke-virtual {p0, v0, v1}, Linstagram/features/stories/fragment/ReelViewerFragment;->${seekMethod.name}(IZ)V
+                        return-void
+                        """.trimIndent(),
+                        ExternalLabel("piko_exit", getInstruction(0)),
+                    )
+                } else {
+                    val entryCast = getInstruction(indexOfFirstInstructionOrThrow(Opcode.CHECK_CAST))
+                    val reelItemRegister = entryCast.registersUsed[0]
+                    val reelItemType = entryCast.getReference<TypeReference>()!!.type
+
+                    val restartIndex =
+                        indexOfFirstInstructionReversedOrThrow(
+                            indexOfFirstStringInstructionOrThrow("resume"),
+                            Opcode.INVOKE_STATIC,
+                        )
+
+                    val seekInstruction =
+                        getInstruction(
+                            indexOfFirstInstructionOrThrow(restartIndex) {
+                                opcode == Opcode.INVOKE_INTERFACE &&
+                                    getReference<MethodReference>()?.let { reference ->
+                                        reference.returnType == "V" &&
+                                            reference.parameterTypes.map(CharSequence::toString) ==
+                                            listOf("I", "Z")
+                                    } == true
+                            },
+                        )
+                    val positionRegister = seekInstruction.registersUsed[1]
+                    val playingRegister = seekInstruction.registersUsed[2]
+
+                    check(
+                        p0Register > 0 &&
+                            reelItemRegister > 0 &&
+                            positionRegister < p0Register &&
+                            playingRegister < p0Register,
+                    ) {
+                        "Story restart block does not keep its state in local registers"
+                    }
+
+                    addInstructionsWithLabels(
+                        0,
+                        """
+                        ${PREF_CALL_DESCRIPTOR}->loopStory()Z
+                        move-result v0
+                        if-eqz v0, :piko
+                        check-cast v$reelItemRegister, $reelItemType
+                        const/4 v$playingRegister, 0x1
+                        const/4 v$positionRegister, 0x0
+                        goto :piko_loop
+                        """.trimIndent(),
+                        ExternalLabel("piko", getInstruction(0)),
+                        ExternalLabel("piko_loop", getInstruction(restartIndex)),
+                    )
+                }
             }
             enableSettings("loopStory")
         }
