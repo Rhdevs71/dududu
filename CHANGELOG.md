@@ -1,3 +1,9 @@
+## [1.0.11](https://github.com/Rhdevs71/dududu/compare/v1.0.10...v1.0.11) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve VerifyError in FilterStoriesPatch for v444 ([8be5e2a](https://github.com/Rhdevs71/dududu/commit/8be5e2a02aff96b67c95c239627b01bc06d7cdf6))
+
 ## [1.0.10](https://github.com/Rhdevs71/dududu/compare/v1.0.9...v1.0.10) (2026-09-05)
 
 ### 🐛 Bug Fixes
