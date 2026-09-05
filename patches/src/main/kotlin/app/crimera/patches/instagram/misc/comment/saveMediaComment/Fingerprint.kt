@@ -32,7 +32,7 @@ internal object InitSaveMediaButtonExtensionFingerprint : Fingerprint(
 internal object SaveMediaChatButtonToStringFingerprint : Fingerprint(
     name = "toString",
     returnType = "Ljava/lang/String;",
-    custom = { methodDef, classDef ->
+    custom = custom@{ methodDef, classDef ->
         if (classDef.superclass != CHAT_CONTEXT_BUTTON_SUPER_CLASS) return@custom false
 
         val instructions = methodDef.implementation?.instructions ?: return@custom false

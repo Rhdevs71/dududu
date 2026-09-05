@@ -43,11 +43,12 @@ val loopStoryPatch =
         compatibleWith(COMPATIBILITY_INSTAGRAM)
 
         execute {
-            StoryProgressCompletedFingerprint.method.apply {
-                val seekMethod = classDef.methods.firstOrNull {
-                    it.parameterTypes.map(CharSequence::toString) == listOf("I", "Z") && it.returnType == "V"
+            val seekMethod =
+                StoryProgressCompletedFingerprint.classDef.methods.firstOrNull { method ->
+                    method.parameterTypes.map(CharSequence::toString) == listOf("I", "Z") && method.returnType == "V"
                 }
 
+            StoryProgressCompletedFingerprint.method.apply {
                 if (seekMethod != null) {
                     addInstructionsWithLabels(
                         0,
