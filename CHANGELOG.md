@@ -1,3 +1,10 @@
+## [1.0.6](https://github.com/Rhdevs71/dududu/compare/v1.0.5...v1.0.6) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve lambda label and classDef scope in SaveMedia and LoopStory ([c67a2ea](https://github.com/Rhdevs71/dududu/commit/c67a2ea49756d68ca20ee1670c8a085b81039374))
+* **instagram:** update SaveMedia, ComposePrism, LoopStory, and UnlockPlus for v444 ([82ddac7](https://github.com/Rhdevs71/dududu/commit/82ddac74c0712db73e123b0b6f2b68fe2158fd2f))
+
 ## [1.0.5](https://github.com/Rhdevs71/dududu/compare/v1.0.4...v1.0.5) (2026-09-05)
 
 ### 🐛 Bug Fixes
