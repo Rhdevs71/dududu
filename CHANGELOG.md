@@ -1,3 +1,9 @@
+## [1.0.4](https://github.com/Rhdevs71/dududu/compare/v1.0.3...v1.0.4) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** update ShareLinks and CommentButton fingerprints for Instagram v444 ([c01ded0](https://github.com/Rhdevs71/dududu/commit/c01ded0ba6058dd0b9cb3354e44ab4249c4cfcf4))
+
 ## [1.0.3](https://github.com/Rhdevs71/dududu/compare/v1.0.2...v1.0.3) (2026-09-05)
 
 ### 🐛 Bug Fixes
