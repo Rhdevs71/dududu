@@ -8,12 +8,15 @@ package app.crimera.patches.instagram.entity.decoder
 
 import app.crimera.patches.instagram.utils.Constants.EDIT_MEDIA_INFO_FRAGMENT_CLASS
 import app.morphe.patcher.Fingerprint
+import com.android.tools.smali.dexlib2.Opcode
 
 // Also used to in description extraction in MediaEntity
 object EditMediaInfoGetCurrentMediaIdFingerprint : Fingerprint(
     definingClass = EDIT_MEDIA_INFO_FRAGMENT_CLASS,
     returnType = "Ljava/lang/String;",
-    parameters = listOf(),
+    custom = { methodDef, _ ->
+        methodDef.implementation?.instructions?.any { it.opcode == Opcode.IGET } == true
+    },
 )
 
 object CommentButtonOnClickFingerprint : Fingerprint(
