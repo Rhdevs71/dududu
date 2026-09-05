@@ -1,3 +1,9 @@
+## [1.0.3](https://github.com/Rhdevs71/dududu/compare/v1.0.2...v1.0.3) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** update EditMediaInfoGetCurrentMediaIdFingerprint for Instagram v444 ([c8b22d1](https://github.com/Rhdevs71/dududu/commit/c8b22d129e0e074a1691cd4aa0f4367a493ac7a8))
+
 ## [1.0.2](https://github.com/Rhdevs71/dududu/compare/v1.0.1...v1.0.2) (2026-09-04)
 
 ### 🐛 Bug Fixes
