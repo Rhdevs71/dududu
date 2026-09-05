@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-05T06:48:57",
-  "description": "## [1.0.9](https://github.com/Rhdevs71/dududu/compare/v1.0.8...v1.0.9) (2026-09-05)\n\n### 🐛 Bug Fixes\n\n* **instagram:** pass valid ViewGroup to mainFeedActionBarButton to prevent runtime VerifyError ([08595c3](https://github.com/Rhdevs71/dududu/commit/08595c32e349700c49f879cb905a347b2a9ee22b))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.9/patches-1.0.9.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.9/patches-1.0.9.mpp.asc",
-  "version": "1.0.9"
+  "created_at": "2026-09-05T07:48:42",
+  "description": "## [1.0.10](https://github.com/Rhdevs71/dududu/compare/v1.0.9...v1.0.10) (2026-09-05)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve Context register in SettingsPatch for MainFeedFragment ([ccf8b0b](https://github.com/Rhdevs71/dududu/commit/ccf8b0b2b8732243981c21baf718e441e15fa597))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.10/patches-1.0.10.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.10/patches-1.0.10.mpp.asc",
+  "version": "1.0.10"
 }
