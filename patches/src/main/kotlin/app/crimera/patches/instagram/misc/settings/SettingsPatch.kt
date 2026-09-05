@@ -31,6 +31,8 @@ import app.morphe.util.findFreeRegister
 import app.morphe.util.indexOfFirstInstruction
 import app.morphe.util.registersUsed
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 @Suppress("unused")
 val settingsPatch =
@@ -94,7 +96,16 @@ val settingsPatch =
                 val strIndex = stringMatches[0].index
 
                 method.apply {
-                    val contextIndex = indexOfFirstInstruction(strIndex, Opcode.MOVE_RESULT_OBJECT)
+                    val contextCallIndex = instructions.indexOfFirst { instruction ->
+                        instruction is ReferenceInstruction &&
+                            (instruction.reference as? MethodReference)?.returnType == "Landroid/content/Context;"
+                    }
+                    val contextIndex =
+                        if (contextCallIndex >= 0) {
+                            indexOfFirstInstruction(contextCallIndex, Opcode.MOVE_RESULT_OBJECT)
+                        } else {
+                            indexOfFirstInstruction(strIndex, Opcode.MOVE_RESULT_OBJECT)
+                        }
                     val contextInstruction = getInstruction(contextIndex)
                     val contextRegister = contextInstruction.registersUsed[0]
 
