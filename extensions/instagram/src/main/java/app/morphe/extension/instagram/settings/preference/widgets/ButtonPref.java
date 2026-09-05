@@ -57,8 +57,8 @@ public class ButtonPref extends Preference {
         setOnPreferenceClickListener(new OnPreferenceClickListener() {
             @Override
             public boolean onPreferenceClick(Preference preference) {
+                String key = getKey();
                 try {
-                    String key = getKey();
                     if (key == null) {
                         return true;
                     }
@@ -96,7 +96,7 @@ public class ButtonPref extends Preference {
                     }
                 } catch (Exception e) {
                     PikoLog.e("ButtonPref", "Preference button onclick failure: " + key, e);
-                    Utils.showToastShort(e.getMessage());
+                    PikoUtils.toast(e.getMessage());
                 }
                 return true;
             }

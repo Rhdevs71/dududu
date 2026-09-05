@@ -171,11 +171,11 @@ public class DownloadUtils {
                         downloadMedia(context, mediaInfo, position, MediaType.IMAGE);
 
                     } else if (selectedOption.equals(str("piko_copy_media_link"))) {
-                        Utils.setClipboard(currentMediaDataFinal.getMediaLink());
+                        Utils.setClipboard(finalMediaData.getMediaLink());
                         PikoUtils.toast(str("piko_copied_media_link"));
 
                     } else if (selectedOption.equals(str("piko_open_video_externally")) || selectedOption.equals(str("piko_open_image_externally"))) {
-                        ActivityHook.handleUrlIntent(isVideoFinal, currentMediaDataFinal.getMediaLink());
+                        ActivityHook.handleUrlIntent(isVideoFinal, finalMediaData.getMediaLink());
 
                     } else if (selectedOption.equals(str("piko_download_all"))) {
                         downloadMedia(context, mediaInfo, -1, MediaType.ANY);
@@ -184,10 +184,10 @@ public class DownloadUtils {
                         downloadMedia(context, mediaInfo, position, MediaType.AUDIO);
 
                     } else if (selectedOption.equals(str("piko_video_variants"))) {
-                        buildVariantDialogBox(context, currentMediaDataFinal, MediaType.VIDEO);
+                        buildVariantDialogBox(context, finalMediaData, MediaType.VIDEO);
 
                     } else if (selectedOption.equals(str("piko_image_variants"))) {
-                        buildVariantDialogBox(context, currentMediaDataFinal, MediaType.IMAGE);
+                        buildVariantDialogBox(context, finalMediaData, MediaType.IMAGE);
 
                     }
                 } catch (Exception e) {
