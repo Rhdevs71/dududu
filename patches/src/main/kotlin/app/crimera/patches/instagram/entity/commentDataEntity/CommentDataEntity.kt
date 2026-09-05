@@ -19,8 +19,10 @@ import app.crimera.utils.methodExtractor
 import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.util.getReference
 import app.morphe.util.indexOfFirstInstruction
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 import kotlin.properties.Delegates
 
 var CHAT_CONTEXT_BUTTON_SUPER_CLASS: String by Delegates.notNull()
@@ -53,11 +55,13 @@ val commentDataEntity =
                 commentObject = method.returnType
 
                 method.apply {
-                    instructions.filter { it.opcode == Opcode.NEW_INSTANCE }.firstOrNull {
-                        val index = it.location.index
+                    instructions.filter { it.opcode == Opcode.NEW_INSTANCE }.firstOrNull { instruction ->
+                        val index = instruction.location.index
+                        val nextInvokeDirectIndex = indexOfFirstInstruction(index, Opcode.INVOKE_DIRECT)
+                        val methodRef = getInstruction(nextInvokeDirectIndex).getReference<MethodReference>()
                         val prevOpcode = getInstruction(index - 1).opcode
-                        if (prevOpcode == Opcode.CONST_4) {
-                            val nextInvokeDirectIndex = indexOfFirstInstruction(index, Opcode.INVOKE_DIRECT)
+
+                        if (prevOpcode == Opcode.CONST_4 || methodRef?.parameterTypes?.any { it.toString() == MEDIA_CLASS_NAME } == true) {
                             commentMediaHelperClass =
                                 extensionToClassName(getInstruction(nextInvokeDirectIndex).methodExtractor().definingClass)
                             true

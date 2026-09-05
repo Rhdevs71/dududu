@@ -12,7 +12,7 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 
 object PostOnSingleTapConfirmedFingerprint : Fingerprint(
-    strings = listOf("open_cmon_interstitial"),
+    strings = listOf("feed_video"),
     name = "onSingleTapConfirmed",
 )
 
