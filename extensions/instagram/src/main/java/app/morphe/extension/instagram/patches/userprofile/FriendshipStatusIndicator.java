@@ -171,15 +171,7 @@ public class FriendshipStatusIndicator {
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
             layoutParams.setMargins(0, Dim.dp4, 0, Dim.dp6);
-            ViewGroup.LayoutParams generatedParams = null;
-            try {
-                generatedParams = viewGroup.generateLayoutParams(layoutParams);
-            } catch (Exception ignored) {
-            }
-            if (generatedParams == null) {
-                generatedParams = layoutParams;
-            }
-            viewGroup.addView(friendshipStatusTextView, targetIndex + 1, generatedParams);
+            viewGroup.addView(friendshipStatusTextView, targetIndex + 1, layoutParams);
         }
     }
 
