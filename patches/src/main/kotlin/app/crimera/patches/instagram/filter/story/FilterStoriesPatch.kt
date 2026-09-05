@@ -12,13 +12,12 @@ import app.crimera.patches.instagram.misc.settings.settingsPatch
 import app.crimera.patches.instagram.utils.Constants.COMPATIBILITY_INSTAGRAM
 import app.crimera.patches.instagram.utils.Constants.PATCHES_DESCRIPTOR
 import app.crimera.patches.instagram.utils.enableSettings
-import app.morphe.patcher.extensions.InstructionExtensions.addInstructionsWithLabels
-import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.bytecodePatch
-import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.util.registersUsed
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 
 // Heavily based on @brosssh work.
 // https://github.com/brosssh/instagram-morphe-patches-library/blob/dev/patch-library/src/main/kotlin/app/morphe/library/instagram/patches/FilterStoriesListPatch.kt
@@ -35,22 +34,27 @@ val filterStoriesPatch =
         execute {
 
             StoryResponseJsonParserFingerprint.apply {
-                val strIndex = stringMatches[0].index
+                val trayIndex = (stringMatches.firstOrNull { it.string == "tray" } ?: stringMatches[0]).index
 
                 method.apply {
+                    val addInstruction = instructions.first {
+                        it.location.index > trayIndex &&
+                            it.opcode == Opcode.INVOKE_VIRTUAL &&
+                            (it as? ReferenceInstruction)?.reference?.toString()?.contains(";->add(Ljava/lang/Object;)Z") == true
+                    }
 
-                    val reelItemCheckInstruction = instructions.last { it.location.index < strIndex && it.opcode == Opcode.IF_EQZ }
-                    val index = reelItemCheckInstruction.location.index
-                    val reelResponseItemRegister = reelItemCheckInstruction.registersUsed[0]
+                    val ifEqzInstruction = instructions.last {
+                        it.location.index < addInstruction.location.index &&
+                            it.opcode == Opcode.IF_EQZ
+                    }
+                    val reelResponseItemRegister = ifEqzInstruction.registersUsed[0]
 
-                    addInstructionsWithLabels(
-                        index + 1,
+                    addInstructions(
+                        ifEqzInstruction.location.index,
                         """
-                        invoke-static{v$reelResponseItemRegister}, $PATCHES_DESCRIPTOR/filter/story/FilterStory;->filter(Ljava/lang/Object;)Ljava/lang/Object;
+                        invoke-static {v$reelResponseItemRegister}, $PATCHES_DESCRIPTOR/filter/story/FilterStory;->filter(Ljava/lang/Object;)Ljava/lang/Object;
                         move-result-object v$reelResponseItemRegister
-                        if-eqz v$reelResponseItemRegister, :piko
                         """.trimIndent(),
-                        ExternalLabel("piko", getInstruction(index + 2)),
                     )
 
                     enableSettings("storyFilters")
