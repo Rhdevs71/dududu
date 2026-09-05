@@ -26,11 +26,14 @@ public class ProfileInfo extends Entity {
 
     public boolean isSelfProfile() throws Exception {
         Entity profileRelatedDetails = getProfileRelatedDetails();
-        return (Boolean) profileRelatedDetails.getField("fieldName");
+        if (profileRelatedDetails == null) return false;
+        Object val = profileRelatedDetails.getField("fieldName");
+        return Boolean.TRUE.equals(val);
     }
 
     public UserData getUserData() throws Exception {
         Entity userDetailViewModel = getUserDetailViewModel();
+        if (userDetailViewModel == null) return new UserData(null);
         Object userDataObject = userDetailViewModel.getField("fieldName");
         return new UserData(userDataObject);
     }

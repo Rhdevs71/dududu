@@ -20,25 +20,29 @@ public class UserFriendshipStatus extends Entity {
     }
 
     public Map<String, Boolean> getMappings(){
+        if (this.obj == null) {
+            return new HashMap<>();
+        }
         try {
             Class<?> helperClass = Class.forName("classname");
-            return (Map) super.getMethod(helperClass, "methodname", new Class[]{FriendshipStatus.class}, this.obj);
+            Map result = (Map) super.getMethod(helperClass, "methodname", new Class[]{FriendshipStatus.class}, this.obj);
+            return result != null ? result : new HashMap<>();
         } catch (Exception e) {
             PikoUtils.logger(e);
         }
-        return new HashMap();
+        return new HashMap<>();
     }
 
-    private Boolean getValue(String key) throws Exception {
+    private Boolean getValue(String key) {
         Map<String, Boolean> mappings = getMappings();
-        return mappings.getOrDefault(key,false);
+        return Boolean.TRUE.equals(mappings.get(key));
     }
 
-    public Boolean getFollowBackStatus() throws Exception {
+    public Boolean getFollowBackStatus() {
         return getValue("followed_by");
     }
 
-    public Boolean getFollowingStatus() throws Exception {
+    public Boolean getFollowingStatus() {
         return getValue("following");
     }
 }

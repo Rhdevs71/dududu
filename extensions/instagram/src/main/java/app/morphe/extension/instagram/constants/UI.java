@@ -62,11 +62,27 @@ public class UI {
             "instagram_chevron_right_outline_rtl_16";
 
     public static int getThemedColour(String attrName) {
-        Context context = Utils.getContext();
-        TypedValue typedValue = new TypedValue();
-        int attrId = ResourceUtils.getAttrIdentifier(attrName);
-        boolean resolved = context.getTheme().resolveAttribute(attrId, typedValue, true);
-        return context.getColor(typedValue.resourceId);
+        try {
+            Context context = Utils.getContext();
+            if (context == null) return Color.WHITE;
+            TypedValue typedValue = new TypedValue();
+            int attrId = ResourceUtils.getAttrIdentifier(attrName);
+            if (attrId == 0) {
+                return Color.WHITE;
+            }
+            boolean resolved = context.getTheme().resolveAttribute(attrId, typedValue, true);
+            if (resolved) {
+                if (typedValue.resourceId != 0) {
+                    return context.getColor(typedValue.resourceId);
+                }
+                if (typedValue.type >= TypedValue.TYPE_FIRST_COLOR_INT && typedValue.type <= TypedValue.TYPE_LAST_COLOR_INT) {
+                    return typedValue.data;
+                }
+            }
+        } catch (Exception e) {
+            Logger.printException(() -> "Failed getThemedColour: " + attrName, e);
+        }
+        return Color.WHITE;
     }
 
     public static boolean isDarkMode() {

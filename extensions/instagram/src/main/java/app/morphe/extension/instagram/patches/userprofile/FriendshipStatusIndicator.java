@@ -162,31 +162,59 @@ public class FriendshipStatusIndicator {
             });
 
             int targetIndex = viewGroup.indexOfChild(internalBadgeTextView);
+            if (targetIndex < 0) {
+                return;
+            }
+
             ViewGroup.MarginLayoutParams layoutParams = new ViewGroup.MarginLayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
             layoutParams.setMargins(0, Dim.dp4, 0, Dim.dp6);
-            viewGroup.addView(friendshipStatusTextView, targetIndex + 1, layoutParams);
+            ViewGroup.LayoutParams generatedParams = null;
+            try {
+                generatedParams = viewGroup.generateLayoutParams(layoutParams);
+            } catch (Exception ignored) {
+            }
+            if (generatedParams == null) {
+                generatedParams = layoutParams;
+            }
+            viewGroup.addView(friendshipStatusTextView, targetIndex + 1, generatedParams);
         }
     }
 
     public static void addFriendshipIndicator(Object profileInfoObject, Object badgeObject){
         if(Pref.followBackIndicator() && SettingsStatus.followBackIndicator) {
             try {
+                if (profileInfoObject == null || badgeObject == null) {
+                    return;
+                }
+
                 ProfileInfo profileInfo = new ProfileInfo(profileInfoObject);
-                Boolean isSelfProfile = profileInfo.isSelfProfile();
+                boolean isSelfProfile = profileInfo.isSelfProfile();
 
                 // If the logged in profile, then no need to display the badge.
                 if (isSelfProfile) return;
 
                 UserData viewingUserData = profileInfo.getUserData();
+                if (viewingUserData == null || viewingUserData.getObject() == null) {
+                    return;
+                }
+
                 UserFriendshipStatus userFriendshipStatus = viewingUserData.getUserFriendshipStatus();
-                Boolean followed_by = userFriendshipStatus.getFollowBackStatus();
-                Boolean following = userFriendshipStatus.getFollowingStatus();
+                if (userFriendshipStatus == null) {
+                    return;
+                }
+
+                boolean followed_by = Boolean.TRUE.equals(userFriendshipStatus.getFollowBackStatus());
+                boolean following = Boolean.TRUE.equals(userFriendshipStatus.getFollowingStatus());
 
                 Entity entity = new Entity(badgeObject);
-                View badgeView = (View) entity.getMethod("getView");
+                Object viewObj = entity.getMethod("getView");
+                if (!(viewObj instanceof View)) {
+                    return;
+                }
+                View badgeView = (View) viewObj;
 
                 String indicatorText;
                 String indicatorIconDrawable;
@@ -215,7 +243,7 @@ public class FriendshipStatusIndicator {
                 );
 
             } catch (Exception ex) {
-                Logger.printException(() -> "Failed follow back indicator", ex);
+                Logger.printException(() -> "Failed follow back indicator: " + ex.getMessage(), ex);
             }
         }
     }

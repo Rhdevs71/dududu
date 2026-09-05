@@ -18,6 +18,7 @@ public class UserData extends Entity {
     }
 
     private Object getAdditionalUserInfo() throws Exception {
+        if (this.obj == null) return null;
         return super.getField(this.obj, "fieldName");
     }
 
@@ -73,6 +74,9 @@ public class UserData extends Entity {
 
     public UserFriendshipStatus getUserFriendshipStatus() throws Exception {
         Object additionalUserInfo = getAdditionalUserInfo();
+        if (additionalUserInfo == null) {
+            return new UserFriendshipStatus(null);
+        }
         Object friendshipStatusObject = super.getMethod(additionalUserInfo, "methodname");
         return new UserFriendshipStatus(friendshipStatusObject);
     }
