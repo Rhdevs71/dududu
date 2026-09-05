@@ -205,6 +205,7 @@ internal object AyuMidcardMediaHelperImageObjectMethodFingerprint : Fingerprint(
 
 internal object GetOriginalSoundDataIntfFromMediaFingerprint : Fingerprint(
     classFingerprint = ReelsInlineQualitySurveyRelatedFingerprint,
+    parameters = listOf(MEDIA_CLASS_NAME),
     returnType = ORIGINAL_SOUND_DATA_INTF,
 )
 

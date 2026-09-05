@@ -93,11 +93,42 @@ public class DownloadUtils {
     }
 
     private static void downloadDialogBox(Context context, MediaData mediaInfo, int position) throws Exception {
-        int carouselSize = mediaInfo.getCarouselSize();
-        MediaData currentMediaData = mediaInfo.getMediaAt(position);
-        String username = mediaInfo.getUserData().getUsername();
-        Boolean isCurrentMediaVideo = currentMediaData.isVideo();
-        Boolean currentMediaHasAudio = currentMediaData.hasAudio();
+        int carouselSize = 1;
+        try {
+            carouselSize = mediaInfo.getCarouselSize();
+        } catch (Exception ignored) {
+        }
+
+        MediaData currentMediaData = null;
+        try {
+            currentMediaData = mediaInfo.getMediaAt(position);
+        } catch (Exception ignored) {
+        }
+        if (currentMediaData == null) {
+            currentMediaData = mediaInfo;
+        }
+
+        String username = "instagram_user";
+        try {
+            UserData userData = mediaInfo.getUserData();
+            if (userData != null) {
+                String u = userData.getUsername();
+                if (u != null && !u.isEmpty()) username = u;
+            }
+        } catch (Exception ignored) {
+        }
+
+        boolean isCurrentMediaVideo = false;
+        try {
+            isCurrentMediaVideo = currentMediaData.isVideo();
+        } catch (Exception ignored) {
+        }
+
+        boolean currentMediaHasAudio = false;
+        try {
+            currentMediaHasAudio = currentMediaData.hasAudio();
+        } catch (Exception ignored) {
+        }
 
         InstagramDialogBox dialog = new InstagramDialogBox(context);
 
@@ -118,6 +149,9 @@ public class DownloadUtils {
 
         CharSequence[] items = options.toArray(new CharSequence[0]);
 
+        final boolean isVideoFinal = isCurrentMediaVideo;
+        final MediaData finalMediaData = currentMediaData;
+
         dialog.addDialogMenuItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface d, int which) {
@@ -132,11 +166,11 @@ public class DownloadUtils {
                         downloadMedia(context, mediaInfo, position, MediaType.IMAGE);
 
                     } else if (selectedOption.equals(str("piko_copy_media_link"))) {
-                        Utils.setClipboard(currentMediaData.getMediaLink());
+                        Utils.setClipboard(finalMediaData.getMediaLink());
                         Utils.showToastShort(str("piko_copied_media_link"));
 
                     } else if (selectedOption.equals(str("piko_open_video_externally")) || selectedOption.equals(str("piko_open_image_externally"))) {
-                        ActivityHook.handleUrlIntent(isCurrentMediaVideo, currentMediaData.getMediaLink());
+                        ActivityHook.handleUrlIntent(isVideoFinal, finalMediaData.getMediaLink());
 
                     } else if (selectedOption.equals(str("piko_download_all"))) {
                         downloadMedia(context, mediaInfo, -1, MediaType.ANY);
@@ -145,14 +179,14 @@ public class DownloadUtils {
                         downloadMedia(context, mediaInfo, position, MediaType.AUDIO);
 
                     } else if (selectedOption.equals(str("piko_video_variants"))) {
-                        buildVariantDialogBox(context, currentMediaData, MediaType.VIDEO);
+                        buildVariantDialogBox(context, finalMediaData, MediaType.VIDEO);
 
                     } else if (selectedOption.equals(str("piko_image_variants"))) {
-                        buildVariantDialogBox(context, currentMediaData, MediaType.IMAGE);
+                        buildVariantDialogBox(context, finalMediaData, MediaType.IMAGE);
 
                     }
                 } catch (Exception e) {
-                    PikoUtils.logger(e);
+                    PikoUtils.logger("DownloadUtils.downloadDialogBox", e);
                     Logger.printException(() -> "Error at downloadDialogBox", e);
                     Utils.showToastShort(e.getMessage());
                 }
@@ -171,6 +205,9 @@ public class DownloadUtils {
 
     public static void downloadPost(Context context,  UserSession userSession, Object mediaObject, int position) {
         try {
+            if (context == null || mediaObject == null) {
+                return;
+            }
             boolean ENABLE_DIRECT_DOWNLOAD = Pref.enableDirectDownload() && SettingsStatus.downloadMedia;
             position = position < 1 ? 0 : position;
             MediaData mediaInfo = new MediaData(mediaObject, userSession);
@@ -181,7 +218,7 @@ public class DownloadUtils {
             }
 
         } catch (Exception e) {
-            PikoUtils.logger(e);
+            PikoUtils.logger("DownloadUtils.downloadPost", e);
             Logger.printException(() -> "Error at downloadPost", e);
         }
     }

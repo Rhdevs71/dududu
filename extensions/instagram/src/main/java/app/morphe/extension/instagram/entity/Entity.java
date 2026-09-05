@@ -54,7 +54,54 @@ public class Entity {
                 current = current.getSuperclass();
             }
         }
+
+        // Polymorphic matching fallback (interfaces, subclasses, primitives)
+        current = clazz;
+        while (current != null) {
+            for (Method m : current.getDeclaredMethods()) {
+                if (m.getName().equals(methodName) && isParametersCompatible(m.getParameterTypes(), paramTypes)) {
+                    m.setAccessible(true);
+                    return m;
+                }
+            }
+            current = current.getSuperclass();
+        }
+
         throw new NoSuchMethodException("Method " + methodName + " not found in " + clazz);
+    }
+
+    private static boolean isParametersCompatible(Class<?>[] declaredTypes, Class<?>[] actualTypes) {
+        if (declaredTypes.length != actualTypes.length) {
+            return false;
+        }
+        for (int i = 0; i < declaredTypes.length; i++) {
+            Class<?> dec = declaredTypes[i];
+            Class<?> act = actualTypes[i];
+            if (act == null) {
+                if (dec.isPrimitive()) return false;
+                continue;
+            }
+            if (dec.isAssignableFrom(act) || isWrapperMatch(dec, act)) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean isWrapperMatch(Class<?> dec, Class<?> act) {
+        if (dec == int.class && act == Integer.class) return true;
+        if (dec == long.class && act == Long.class) return true;
+        if (dec == boolean.class && act == Boolean.class) return true;
+        if (dec == byte.class && act == Byte.class) return true;
+        if (dec == char.class && act == Character.class) return true;
+        if (dec == short.class && act == Short.class) return true;
+        if (dec == float.class && act == Float.class) return true;
+        if (dec == double.class && act == Double.class) return true;
+        if (act == int.class && dec == Integer.class) return true;
+        if (act == long.class && dec == Long.class) return true;
+        if (act == boolean.class && dec == Boolean.class) return true;
+        return false;
     }
 
     public Object getField(Class cls, Object clsObj, String fieldName) throws Exception {

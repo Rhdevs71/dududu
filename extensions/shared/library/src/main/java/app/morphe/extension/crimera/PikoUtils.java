@@ -148,15 +148,85 @@ public class PikoUtils {
     }
 
     public static void logger(Object e) {
+        logger("Piko", e);
+    }
+
+    public static void logger(String tag, Object e) {
         String logName = "piko";
-        Log.d(logName, e +"\n");
-        if (e instanceof Exception) {
-            Exception ex = (Exception) e;
-        StackTraceElement[] stackTraceElements = ex.getStackTrace();
-            for (StackTraceElement element : stackTraceElements) {
-                Log.d(logName, "Exception occurred at line " + element.getLineNumber() + " in " + element.getClassName()
-                        + "." + element.getMethodName());
+        Log.e(logName, "[" + tag + "] " + e);
+        if (e instanceof Throwable) {
+            Log.e(logName, "[" + tag + "] StackTrace: ", (Throwable) e);
+        }
+        logToFile(tag, e);
+    }
+
+    public static synchronized void logToFile(String tag, Object e) {
+        try {
+            java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", java.util.Locale.US);
+            String timestamp = sdf.format(new java.util.Date());
+            StringBuilder sb = new StringBuilder();
+            sb.append("\n================================================================\n");
+            sb.append("[").append(timestamp).append("] [").append(tag).append("] [Thread: ").append(Thread.currentThread().getName()).append("]\n");
+
+            if (e instanceof Throwable) {
+                Throwable t = (Throwable) e;
+                sb.append("Exception: ").append(t.getClass().getName()).append(": ").append(t.getMessage()).append("\n");
+                java.io.StringWriter sw = new java.io.StringWriter();
+                java.io.PrintWriter pw = new java.io.PrintWriter(sw);
+                t.printStackTrace(pw);
+                sb.append("Stack trace:\n").append(sw.toString());
+            } else {
+                sb.append("Message: ").append(e).append("\n");
             }
+
+            byte[] logBytes = sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+            // 1. Try public Downloads/Piko/piko_debug.log
+            try {
+                File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                File pikoDir = new File(downloadsDir, "Piko");
+                if (!pikoDir.exists()) {
+                    pikoDir.mkdirs();
+                }
+                File logFile = new File(pikoDir, "piko_debug.log");
+                writeRawFile(logFile, logBytes, true);
+            } catch (Exception ignored) {
+            }
+
+            // 2. Fallback to app external and internal files dir
+            Context context = ctx != null ? ctx : Utils.getContext();
+            if (context != null) {
+                try {
+                    File extDir = context.getExternalFilesDir("logs");
+                    if (extDir != null) {
+                        if (!extDir.exists()) extDir.mkdirs();
+                        File logFile = new File(extDir, "piko_debug.log");
+                        writeRawFile(logFile, logBytes, true);
+                    }
+                } catch (Exception ignored) {
+                }
+                try {
+                    File intDir = new File(context.getFilesDir(), "logs");
+                    if (!intDir.exists()) intDir.mkdirs();
+                    File logFile = new File(intDir, "piko_debug.log");
+                    writeRawFile(logFile, logBytes, true);
+                } catch (Exception ignored) {
+                }
+            }
+        } catch (Exception ex) {
+            Log.e("piko", "Error in logToFile: " + ex);
+        }
+    }
+
+    private static boolean writeRawFile(File file, byte[] data, boolean append) {
+        try {
+            FileOutputStream fos = new FileOutputStream(file, append);
+            fos.write(data);
+            fos.flush();
+            fos.close();
+            return true;
+        } catch (Exception ignored) {
+            return false;
         }
     }
 

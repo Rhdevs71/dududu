@@ -28,17 +28,28 @@ public class UserData extends Entity {
     }
 
     public String getUsername() throws Exception {
+        if (this.obj == null) return "instagram_user";
         Object additionalUserInfo = getAdditionalUserInfo();
-        return (String) super.getMethod(additionalUserInfo, "methodName");
+        if (additionalUserInfo == null) return "instagram_user";
+        try {
+            String uname = (String) super.getMethod(additionalUserInfo, "methodName");
+            if (uname != null && !uname.isEmpty()) return uname;
+        } catch (Exception ignored) {
+        }
+        return "instagram_user";
     }
 
     public String getFullName() throws Exception {
+        if (this.obj == null) return "";
         Object additionalUserInfo = getAdditionalUserInfo();
-        String name = (String) super.getMethod(additionalUserInfo, "methodName");
-        if(name!=null && !name.isEmpty() && name.length()>0){
-            return name;
+        if (additionalUserInfo == null) return this.getUsername();
+        try {
+            String name = (String) super.getMethod(additionalUserInfo, "methodName");
+            if(name != null && !name.isEmpty()){
+                return name;
+            }
+        } catch (Exception ignored) {
         }
-        // Some users don't have fullname, but only username.
         return this.getUsername();
     }
 

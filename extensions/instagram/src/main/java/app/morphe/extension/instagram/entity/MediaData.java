@@ -52,24 +52,29 @@ public class MediaData extends Entity {
     }
 
     public String getShortcode() {
-        long instaId = Long.valueOf(this.getPostID());
+        try {
+            String postId = this.getPostID();
+            if (postId == null || postId.isEmpty()) return "";
+            long instaId = Long.parseLong(postId);
 
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+            String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
-        // Handle the edge case where the ID is 0
-        if (instaId == 0) {
-            return String.valueOf(alphabet.charAt(0));
+            if (instaId == 0) {
+                return String.valueOf(alphabet.charAt(0));
+            }
+
+            StringBuilder shortCode = new StringBuilder();
+
+            while (instaId > 0) {
+                int remainder = (int) (instaId % 64);
+                shortCode.append(alphabet.charAt(remainder));
+                instaId = instaId / 64;
+            }
+
+            return shortCode.reverse().toString();
+        } catch (Exception ignored) {
+            return "";
         }
-
-        StringBuilder shortCode = new StringBuilder();
-
-        while (instaId > 0) {
-            int remainder = (int) (instaId % 64);
-            shortCode.append(alphabet.charAt(remainder));
-            instaId = instaId / 64;
-        }
-
-        return shortCode.reverse().toString();
     }
 
     public String getPostID() {
@@ -107,13 +112,19 @@ public class MediaData extends Entity {
 
     private List<MediaData> getCarouselMediaData() throws Exception {
         List<MediaData> carouselMediaData = new ArrayList<>();
-        List<Object> mediaList = this.getMediaList();
-        if (mediaList.isEmpty()){
+        try {
+            List<Object> mediaList = this.getMediaList();
+            if (mediaList == null || mediaList.isEmpty()){
+                carouselMediaData.add(new MediaData(this.obj, this.userSession));
+            } else {
+                for (Object item : mediaList) {
+                    if (item != null) {
+                        carouselMediaData.add(new MediaData(item, this.userSession));
+                    }
+                }
+            }
+        } catch (Exception ignored) {
             carouselMediaData.add(new MediaData(this.obj, this.userSession));
-        } else {
-            mediaList.forEach(item->{
-                carouselMediaData.add(new MediaData(item, this.userSession));
-            });
         }
         return carouselMediaData;
     }
@@ -123,11 +134,22 @@ public class MediaData extends Entity {
     }
 
     public boolean isVideo() throws Exception {
-        return (boolean) super.getMethod(this.obj, "methodName");
+        try {
+            Object res = super.getMethod(this.obj, "methodName");
+            if (res instanceof Boolean) {
+                return (Boolean) res;
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
     }
 
     public boolean hasAudio() throws Exception {
-        return this.getAudioMedia() != null;
+        try {
+            return this.getAudioMedia() != null;
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     private String getMediaExtension(MediaType mediaType) throws Exception {
