@@ -1,3 +1,10 @@
+## [1.0.13](https://github.com/Rhdevs71/dududu/compare/v1.0.12...v1.0.13) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** harden friendship status indicator and reflection against null and missing methods ([6768071](https://github.com/Rhdevs71/dududu/commit/676807133b24991f373cb367290ab9f691272850))
+* **instagram:** pass layoutParams directly to addView in FriendshipStatusIndicator ([8989c36](https://github.com/Rhdevs71/dududu/commit/8989c36b8ace0a30733c67f41ac4473a263e7d35))
+
 ## [1.0.12](https://github.com/Rhdevs71/dududu/compare/v1.0.11...v1.0.12) (2026-09-05)
 
 ### 🐛 Bug Fixes
