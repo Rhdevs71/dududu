@@ -1,3 +1,9 @@
+## [1.0.12](https://github.com/Rhdevs71/dududu/compare/v1.0.11...v1.0.12) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve Failed follow back indicator in FriendshipStatusIndicator ([d3b6248](https://github.com/Rhdevs71/dududu/commit/d3b624859cf5b04549d693b0c2e807fb79a75a14))
+
 ## [1.0.11](https://github.com/Rhdevs71/dududu/compare/v1.0.10...v1.0.11) (2026-09-05)
 
 ### 🐛 Bug Fixes
