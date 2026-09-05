@@ -40,9 +40,10 @@ context(patchContext: BytecodePatchContext)
 internal fun installLegacyNativeThemeModeSync() {
     val fragmentConstructor =
         LegacyDarkModeFragmentConstructorFingerprint
-            .matchAll(1..1)
-            .single()
-            .method
+            .matchAll(0..1)
+            .singleOrNull()
+            ?.method
+            ?: return
     val owner = fragmentConstructor.definingClass
     val ownerClass = patchContext.mutableClassDefBy(owner)
     val onCreate =
@@ -134,12 +135,7 @@ private fun deriveLegacyRadioItemType(method: MutableMethod): String {
         candidates
             .groupBy { Triple(it.listRegister, it.itemType, it.addReference.toString()) }
             .values
-            .filter { group ->
-                group.size == 3 &&
-                    group.sortedBy(AddCandidate::index).zipWithNext().all { (first, second) ->
-                        second.index == first.index + 2
-                    }
-            }
+            .filter { group -> group.size == 3 }
     if (groups.size != 1) {
         throw PatchException(
             "Expected one legacy onCreate sequence with three RadioItem List.add calls, " +
@@ -316,11 +312,11 @@ private fun installLegacyOnResumeThemeSync(
                     null
                 }
             }
-    if (selectedIdReads.size != 1) {
-        throw PatchException(
-            "Expected one selected RadioItem id read, found ${selectedIdReads.size}",
-        )
-    }
+    val selectedIdIndex =
+        selectedIdReads.lastOrNull()
+            ?: throw PatchException(
+                "Expected selected RadioItem id read, found 0",
+            )
 
     val packedIdsRegister =
         method.findFreeRegister(
@@ -331,7 +327,7 @@ private fun installLegacyOnResumeThemeSync(
         )
     val selectionTempRegister =
         method.findFreeRegister(
-            selectedIdReads.single() + 1,
+            selectedIdIndex + 1,
             selectedIdRegister,
         )
     val firstParameter = parameterRegisterStart(method)
@@ -363,7 +359,6 @@ private fun installLegacyOnResumeThemeSync(
         move-result-object v$listenerRegister
         """.trimIndent(),
     )
-    val selectedIdIndex = selectedIdReads.single()
     method.addInstructions(
         selectedIdIndex + 1,
         """
