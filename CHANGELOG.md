@@ -1,3 +1,9 @@
+## [1.0.5](https://github.com/Rhdevs71/dududu/compare/v1.0.4...v1.0.5) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** update CommentDataEntity and PostOnSingleTapConfirmedFingerprint for v444 ([d51e09e](https://github.com/Rhdevs71/dududu/commit/d51e09ef7c63c554a83460453902b8094ab69d6a))
+
 ## [1.0.4](https://github.com/Rhdevs71/dududu/compare/v1.0.3...v1.0.4) (2026-09-05)
 
 ### 🐛 Bug Fixes
