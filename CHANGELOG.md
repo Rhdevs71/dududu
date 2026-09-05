@@ -1,3 +1,9 @@
+## [1.0.7](https://github.com/Rhdevs71/dududu/compare/v1.0.6...v1.0.7) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** make DarkModeSectionFingerprint resilient to Compose line changes ([42314c1](https://github.com/Rhdevs71/dududu/commit/42314c1ca881caf7905a8c1a7efcb97ab485c41b))
+
 ## [1.0.6](https://github.com/Rhdevs71/dududu/compare/v1.0.5...v1.0.6) (2026-09-05)
 
 ### 🐛 Bug Fixes
