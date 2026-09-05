@@ -17,6 +17,8 @@ import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.util.registersUsed
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 
 object BindMainFeedActionBarFingerprint : Fingerprint(
     strings = listOf("BindMainFeedActionBar"),
@@ -40,15 +42,21 @@ val mainFeedActionBarButtonPatch =
                         val prevInstruction = getInstruction(index - 1)
                         val prevInstructionOpcode = prevInstruction.opcode
                         if (prevInstructionOpcode == Opcode.IGET_OBJECT) {
-                            val layoutRegister = prevInstruction.registersUsed[0]
-                            addInstruction(
-                                index,
-                                """
-                                invoke-static {v$layoutRegister}, $ACTIONBAR_DESCRIPTOR->mainFeedActionBarButton(Landroid/view/ViewGroup;)V
-                                """.trimIndent(),
-                            )
-                            addFlags("mainFeedActionBarFlags")
-                            true
+                            val fieldRef = (prevInstruction as? ReferenceInstruction)?.reference as? FieldReference
+                            val fieldType = fieldRef?.type ?: ""
+                            if (fieldType == "Landroid/view/ViewGroup;" || fieldType.endsWith("Layout;")) {
+                                val layoutRegister = prevInstruction.registersUsed[0]
+                                addInstruction(
+                                    index,
+                                    """
+                                    invoke-static {v$layoutRegister}, $ACTIONBAR_DESCRIPTOR->mainFeedActionBarButton(Landroid/view/ViewGroup;)V
+                                    """.trimIndent(),
+                                )
+                                addFlags("mainFeedActionBarFlags")
+                                true
+                            } else {
+                                false
+                            }
                         } else {
                             false
                         }
