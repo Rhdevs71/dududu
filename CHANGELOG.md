@@ -1,3 +1,9 @@
+## [1.0.9](https://github.com/Rhdevs71/dududu/compare/v1.0.8...v1.0.9) (2026-09-05)
+
+### 🐛 Bug Fixes
+
+* **instagram:** pass valid ViewGroup to mainFeedActionBarButton to prevent runtime VerifyError ([08595c3](https://github.com/Rhdevs71/dududu/commit/08595c32e349700c49f879cb905a347b2a9ee22b))
+
 ## [1.0.8](https://github.com/Rhdevs71/dududu/compare/v1.0.7...v1.0.8) (2026-09-05)
 
 ### 🐛 Bug Fixes
