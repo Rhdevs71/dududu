@@ -213,3 +213,80 @@ java -cp "C:\Users\Rhdevs\.gemini\antigravity-ide\brain\1d333b8e-d15c-4ed1-ba84-
 3. **Standar Penanganan Error**:
    - DILARANG membiarkan catch block kosong (`catch (Exception ignored) {}`) tanpa alasan yang sangat kuat.
    - Semua error baru WAJIB menggunakan `PikoLog.e(TAG, message, exception)` agar tercatat di `/sdcard/Download/Piko/piko_debug.log`.
+
+---
+
+## 8. Basis Analisis & Pengetahuan Teknis Reverse Engineering (Disassembly v444)
+
+Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali, dan temuan runtime agar agen berikutnya tidak perlu mengulang investigasi dari nol.
+
+### A. Sumber Daya & Path Basis Analisis
+1. **Decompiled Base Smali (Acuan Utama Struktur APK Target)**:
+   - Path Folder: `C:\Users\Rhdevs\Downloads\apktools\unknown\base`
+   - Keterangan: Berisi seluruh hasil disassembly apktool terhadap file APK Instagram v444 (`classes.dex` sampai `classes15.dex` dan seluruh resources XML).
+2. **Log Nyata Perangkat Pengguna (Device Truth)**:
+   - Path Lokal: `C:\Users\Rhdevs\Downloads\piko_debug.log`
+   - Path di Perangkat: `/sdcard/Download/Piko/piko_debug.log`
+   - Keterangan: Dicatat langsung oleh smartphone pengguna (TECNO, Android 15 SDK 35) melalui sistem logging terpusat Piko.
+3. **Master Target APK**:
+   - Path: `c:\Users\Rhdevs\Downloads\apknya.apkm` (Instagram Android versi `444.0.0.46.85`)
+4. **Patched APK Terkini**:
+   - Path: `C:\Users\Rhdevs\Downloads\instagram_v1.0.17_59patches.apk` (151,488,102 bytes)
+5. **Patching Engine & Release MPP**:
+   - CLI: `C:\Users\Rhdevs\Downloads\morphe-cli.jar`
+   - Bundle Terkini: `C:\Users\Rhdevs\Downloads\patches-1.0.17.mpp` (Rilis GitHub Actions Run #31, tag `v1.0.17`)
+
+---
+
+### B. Hasil Analisis & Peta Obfuscation Instagram v444
+
+#### 1. Model Akun Pengguna (`com.instagram.user.model.User`)
+* **File Smali Acuan**: Disassembly pada `unknown/base/smali/com/instagram/user/model/User.smali`
+* **Pemetaan Method Obfuscated v444**:
+  - `A1B()` -> `getBio()` (mengembalikan biografi pengguna sebagai `String`)
+  - `A6y()` -> `getUsername()` (mengembalikan username pengguna sebagai `String`)
+  - `A86()` / `A7N()` -> `getFullName()` / `getFollowersCount()`
+  - `A1d()` -> `getFollowingCount()`
+  - `A1i()` -> `getProfilePicUrl()` (mengembalikan URL foto profil / objek `ImageUrl`)
+  - `A5s()` -> `isVerified()` (mengembalikan boolean status verifikasi centang biru)
+* **Temuan Gotcha Primitive `Long`**:
+  - Pada Instagram v444, field `A04` pada controller profil bertipe primitif `long`. Jika diekstrak via reflection generic, menghasilkan objek `java.lang.Long` yang tidak memiliki method profil user.
+  - *Solusi Paten*: Guarding `!(obj instanceof Long)` dan memanggil method langsung pada instance `com.instagram.user.model.User`.
+
+#### 2. Mekanisme Penggantian String Morphe (`UserDataEntity.kt`)
+* **Temuan Masalah Bytecode**:
+  - Fungsi Morphe `changeFirstString("val")` hanya mengganti instruksi `const-string` pertama pada sebuah method (index 0).
+  - Jika developer menambahkan instruksi/konstanta string baru di baris awal method (misal `return ""` atau log tag), urutan index string bergeser. Akibatnya string nama method yang dituju tidak terganti dan tetap menjadi string sentinel mentah (`"Bvt"`, `"BCu"`, `"methodName"`, `"methodname"`, dll.), memicu `NoSuchMethodException` dan `MalformedURLException`.
+* **Solusi Paten**:
+  - Selalu gunakan `changeString("sentinel_token", actualMethodName)` secara eksplisit dan presisi.
+
+#### 3. Bottom Sheet Story Controller (`LX/0Tlr;`)
+* **File Smali Acuan**: `unknown/base/smali/X/0Tlr.smali` (method `A0o` dan `A0q`)
+* **Temuan Masalah Bytecode**:
+  - Hook lama menduga instruksi sebelum percabangan `if-eqz` adalah list hasil `move-result-object`.
+  - Pada v444, instruksi tersebut telah berubah menjadi `iget-boolean ... A06:Z` (register `v0` boolean).
+  - Menginjeksi `v0` ke method `StoryButton.addButtons(ArrayList)` menyebabkan **`java.lang.VerifyError: register v0 has type Boolean but expected Reference`** pada ART Verifier Android 15.
+* **Solusi Paten**:
+  - Pindahkan titik injeksi tepat sebelum pemanggilan `toArray` di mana register `v5` terbukti menyimpan referensi `java.util.ArrayList` yang valid.
+
+#### 4. Media Downloader (Gambar & Video)
+* **File Smali Acuan Gambar**: `unknown/base` (interface `ImageInfo` dan implementasi `ImageInfoImpl`)
+  - Fingerprint lama mengambil method internal `Cmh()` yang tidak ada pada `ImageInfoImpl` v444.
+  - Method publik interface yang mengembalikan list URL resolusi gambar adalah method dengan return type `Ljava/util/List;` (method interface `BaG`). Ekstraksi kandidat dilakukan dari method ini disertai dynamic fallback.
+* **File Smali Acuan Video**: `com/instagram/api/schemas/VideoVersionIntf.smali`
+  - Meta memindahkan package `VideoVersionIntf` dari `com.instagram.model.mediasize.*` ke `com.instagram.api.schemas.*`.
+  - Penggunaan static cast menyebabkan `NoClassDefFoundError`.
+  - *Solusi Paten*: Akses dinamis via reflection `super.getMethod(this.obj, "getUrl")` dan fallback deteksi Pando video model.
+
+#### 5. Larangan Drawable Facebook Icon pada Instagram (`AppFbIconDrawable`)
+* **Temuan Runtime Log**:
+  - Pemanggilan `ResourceUtils.getDrawable("fb_ic_friend_*")` memicu fatal exception:
+    `java.lang.IllegalStateException: FB icon drawables are not supported in IG!`
+  - Class internal Instagram `AppFbIconDrawable` sengaja memblokir penggunaan drawable turunan FBUI.
+* **Solusi Paten**:
+  - Wajib hanya menggunakan drawable resmi Instagram, antara lain:
+    * Follows You: `instagram_user_following_pano_outline_24`
+    * Mutual: `instagram_user_follow_pano_outline_24`
+    * Not Following: `instagram_user_unfollow_outline_24`
+  - Seluruh pemanggilan resource icon dibungkus `try-catch` agar kegagalan resource tidak pernah merusak render layout badge status.
+
