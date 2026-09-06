@@ -113,7 +113,14 @@ public class FriendshipStatusIndicator {
             int indicatorColor = indicatorColorHex == null
                     ? primaryTextColor
                     : Color.parseColor(indicatorColorHex);
-            Drawable rawIcon = ResourceUtils.getDrawable(indicatorIconDrawable);
+            Drawable rawIcon = null;
+            try {
+                if (indicatorIconDrawable != null) {
+                    rawIcon = ResourceUtils.getDrawable(indicatorIconDrawable);
+                }
+            } catch (Throwable t) {
+                // Ignore if icon cannot be loaded so the text badge still renders
+            }
             if (rawIcon != null) {
                 Drawable statusIcon = rawIcon.mutate();
                 statusIcon.setColorFilter(
@@ -215,15 +222,15 @@ public class FriendshipStatusIndicator {
                 boolean useStatusColor = Pref.followBackColorIndicator();
                 if (followed_by && following) {
                     indicatorText = str("piko_fbi_following_each_other");
-                    indicatorIconDrawable = "fb_ic_friend_confirm_20";
+                    indicatorIconDrawable = "instagram_user_following_pano_outline_24";
                     indicatorColorHex = useStatusColor ? "#3389DF" : null;
                 } else if (followed_by) {
                     indicatorText = str("piko_fbi_follows_you");
-                    indicatorIconDrawable = "fb_ic_friend_add_20";
+                    indicatorIconDrawable = "instagram_user_follow_pano_outline_24";
                     indicatorColorHex = useStatusColor ? "#3CC176" : null;
                 } else {
                     indicatorText = str("piko_fbi_doesnt_follows_you");
-                    indicatorIconDrawable = "fb_ic_friend_remove_20";
+                    indicatorIconDrawable = "instagram_user_unfollow_outline_24";
                     indicatorColorHex = useStatusColor ? "#EB4941" : null;
                 }
 

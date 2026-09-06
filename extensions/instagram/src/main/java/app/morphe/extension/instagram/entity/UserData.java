@@ -44,80 +44,149 @@ public class UserData extends Entity {
 
     public Boolean isVerified() throws Exception {
         Object target = getAdditionalUserInfo();
-        try {
-            Object res = invokeUserMethod(target, "isVerified");
-            if (res instanceof Boolean) return (Boolean) res;
-        } catch (Exception e) {
-            PikoLog.e("UserData", "Error at isVerified", e);
+        if (target != null) {
+            try {
+                Object res = invokeUserMethod(target, "isVerified");
+                if (res instanceof Boolean) return (Boolean) res;
+            } catch (Exception e) {
+                PikoLog.e("UserData", "Error at isVerified", e);
+            }
+        }
+        if (this.obj != null) {
+            try {
+                Object res = super.getMethod(this.obj, "A5s");
+                if (res instanceof Boolean) return (Boolean) res;
+            } catch (Exception ignored) {
+            }
+            try {
+                Object res = super.getMethod(this.obj, "isVerified");
+                if (res instanceof Boolean) return (Boolean) res;
+            } catch (Exception ignored) {
+            }
         }
         return false;
     }
 
     public String getUsername() throws Exception {
-        if (this.obj == null) return "instagram_user";
         Object target = getAdditionalUserInfo();
-        try {
-            Object uname = invokeUserMethod(target, "methodName");
-            if (uname != null && !uname.toString().isEmpty()) return uname.toString();
-        } catch (Exception ignored) {
+        if (target != null) {
+            try {
+                Object uname = invokeUserMethod(target, "methodName");
+                if (uname != null && !uname.toString().isEmpty()) return uname.toString();
+            } catch (Exception ignored) {
+            }
         }
-        try {
-            Object uname = super.getMethod(this.obj, "getUsername");
-            if (uname != null && !uname.toString().isEmpty()) return uname.toString();
-        } catch (Exception ignored) {
+        if (this.obj != null) {
+            try {
+                Object uname = super.getMethod(this.obj, "A86");
+                if (uname != null && !uname.toString().isEmpty()) return uname.toString();
+            } catch (Exception ignored) {
+            }
+            try {
+                Object uname = super.getMethod(this.obj, "getUsername");
+                if (uname != null && !uname.toString().isEmpty()) return uname.toString();
+            } catch (Exception ignored) {
+            }
         }
         return "instagram_user";
     }
 
     public String getFullName() throws Exception {
-        if (this.obj == null) return "";
         Object target = getAdditionalUserInfo();
-        try {
-            Object name = invokeUserMethod(target, "methodName");
-            if (name != null && !name.toString().isEmpty()) return name.toString();
-        } catch (Exception ignored) {
+        if (target != null) {
+            try {
+                Object name = invokeUserMethod(target, "methodName");
+                if (name != null && !name.toString().isEmpty()) return name.toString();
+            } catch (Exception ignored) {
+            }
+        }
+        if (this.obj != null) {
+            try {
+                Object name = super.getMethod(this.obj, "A7N");
+                if (name != null && !name.toString().isEmpty()) return name.toString();
+            } catch (Exception ignored) {
+            }
         }
         return this.getUsername();
     }
 
     public String getBio() throws Exception {
         Object target = getAdditionalUserInfo();
-        if (target == null) return "";
-        try {
-            Object bio = invokeUserMethod(target, "BCu");
-            return bio != null ? bio.toString() : "";
-        } catch (Exception e) {
-            PikoLog.e("UserData", "Error at getBio", e);
-            return "";
-        }
-    }
-
-    public String getProfilePictureUrl() throws Exception {
-        Object target = getAdditionalUserInfo();
-        if (target == null) return "";
-        try {
-            Object profilePicObject = invokeUserMethod(target, "Bvt");
-            if (profilePicObject != null) {
-                Entity profilePicEntity = new Entity(profilePicObject);
-                Object url = profilePicEntity.getMethod("getUrl");
-                return url != null ? url.toString() : "";
+        if (target != null) {
+            try {
+                Object bio = invokeUserMethod(target, "BCu");
+                if (bio != null) return bio.toString();
+            } catch (Exception e) {
+                PikoLog.e("UserData", "Error at getBio", e);
             }
-        } catch (Exception e) {
-            PikoLog.e("UserData", "Error at getProfilePictureUrl", e);
+        }
+        if (this.obj != null) {
+            try {
+                Object bio = super.getMethod(this.obj, "A6y");
+                if (bio != null) return bio.toString();
+            } catch (Exception ignored) {
+            }
         }
         return "";
     }
 
+    public String getProfilePictureUrl() throws Exception {
+        Object target = getAdditionalUserInfo();
+        if (target != null) {
+            try {
+                Object profilePicObject = invokeUserMethod(target, "Bvt");
+                if (profilePicObject != null) {
+                    Entity profilePicEntity = new Entity(profilePicObject);
+                    Object url = profilePicEntity.getMethod("getUrl");
+                    if (url != null && !url.toString().isEmpty()) {
+                        return url.toString();
+                    }
+                }
+            } catch (Exception e) {
+                PikoLog.e("UserData", "Error at getProfilePictureUrl", e);
+            }
+        }
+        if (this.obj != null) {
+            try {
+                Object picObj = super.getMethod(this.obj, "A1B");
+                if (picObj != null) {
+                    Object url = new Entity(picObj).getMethod("getUrl");
+                    if (url != null && !url.toString().isEmpty()) return url.toString();
+                }
+            } catch (Exception ignored) {
+            }
+            try {
+                Object lowRes = super.getMethod(this.obj, "A1d");
+                if (lowRes != null) {
+                    Object url = new Entity(lowRes).getMethod("getUrl");
+                    if (url != null && !url.toString().isEmpty()) return url.toString();
+                }
+            } catch (Exception ignored) {
+            }
+        }
+        return null;
+    }
+
     public ImageUrl getLowResProfilePicture() throws Exception {
         Object target = getAdditionalUserInfo();
-        if (target == null) return null;
-        try {
-            Object imageUrlObject = invokeUserMethod(target, "mediaName");
-            return (ImageUrl) imageUrlObject;
-        } catch (Exception e) {
-            PikoLog.e("UserData", "Error at getLowResProfilePicture", e);
-            return null;
+        if (target != null) {
+            try {
+                Object imageUrlObject = invokeUserMethod(target, "mediaName");
+                if (imageUrlObject instanceof ImageUrl) {
+                    return (ImageUrl) imageUrlObject;
+                }
+            } catch (Exception e) {
+                PikoLog.e("UserData", "Error at getLowResProfilePicture", e);
+            }
         }
+        if (this.obj != null) {
+            try {
+                Object lowRes = super.getMethod(this.obj, "A1d");
+                if (lowRes instanceof ImageUrl) return (ImageUrl) lowRes;
+            } catch (Exception ignored) {
+            }
+        }
+        return null;
     }
 
     /** The public permalink of this profile: what "share" and "copy link" both hand out. */
@@ -138,15 +207,25 @@ public class UserData extends Entity {
 
     public UserFriendshipStatus getUserFriendshipStatus() throws Exception {
         Object target = getAdditionalUserInfo();
-        if (target == null) {
-            return new UserFriendshipStatus(null);
+        if (target != null) {
+            try {
+                Object friendshipStatusObject = invokeUserMethod(target, "methodname");
+                if (friendshipStatusObject != null) {
+                    return new UserFriendshipStatus(friendshipStatusObject);
+                }
+            } catch (Exception e) {
+                PikoLog.e("UserData", "Error at getUserFriendshipStatus", e);
+            }
         }
-        try {
-            Object friendshipStatusObject = invokeUserMethod(target, "methodname");
-            return new UserFriendshipStatus(friendshipStatusObject);
-        } catch (Exception e) {
-            PikoLog.e("UserData", "Error at getUserFriendshipStatus", e);
-            return new UserFriendshipStatus(null);
+        if (this.obj != null) {
+            try {
+                Object statusObj = super.getMethod(this.obj, "A1i");
+                if (statusObj != null) {
+                    return new UserFriendshipStatus(statusObj);
+                }
+            } catch (Exception ignored) {
+            }
         }
+        return new UserFriendshipStatus(null);
     }
 }

@@ -11,6 +11,7 @@ import app.crimera.patches.instagram.entity.decoder.decoderEntity
 import app.crimera.patches.instagram.entity.userfriendshipstatus.userFriendshipStatusEntity
 import app.crimera.patches.instagram.utils.Constants.FRIENDSHIP_STATUS_CLASS
 import app.crimera.utils.changeFirstString
+import app.crimera.utils.changeString
 import app.crimera.utils.extensionToClassName
 import app.crimera.utils.fieldExtractor
 import app.crimera.utils.getReference
@@ -38,13 +39,13 @@ val userDataEntity =
             userModelClass =
                 if (classDefByOrNull(LIVE_TREE_USER_DICT_CLASS) != null) LIVE_TREE_USER_DICT_CLASS else USER_MODEL_CLASS_NAME
 
-            GetUsernameExtensionFingerprint.changeFirstString(UserNameLiveTreeUserDictFingerprint.getMethodName())
-            GetFullNameExtensionFingerprint.changeFirstString(FullNameLiveTreeUserDictFingerprint.getMethodName())
-            GetUserFriendshipStatusExtensionFingerprint.changeFirstString(FriendshipStatusLiveTreeUserDictFingerprint.getMethodName())
-            GetBioExtensionFingerprint.changeFirstString(BiographyLiveTreeUserDictFingerprint.getMethodName())
-            GetProfilePictureUrlExtensionFingerprint.changeFirstString(HDProfileInfoUserTreeDictFingerprint.getMethodName())
-            GetLowResProfilePictureExtensionFingerprint.changeFirstString(LowResProfilePictureUserTreeDictFingerprint.getMethodName())
-            IsVerifiedExtensionFingerprint.changeFirstString(IsVerifiedUserTreeDictFingerprint.getMethodName())
+            GetUsernameExtensionFingerprint.changeString("methodName", UserNameLiveTreeUserDictFingerprint.getMethodName())
+            GetFullNameExtensionFingerprint.changeString("methodName", FullNameLiveTreeUserDictFingerprint.getMethodName())
+            GetUserFriendshipStatusExtensionFingerprint.changeString("methodname", FriendshipStatusLiveTreeUserDictFingerprint.getMethodName())
+            GetBioExtensionFingerprint.changeString("BCu", BiographyLiveTreeUserDictFingerprint.getMethodName())
+            GetProfilePictureUrlExtensionFingerprint.changeString("Bvt", HDProfileInfoUserTreeDictFingerprint.getMethodName())
+            GetLowResProfilePictureExtensionFingerprint.changeString("mediaName", LowResProfilePictureUserTreeDictFingerprint.getMethodName())
+            IsVerifiedExtensionFingerprint.changeString("isVerified", IsVerifiedUserTreeDictFingerprint.getMethodName())
 
             if (userModelClass != USER_MODEL_CLASS_NAME) {
                 SelectHighlightsCoverFragmentOnCreateFingerprint.method.apply {
