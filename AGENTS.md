@@ -33,7 +33,7 @@
    - *Penyebab*: Perubahan fingerprint UI pada v444 di mana layout badge profil dipindahkan ke controller baru.
    - *Solusi*: Memperbarui hook pada `ProfileInfoFingerprint` dan merapikan inject badge di `FriendshipStatusIndicator.java`.
 
-3. **Tahap 3: Penerapan Sistem Debug Log Terpusat & Terinci di SEMUA Fitur (Rilis v1.0.15 - Terkini)**
+3. **Tahap 3: Penerapan Sistem Debug Log Terpusat & Terinci di SEMUA Fitur (Rilis v1.0.15)**
    - *Permintaan Pengguna*: Pengguna meminta **SEMUA** fitur, patch, tambalan, dan error handler mencatat kegagalan ke satu file log terpadu secara rinci (bukan hanya fitur download, dan tidak hanya menampilkan toast singkat yang cepat hilang).
    - *Solusi*:
      - Membuat bridge logger sentral `PikoLog.java`.
@@ -41,7 +41,15 @@
      - Mengarahkan fatal uncaught crash pada thread mana pun ke `CustomCrashHandler.java`.
      - Mengarahkan semua toast ke file log melalui `PikoUtils.toast`.
      - File log disimpan di: **`/sdcard/Download/Piko/piko_debug.log`**.
-   - *Status Saat Ini*: Rilis **`v1.0.15`** (`patches-1.0.15.mpp`) berhasil dirilis via CI Run #27. APK `C:\Users\Rhdevs\Downloads\instagram_v1015_59patches.apk` telah dipatch dan diaudit (102 calls checked, **0 warnings / 0 VerifyError**).
+   - *Status*: Rilis **`v1.0.15`** (`patches-1.0.15.mpp`) berhasil dirilis via CI Run #27.
+
+4. **Tahap 4: Perbaikan 4 Crash & Bug Krusial Berdasarkan Analisis `piko_debug.log` (Rilis v1.0.16 - Terkini)**
+   - *Analisis Log Perangkat Pengguna (`piko_debug.log`)*:
+     1. `FriendshipStatusIndicator & ProfileMoreOption`: `Method not found in class java.lang.Long`. Pada v444 field `A04` bertipe `long` sehingga `getAdditionalUserInfo()` memuat `Long`. Diperbaiki dengan mengabaikan primitive `Long` dan memanggil method langsung pada model `User`.
+     2. `Video Downloader`: `NoClassDefFoundError: VideoVersionIntf`. Interface dipindah ke `com.instagram.api.schemas`. Diperbaiki dengan dynamic reflection `super.getMethod(this.obj, "getUrl")` dan deteksi aman Pando video.
+     3. `Image Downloader`: `Method Cmh not found in class ImageInfoImpl`. Fingerprint mengambil method yang salah. Diperbaiki dengan mengekstrak method return `List` dari interface `ImageInfo` (`BaG`) serta dynamic discovery fallback.
+     4. `Story Bottom Sheet`: `VerifyError: [0x38] register v0 has type Boolean but expected Reference: java.util.ArrayList`. Hook `SelfStoryAddStoryButtonFingerprint` salah mengambil register `boolean` dari `iget-boolean ... A06:Z`. Diperbaiki dengan hook presisi sebelum `toArray` pada register `ArrayList` `v5`.
+   - *Status Saat Ini*: Rilis **`v1.0.16`** (`patches-1.0.16.mpp`) berhasil dirilis via CI Run #29. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.16_59patches.apk`** telah dipatch dan diaudit (102 calls checked, **0 warnings / 0 VerifyError**).
 
 ---
 
