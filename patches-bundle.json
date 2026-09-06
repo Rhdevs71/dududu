@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-05T17:31:47",
-  "description": "## [1.0.15](https://github.com/Rhdevs71/dududu/compare/v1.0.14...v1.0.15) (2026-09-05)\n\n### 🐛 Bug Fixes\n\n* **instagram:** add missing PikoUtils import in ButtonPref ([38b8fa6](https://github.com/Rhdevs71/dududu/commit/38b8fa695544314596230044a380b91b4b7bbbda))\n* **instagram:** fix variable references in DownloadUtils and ButtonPref ([226d425](https://github.com/Rhdevs71/dududu/commit/226d425f39d077697c28c2f4ec93b5d375ad5f93))\n* **instagram:** route all feature errors, toasts, and crashes to unified debug log ([4ea2a49](https://github.com/Rhdevs71/dududu/commit/4ea2a491e606177af8e9bcca3fa1bfb76a89c7b1))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.15/patches-1.0.15.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.15/patches-1.0.15.mpp.asc",
-  "version": "1.0.15"
+  "created_at": "2026-09-06T15:01:05",
+  "description": "## [1.0.16](https://github.com/Rhdevs71/dududu/compare/v1.0.15...v1.0.16) (2026-09-06)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve video/image downloader, userdata reflection, and story bottom sheet VerifyError ([0e5b2b6](https://github.com/Rhdevs71/dududu/commit/0e5b2b6bd681566fe17bd649628ff70a4699c6a5))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.16/patches-1.0.16.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.16/patches-1.0.16.mpp.asc",
+  "version": "1.0.16"
 }

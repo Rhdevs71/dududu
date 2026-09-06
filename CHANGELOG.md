@@ -1,3 +1,9 @@
+## [1.0.16](https://github.com/Rhdevs71/dududu/compare/v1.0.15...v1.0.16) (2026-09-06)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve video/image downloader, userdata reflection, and story bottom sheet VerifyError ([0e5b2b6](https://github.com/Rhdevs71/dududu/commit/0e5b2b6bd681566fe17bd649628ff70a4699c6a5))
+
 ## [1.0.15](https://github.com/Rhdevs71/dududu/compare/v1.0.14...v1.0.15) (2026-09-05)
 
 ### 🐛 Bug Fixes
