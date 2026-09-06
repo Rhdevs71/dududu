@@ -46,10 +46,12 @@ val userDataEntity =
             GetLowResProfilePictureExtensionFingerprint.changeFirstString(LowResProfilePictureUserTreeDictFingerprint.getMethodName())
             IsVerifiedExtensionFingerprint.changeFirstString(IsVerifiedUserTreeDictFingerprint.getMethodName())
 
-            SelectHighlightsCoverFragmentOnCreateFingerprint.method.apply {
-                val firstIGetObjectIndex = indexOfFirstInstruction(Opcode.IGET_OBJECT)
-                val mutableUserDictIntfFieldName = getInstruction(firstIGetObjectIndex).fieldExtractor().name
-                GetAdditionalUserInfoExtensionFingerprint.changeFirstString(mutableUserDictIntfFieldName)
+            if (userModelClass != USER_MODEL_CLASS_NAME) {
+                SelectHighlightsCoverFragmentOnCreateFingerprint.method.apply {
+                    val firstIGetObjectIndex = indexOfFirstInstruction(Opcode.IGET_OBJECT)
+                    val mutableUserDictIntfFieldName = getInstruction(firstIGetObjectIndex).fieldExtractor().name
+                    GetAdditionalUserInfoExtensionFingerprint.changeFirstString(mutableUserDictIntfFieldName)
+                }
             }
         }
     }

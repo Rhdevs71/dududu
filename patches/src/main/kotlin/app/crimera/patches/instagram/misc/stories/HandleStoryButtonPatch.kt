@@ -20,6 +20,8 @@ import app.morphe.patcher.util.smali.ExternalLabel
 import app.morphe.util.indexOfFirstInstruction
 import app.morphe.util.registersUsed
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 // The method is obfuscated but this is where it adds buttons.
 object AddStoryButtonFingerprint : Fingerprint(
@@ -57,23 +59,44 @@ val handleStoryButtonPatch =
             val STORY_BUTTON_EXTENSION_CLASS = "${PATCHES_DESCRIPTOR}/story/StoryButton;"
             // Add button on self story bottom sheet.
             SelfStoryAddStoryButtonFingerprint.method.apply {
-                instructions.filter { it.opcode == Opcode.IF_EQZ }.first { it ->
-                    val index = it.location.index
-                    val nextOpcode = getInstruction(index + 1).opcode
-                    if (nextOpcode == Opcode.IGET_OBJECT) {
-                        val arrayMoveResultObjectIndex = index - 1
-                        val arrayListRegister = getInstruction(arrayMoveResultObjectIndex).registersUsed[0]
+                val toArrayIndex = instructions.indexOfFirst {
+                    it is ReferenceInstruction && (it.reference as? MethodReference)?.name == "toArray"
+                }
+                if (toArrayIndex != -1) {
+                    val toArrayInstruction = getInstruction(toArrayIndex)
+                    val arrayListRegister = toArrayInstruction.registersUsed[0]
 
-                        addInstructions(
-                            arrayMoveResultObjectIndex + 1,
-                            """
-                            invoke-static {v$arrayListRegister},$STORY_BUTTON_EXTENSION_CLASS ->addButtons(Ljava/util/ArrayList;)Ljava/util/ArrayList;
-                            move-result-object v$arrayListRegister
-                            """.trimIndent(),
-                        )
-                        true
-                    } else {
-                        false
+                    addInstructions(
+                        toArrayIndex,
+                        """
+                        invoke-static {v$arrayListRegister},$STORY_BUTTON_EXTENSION_CLASS ->addButtons(Ljava/util/ArrayList;)Ljava/util/ArrayList;
+                        move-result-object v$arrayListRegister
+                        """.trimIndent(),
+                    )
+                } else {
+                    instructions.filter { it.opcode == Opcode.IF_EQZ }.firstOrNull { it ->
+                        val index = it.location.index
+                        val nextOpcode = getInstruction(index + 1).opcode
+                        if (nextOpcode == Opcode.IGET_OBJECT) {
+                            val arrayMoveResultObjectIndex = index - 1
+                            val prevInst = getInstruction(arrayMoveResultObjectIndex)
+                            if (prevInst.opcode == Opcode.MOVE_RESULT_OBJECT) {
+                                val arrayListRegister = prevInst.registersUsed[0]
+
+                                addInstructions(
+                                    arrayMoveResultObjectIndex + 1,
+                                    """
+                                    invoke-static {v$arrayListRegister},$STORY_BUTTON_EXTENSION_CLASS ->addButtons(Ljava/util/ArrayList;)Ljava/util/ArrayList;
+                                    move-result-object v$arrayListRegister
+                                    """.trimIndent(),
+                                )
+                                true
+                            } else {
+                                false
+                            }
+                        } else {
+                            false
+                        }
                     }
                 }
             }

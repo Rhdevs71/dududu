@@ -51,11 +51,13 @@ val mediaDataEntity =
             GetUserDataWithUserSessionExtensionFingerprint.changeFirstString(GetUserDataFromMediaFingerprint.method.name)
 
             // Extracting image variants list.
-            AyuMidcardMediaHelperImageObjectMethodFingerprint.method.apply {
-                val imageVariantsIndex = instructions.indexOfLast { it.opcode == Opcode.INVOKE_INTERFACE }
-                val imageVariantsMethodName = getInstruction(imageVariantsIndex).methodExtractor().name
-                GetImageVariantsExtensionFingerprint.changeStringAt(1, imageVariantsMethodName)
-            }
+            val imageVariantsMethodName = classDefByOrNull("Lcom/instagram/model/mediasize/ImageInfo;")
+                ?.methods?.firstOrNull { it.returnType == "Ljava/util/List;" }?.name
+                ?: AyuMidcardMediaHelperImageObjectMethodFingerprint.method.let { m ->
+                    val imageVariantsIndex = m.instructions.indexOfLast { it.opcode == Opcode.INVOKE_INTERFACE }
+                    m.getInstruction(imageVariantsIndex).methodExtractor().name
+                }
+            GetImageVariantsExtensionFingerprint.changeStringAt(1, imageVariantsMethodName)
 
             // Extracting the get mention set method used media helper class.
             GetMentionSetExtensionFingerprint.changeFirstString(LiveTreeMediaDictReelsMentionFingerprint.method.name)

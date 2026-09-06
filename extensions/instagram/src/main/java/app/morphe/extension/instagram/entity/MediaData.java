@@ -17,6 +17,7 @@ import android.content.Context;
 import app.morphe.extension.shared.Utils;
 import app.morphe.extension.crimera.downloader.MediaType;
 import app.morphe.extension.instagram.constants.PostType;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 import com.instagram.common.session.UserSession;
 
@@ -271,11 +272,45 @@ public class MediaData extends Entity {
     }
 
     public List getImageVariants() throws Exception {
-        Object imageInfoObject = (Object) super.getField(this.getMoreExtendedData(), "fieldName");
-        List variantList = (List) super.getMethod(imageInfoObject, "methodName");
+        Object extendedData = this.getMoreExtendedData();
+        Object imageInfoObject = super.getField(extendedData, "fieldName");
+        if (imageInfoObject == null) return new ArrayList<>();
+
+        List variantList = null;
+        try {
+            Object res = super.getMethod(imageInfoObject, "methodName");
+            if (res instanceof List) {
+                variantList = (List) res;
+            }
+        } catch (Exception e) {
+            PikoLog.e("MediaData", "Patched getImageVariants method failed, trying dynamic fallback", e);
+        }
+
+        // Fallback: search imageInfoObject for any zero-arg method returning List
+        if (variantList == null) {
+            for (java.lang.reflect.Method m : imageInfoObject.getClass().getMethods()) {
+                if (m.getParameterCount() == 0 && List.class.isAssignableFrom(m.getReturnType())) {
+                    try {
+                        m.setAccessible(true);
+                        Object candidate = m.invoke(imageInfoObject);
+                        if (candidate instanceof List && !((List) candidate).isEmpty()) {
+                            variantList = (List) candidate;
+                            break;
+                        }
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        }
 
         List<ImageData> imageList = new ArrayList<>();
-        variantList.forEach(item -> imageList.add(new ImageData(item)));
+        if (variantList != null) {
+            for (Object item : variantList) {
+                if (item != null) {
+                    imageList.add(new ImageData(item));
+                }
+            }
+        }
         return imageList;
     }
 

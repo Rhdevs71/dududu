@@ -7,6 +7,7 @@
 
 package app.morphe.extension.instagram.entity;
 
+import app.morphe.extension.instagram.utils.PikoLog;
 import com.instagram.common.typedurl.ImageUrl;
 
 public class UserData extends Entity {
@@ -17,23 +18,52 @@ public class UserData extends Entity {
         this.obj = obj;
     }
 
-    private Object getAdditionalUserInfo() throws Exception {
+    private Object getAdditionalUserInfo() {
         if (this.obj == null) return null;
-        return super.getField(this.obj, "fieldName");
+        try {
+            Object res = super.getField(this.obj, "fieldName");
+            if (res != null && !(res instanceof Number)) {
+                return res;
+            }
+        } catch (Exception ignored) {
+        }
+        return this.obj;
+    }
+
+    private Object invokeUserMethod(Object target, String methodName) throws Exception {
+        if (target == null) return null;
+        try {
+            return super.getMethod(target, methodName);
+        } catch (NoSuchMethodException e) {
+            if (target != this.obj && this.obj != null) {
+                return super.getMethod(this.obj, methodName);
+            }
+            throw e;
+        }
     }
 
     public Boolean isVerified() throws Exception {
-        Object additionalUserInfo = getAdditionalUserInfo();
-        return (Boolean) super.getMethod(additionalUserInfo, "isVerified");
+        Object target = getAdditionalUserInfo();
+        try {
+            Object res = invokeUserMethod(target, "isVerified");
+            if (res instanceof Boolean) return (Boolean) res;
+        } catch (Exception e) {
+            PikoLog.e("UserData", "Error at isVerified", e);
+        }
+        return false;
     }
 
     public String getUsername() throws Exception {
         if (this.obj == null) return "instagram_user";
-        Object additionalUserInfo = getAdditionalUserInfo();
-        if (additionalUserInfo == null) return "instagram_user";
+        Object target = getAdditionalUserInfo();
         try {
-            String uname = (String) super.getMethod(additionalUserInfo, "methodName");
-            if (uname != null && !uname.isEmpty()) return uname;
+            Object uname = invokeUserMethod(target, "methodName");
+            if (uname != null && !uname.toString().isEmpty()) return uname.toString();
+        } catch (Exception ignored) {
+        }
+        try {
+            Object uname = super.getMethod(this.obj, "getUsername");
+            if (uname != null && !uname.toString().isEmpty()) return uname.toString();
         } catch (Exception ignored) {
         }
         return "instagram_user";
@@ -41,37 +71,53 @@ public class UserData extends Entity {
 
     public String getFullName() throws Exception {
         if (this.obj == null) return "";
-        Object additionalUserInfo = getAdditionalUserInfo();
-        if (additionalUserInfo == null) return this.getUsername();
+        Object target = getAdditionalUserInfo();
         try {
-            String name = (String) super.getMethod(additionalUserInfo, "methodName");
-            if(name != null && !name.isEmpty()){
-                return name;
-            }
+            Object name = invokeUserMethod(target, "methodName");
+            if (name != null && !name.toString().isEmpty()) return name.toString();
         } catch (Exception ignored) {
         }
         return this.getUsername();
     }
 
     public String getBio() throws Exception {
-        Object additionalUserInfo = getAdditionalUserInfo();
-        return (String) super.getMethod(additionalUserInfo, "BCu");
+        Object target = getAdditionalUserInfo();
+        if (target == null) return "";
+        try {
+            Object bio = invokeUserMethod(target, "BCu");
+            return bio != null ? bio.toString() : "";
+        } catch (Exception e) {
+            PikoLog.e("UserData", "Error at getBio", e);
+            return "";
+        }
     }
 
     public String getProfilePictureUrl() throws Exception {
-        Object additionalUserInfo = getAdditionalUserInfo();
-        Object profilePicObject =  super.getMethod(additionalUserInfo, "Bvt");
-        if(profilePicObject!=null){
-            Entity profilePicEntity = new Entity(profilePicObject);
-            return (String) profilePicEntity.getMethod("getUrl");
+        Object target = getAdditionalUserInfo();
+        if (target == null) return "";
+        try {
+            Object profilePicObject = invokeUserMethod(target, "Bvt");
+            if (profilePicObject != null) {
+                Entity profilePicEntity = new Entity(profilePicObject);
+                Object url = profilePicEntity.getMethod("getUrl");
+                return url != null ? url.toString() : "";
+            }
+        } catch (Exception e) {
+            PikoLog.e("UserData", "Error at getProfilePictureUrl", e);
         }
         return "";
     }
 
     public ImageUrl getLowResProfilePicture() throws Exception {
-        Object additionalUserInfo = getAdditionalUserInfo();
-        Object imageUrlObject =  super.getMethod(additionalUserInfo, "mediaName");
-        return (ImageUrl) imageUrlObject;
+        Object target = getAdditionalUserInfo();
+        if (target == null) return null;
+        try {
+            Object imageUrlObject = invokeUserMethod(target, "mediaName");
+            return (ImageUrl) imageUrlObject;
+        } catch (Exception e) {
+            PikoLog.e("UserData", "Error at getLowResProfilePicture", e);
+            return null;
+        }
     }
 
     /** The public permalink of this profile: what "share" and "copy link" both hand out. */
@@ -80,16 +126,27 @@ public class UserData extends Entity {
     }
 
     public String getUserId() throws Exception {
-        return (String) super.getMethod(this.obj, "getId");
+        if (this.obj == null) return "";
+        try {
+            Object id = super.getMethod(this.obj, "getId");
+            return id != null ? id.toString() : "";
+        } catch (Exception e) {
+            PikoLog.e("UserData", "Error at getUserId", e);
+            return "";
+        }
     }
 
     public UserFriendshipStatus getUserFriendshipStatus() throws Exception {
-        Object additionalUserInfo = getAdditionalUserInfo();
-        if (additionalUserInfo == null) {
+        Object target = getAdditionalUserInfo();
+        if (target == null) {
             return new UserFriendshipStatus(null);
         }
-        Object friendshipStatusObject = super.getMethod(additionalUserInfo, "methodname");
-        return new UserFriendshipStatus(friendshipStatusObject);
+        try {
+            Object friendshipStatusObject = invokeUserMethod(target, "methodname");
+            return new UserFriendshipStatus(friendshipStatusObject);
+        } catch (Exception e) {
+            PikoLog.e("UserData", "Error at getUserFriendshipStatus", e);
+            return new UserFriendshipStatus(null);
+        }
     }
-
 }
