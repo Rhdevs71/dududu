@@ -43,13 +43,19 @@
      - File log disimpan di: **`/sdcard/Download/Piko/piko_debug.log`**.
    - *Status*: Rilis **`v1.0.15`** (`patches-1.0.15.mpp`) berhasil dirilis via CI Run #27.
 
-4. **Tahap 4: Perbaikan 4 Crash & Bug Krusial Berdasarkan Analisis `piko_debug.log` (Rilis v1.0.16 - Terkini)**
+4. **Tahap 4: Perbaikan 4 Crash & Bug Krusial Berdasarkan Analisis `piko_debug.log` (Rilis v1.0.16)**
    - *Analisis Log Perangkat Pengguna (`piko_debug.log`)*:
      1. `FriendshipStatusIndicator & ProfileMoreOption`: `Method not found in class java.lang.Long`. Pada v444 field `A04` bertipe `long` sehingga `getAdditionalUserInfo()` memuat `Long`. Diperbaiki dengan mengabaikan primitive `Long` dan memanggil method langsung pada model `User`.
      2. `Video Downloader`: `NoClassDefFoundError: VideoVersionIntf`. Interface dipindah ke `com.instagram.api.schemas`. Diperbaiki dengan dynamic reflection `super.getMethod(this.obj, "getUrl")` dan deteksi aman Pando video.
      3. `Image Downloader`: `Method Cmh not found in class ImageInfoImpl`. Fingerprint mengambil method yang salah. Diperbaiki dengan mengekstrak method return `List` dari interface `ImageInfo` (`BaG`) serta dynamic discovery fallback.
      4. `Story Bottom Sheet`: `VerifyError: [0x38] register v0 has type Boolean but expected Reference: java.util.ArrayList`. Hook `SelfStoryAddStoryButtonFingerprint` salah mengambil register `boolean` dari `iget-boolean ... A06:Z`. Diperbaiki dengan hook presisi sebelum `toArray` pada register `ArrayList` `v5`.
-   - *Status Saat Ini*: Rilis **`v1.0.16`** (`patches-1.0.16.mpp`) berhasil dirilis via CI Run #29. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.16_59patches.apk`** telah dipatch dan diaudit (102 calls checked, **0 warnings / 0 VerifyError**).
+   - *Status*: Rilis **`v1.0.16`** (`patches-1.0.16.mpp`) berhasil dirilis via CI Run #29. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.16_59patches.apk`** telah dipatch dan diaudit (102 calls checked, **0 warnings / 0 VerifyError**).
+
+5. **Tahap 5: Perbaikan FB Icon Crash di Friendship Badge & Shifting Sentinel UserData (Rilis v1.0.17 - Terkini)**
+   - *Analisis Log Perangkat Pengguna (`piko_debug.log`)*:
+     1. `FriendshipStatusIndicator`: `IllegalStateException: FB icon drawables are not supported in IG!` saat memuat `fb_ic_friend_*` (`AppFbIconDrawable`). Instagram menolak pemakaian drawable FB icon secara tegas. Diperbaiki dengan mengganti drawable ke icon resmi Instagram (`instagram_user_following_pano_outline_24`, `instagram_user_follow_pano_outline_24`, `instagram_user_unfollow_outline_24`) dan menambahkan try-catch guard.
+     2. `UserData & UserDataEntity`: `Method Bvt not found in class com.instagram.user.model.User`, `Method BCu not found`, dan `MalformedURLException: no protocol: A1B`. Terjadi karena `changeFirstString` menimpa string konstanta pertama yang bergeser posisinya akibat penambahan string baru di method. Diperbaiki dengan mengganti `changeFirstString` ke `changeString("sentinel", value)` secara presisi dan menambahkan method direct-call fallback di `UserData.java`.
+   - *Status Saat Ini*: Rilis **`v1.0.17`** (`patches-1.0.17.mpp`) berhasil dirilis via CI Run #31. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.17_59patches.apk`** telah dipatch dan diaudit (102 calls checked, **0 warnings / 0 VerifyError**, seluruh sentinel method name `A1B`, `A6y`, dll terinjeksi sempurna).
 
 ---
 
