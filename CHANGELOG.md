@@ -1,3 +1,9 @@
+## [1.0.17](https://github.com/Rhdevs71/dududu/compare/v1.0.16...v1.0.17) (2026-09-06)
+
+### 🐛 Bug Fixes
+
+* **instagram:** use valid ig drawables and sentinel string replacement for userdata ([281180c](https://github.com/Rhdevs71/dududu/commit/281180c1e2be847d7d033815be1e441a9a015a7c))
+
 ## [1.0.16](https://github.com/Rhdevs71/dududu/compare/v1.0.15...v1.0.16) (2026-09-06)
 
 ### 🐛 Bug Fixes
