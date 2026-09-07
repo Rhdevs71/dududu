@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-07T06:00:26",
-  "description": "## [1.0.18](https://github.com/Rhdevs71/dududu/compare/v1.0.17...v1.0.18) (2026-09-07)\n\n### 🐛 Bug Fixes\n\n* **appicon:** fix custom app icon switching by directly enabling activity alias via InstaAppIconManager ([2c86617](https://github.com/Rhdevs71/dududu/commit/2c8661778126cd9b97f6856e7de7004d4478f9b2))\n* **appicon:** fix fingerprint parameter typing in UnlockPlusBenefitsPatch ([08eca8b](https://github.com/Rhdevs71/dududu/commit/08eca8bcd448075df34507fbbccd70c9156eceaf))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.18/patches-1.0.18.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.18/patches-1.0.18.mpp.asc",
-  "version": "1.0.18"
+  "created_at": "2026-09-07T08:31:26",
+  "description": "## [1.0.19](https://github.com/Rhdevs71/dududu/compare/v1.0.18...v1.0.19) (2026-09-07)\n\n### 🐛 Bug Fixes\n\n* **appicon:** add debug logger method d in PikoLog ([5d39f33](https://github.com/Rhdevs71/dududu/commit/5d39f330b1ddd3668be208c40c344876c891902d))\n* **appicon:** bypass plus paywall dialog and unlock custom app icons unconditionally ([0c08cc6](https://github.com/Rhdevs71/dududu/commit/0c08cc60dbceac2ca1305aa4b57cca13b802bdca))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.19/patches-1.0.19.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.0.19/patches-1.0.19.mpp.asc",
+  "version": "1.0.19"
 }

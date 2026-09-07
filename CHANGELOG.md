@@ -1,3 +1,10 @@
+## [1.0.19](https://github.com/Rhdevs71/dududu/compare/v1.0.18...v1.0.19) (2026-09-07)
+
+### 🐛 Bug Fixes
+
+* **appicon:** add debug logger method d in PikoLog ([5d39f33](https://github.com/Rhdevs71/dududu/commit/5d39f330b1ddd3668be208c40c344876c891902d))
+* **appicon:** bypass plus paywall dialog and unlock custom app icons unconditionally ([0c08cc6](https://github.com/Rhdevs71/dududu/commit/0c08cc60dbceac2ca1305aa4b57cca13b802bdca))
+
 ## [1.0.18](https://github.com/Rhdevs71/dududu/compare/v1.0.17...v1.0.18) (2026-09-07)
 
 ### 🐛 Bug Fixes
