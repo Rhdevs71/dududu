@@ -45,6 +45,17 @@ public class Pref {
         return SharedPref.getBooleanPref(Settings.UNLOCK_PLUS_BENEFITS);
     }
 
+    public static boolean isBenefitAllowed(String benefit) {
+        if (benefit != null && (
+            benefit.equalsIgnoreCase("CUSTOM_APP_ICON") ||
+            benefit.equalsIgnoreCase("custom_app_icon")
+        )) {
+            PikoLog.d("BenefitChecker", "Unlocking custom app icon benefit unconditionally");
+            return true;
+        }
+        return unlockPlusBenefits();
+    }
+
     public static boolean disableAds() {
         return SharedPref.getBooleanPref(Settings.DISABLE_ADS);
     }

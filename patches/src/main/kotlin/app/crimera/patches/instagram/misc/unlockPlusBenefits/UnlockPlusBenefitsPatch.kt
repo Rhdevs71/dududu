@@ -61,7 +61,7 @@ val unlockPlusBenefitsPatch =
                 addInstructionsWithLabels(
                     0,
                     """
-                    invoke-static {}, $PREF_DESCRIPTOR->unlockPlusBenefits()Z
+                    invoke-static {p1}, $PREF_DESCRIPTOR->isBenefitAllowed(Ljava/lang/String;)Z
                     move-result v0
                     if-eqz v0, :piko_continue
                     return v0
