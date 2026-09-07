@@ -51,11 +51,26 @@
      4. `Story Bottom Sheet`: `VerifyError: [0x38] register v0 has type Boolean but expected Reference: java.util.ArrayList`. Hook `SelfStoryAddStoryButtonFingerprint` salah mengambil register `boolean` dari `iget-boolean ... A06:Z`. Diperbaiki dengan hook presisi sebelum `toArray` pada register `ArrayList` `v5`.
    - *Status*: Rilis **`v1.0.16`** (`patches-1.0.16.mpp`) berhasil dirilis via CI Run #29. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.16_59patches.apk`** telah dipatch dan diaudit (102 calls checked, **0 warnings / 0 VerifyError**).
 
-5. **Tahap 5: Perbaikan FB Icon Crash di Friendship Badge & Shifting Sentinel UserData (Rilis v1.0.17 - Terkini)**
+5. **Tahap 5: Perbaikan FB Icon Crash di Friendship Badge & Shifting Sentinel UserData (Rilis v1.0.17)**
    - *Analisis Log Perangkat Pengguna (`piko_debug.log`)*:
      1. `FriendshipStatusIndicator`: `IllegalStateException: FB icon drawables are not supported in IG!` saat memuat `fb_ic_friend_*` (`AppFbIconDrawable`). Instagram menolak pemakaian drawable FB icon secara tegas. Diperbaiki dengan mengganti drawable ke icon resmi Instagram (`instagram_user_following_pano_outline_24`, `instagram_user_follow_pano_outline_24`, `instagram_user_unfollow_outline_24`) dan menambahkan try-catch guard.
      2. `UserData & UserDataEntity`: `Method Bvt not found in class com.instagram.user.model.User`, `Method BCu not found`, dan `MalformedURLException: no protocol: A1B`. Terjadi karena `changeFirstString` menimpa string konstanta pertama yang bergeser posisinya akibat penambahan string baru di method. Diperbaiki dengan mengganti `changeFirstString` ke `changeString("sentinel", value)` secara presisi dan menambahkan method direct-call fallback di `UserData.java`.
-   - *Status Saat Ini*: Rilis **`v1.0.17`** (`patches-1.0.17.mpp`) berhasil dirilis via CI Run #31. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.17_59patches.apk`** telah dipatch dan diaudit (102 calls checked, **0 warnings / 0 VerifyError**, seluruh sentinel method name `A1B`, `A6y`, dll terinjeksi sempurna).
+   - *Status*: Rilis **`v1.0.17`** (`patches-1.0.17.mpp`) berhasil dirilis via CI Run #31. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.17_59patches.apk`** telah dipatch dan diaudit (102 calls checked, **0 warnings / 0 VerifyError**).
+
+6. **Tahap 6: Perbaikan Fitur Ganti Icon Aplikasi (Custom App Icon) IG Plus (Rilis v1.0.18 - Terkini)**
+   - *Analisis Masalah Reverse Engineering*:
+     1. Fitur ganti icon aplikasi pada IG Plus tidak bereaksi saat diklik oleh pengguna.
+     2. Controller asli Instagram `LX/07qq;` mendaftarkan `LX/0KNu;` ke lifecycle listener yang menunda pergantian icon sampai aplikasi masuk ke background (`onStop()`).
+     3. Pada method `LX/0KNu;->onStop()`, terdapat cacat logika Dalvik: register `v11` (hasil pengecekan kesamaan icon saat ini dengan target) bernilai `0` (`false`). Instruksi `pm.setComponentEnabledSetting(component, v11, v11)` memanggil setting dengan state `0` (`COMPONENT_ENABLED_STATE_DEFAULT`). Karena di `AndroidManifest.xml` ke-13 `activity-alias` memiliki nilai default `android:enabled="false"`, maka state `0` mengembalikan status komponen ke kondisi **DISABLED**! Icon tidak pernah aktif dan memicu log kegagalan internal.
+   - *Solusi & Implementasi*:
+     1. Membuat `InstaAppIconManager.java` (`app.morphe.extension.instagram.patches.appicon`):
+        - Mengambil nama activity alias dari field `A02` pada instance enum `LX/0ClA;` (didukung name-matching fallback ke 14 launcher alias manifest).
+        - Mengeksekusi aktivasi seketika: `pm.setComponentEnabledSetting(targetComponent, COMPONENT_ENABLED_STATE_ENABLED, DONT_KILL_APP)`.
+        - Menonaktifkan ke-13 launcher alias lainnya: `pm.setComponentEnabledSetting(otherComp, COMPONENT_ENABLED_STATE_DISABLED, DONT_KILL_APP)`.
+        - Menampilkan Toast konfirmasi langsung: `"Icon aplikasi berhasil diubah ke: [Nama Icon]!\n(Jika belum berubah di beranda, muat ulang launcher Anda)"`.
+        - Mencatat proses secara komprehensif ke `/sdcard/Download/Piko/piko_debug.log`.
+     2. Menginjeksi hook di awal method `LX/07qq;->A02(Context, LX/0ClA, UserSession, String, boolean)V` via `UnlockPlusBenefitsPatch.kt` dengan `invoke-static {p1, p2}, InstaAppIconManager;->applyIcon(Context, Object)V`.
+   - *Status Saat Ini*: Rilis **`v1.0.18`** (`patches-1.0.18.mpp`) berhasil dirilis via CI Run #35. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.18_59patches.apk`** telah dipatch dan diaudit (103 calls checked, **0 warnings / 0 VerifyError**, `InstaAppIconManager` terverifikasi di `classes.dex`).
 
 ---
 
@@ -231,10 +246,10 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
 3. **Master Target APK**:
    - Path: `c:\Users\Rhdevs\Downloads\apknya.apkm` (Instagram Android versi `444.0.0.46.85`)
 4. **Patched APK Terkini**:
-   - Path: `C:\Users\Rhdevs\Downloads\instagram_v1.0.17_59patches.apk` (151,488,102 bytes)
+   - Path: `C:\Users\Rhdevs\Downloads\instagram_v1.0.18_59patches.apk` (151,525,584 bytes)
 5. **Patching Engine & Release MPP**:
    - CLI: `C:\Users\Rhdevs\Downloads\morphe-cli.jar`
-   - Bundle Terkini: `C:\Users\Rhdevs\Downloads\patches-1.0.17.mpp` (Rilis GitHub Actions Run #31, tag `v1.0.17`)
+   - Bundle Terkini: `C:\Users\Rhdevs\Downloads\patches-1.0.18.mpp` (Rilis GitHub Actions Run #35, tag `v1.0.18`)
 
 ---
 
@@ -289,4 +304,36 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
     * Mutual: `instagram_user_follow_pano_outline_24`
     * Not Following: `instagram_user_unfollow_outline_24`
   - Seluruh pemanggilan resource icon dibungkus `try-catch` agar kegagalan resource tidak pernah merusak render layout badge status.
+
+#### 6. Arsitektur Ganti Icon Aplikasi (Custom App Icon) & Activity Aliases
+* **File Smali Acuan**:
+  - `unknown/base/smali/X/07qq.smali` (Controller: `AuraAppIconSwitchManager`)
+  - `unknown/base/smali/X/0ClA.smali` (Enum Icon: `DEFAULT`, `CANNES_NEON`, `CANNES_FIRE`, dll.)
+  - `unknown/base/smali/X/0KNu.smali` (Lifecycle Listener `onStop()` switch handler)
+  - `unknown/base/AndroidManifest.xml` (14 `activity-alias` launcher)
+* **Daftar Lengkap 14 Launcher Activity-Alias di Manifest**:
+  1. `com.instagram.android.activity.MainTabActivity` (Default)
+  2. `com.instagram.android.activity.MainTabActivity.neon` (Cannes Neon)
+  3. `com.instagram.android.activity.MainTabActivity.flame` (Cannes Fire)
+  4. `com.instagram.android.activity.MainTabActivity.floral` (Cannes Floral)
+  5. `com.instagram.android.activity.MainTabActivity.slime` (Cannes Slime)
+  6. `com.instagram.android.activity.MainTabActivity.metal` (Cannes Metal)
+  7. `com.instagram.android.activity.MainTabActivity.kpop` (Cannes K-Pop)
+  8. `com.instagram.android.activity.MainTabActivity.haruko` (Haruko)
+  9. `com.instagram.android.activity.MainTabActivity.felipe` (Felipe)
+  10. `com.instagram.android.activity.MainTabActivity.humberto` (Humberto)
+  11. `com.instagram.android.activity.MainTabActivity.zipeng` (Zipeng)
+  12. `com.instagram.android.activity.MainTabActivity.uzo` (Uzo)
+  13. `com.instagram.android.activity.MainTabActivity.ricky` (Ricky)
+  14. `com.instagram.android.activity.MainTabActivity.throwback` (Throwback)
+* **Temuan Masalah Bytecode**:
+  - Method bawaan `LX/07qq;->A02` menunda penggantian icon dengan me-register runnable `LX/0NsU;` ke `LX/0KNu;` yang hanya dieksekusi saat activity `onStop()` (aplikasi diminimalkan).
+  - Pada `LX/0KNu;->onStop()`, perbandingan `areEqual(source, target)` menghasilkan boolean `0` yang disimpan di register `v11`.
+  - Pemanggilan `pm.setComponentEnabledSetting(targetComponent, v11, v11)` memanggil setting dengan state `0` (`COMPONENT_ENABLED_STATE_DEFAULT`). Karena di manifest semua alias bernilai `android:enabled="false"`, nilai 0 justru mematikan alias tersebut kembali!
+* **Solusi Paten Piko (`InstaAppIconManager.java`)**:
+  - Injeksi langsung di awal method `LX/07qq;->A02(Context, LX/0ClA, UserSession, String, boolean)V`.
+  - Mengambil alias target dari field `A02` pada enum `LX/0ClA;`.
+  - Memanggil `pm.setComponentEnabledSetting(targetComponent, COMPONENT_ENABLED_STATE_ENABLED, DONT_KILL_APP)` seketika.
+  - Menonaktifkan 13 alias lainnya (`COMPONENT_ENABLED_STATE_DISABLED`).
+  - Menampilkan konfirmasi instan via `PikoUtils.toast` dan mencatat debug log ke `piko_debug.log`.
 
