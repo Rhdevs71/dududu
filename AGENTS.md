@@ -70,7 +70,20 @@
         - Menampilkan Toast konfirmasi langsung: `"Icon aplikasi berhasil diubah ke: [Nama Icon]!\n(Jika belum berubah di beranda, muat ulang launcher Anda)"`.
         - Mencatat proses secara komprehensif ke `/sdcard/Download/Piko/piko_debug.log`.
      2. Menginjeksi hook di awal method `LX/07qq;->A02(Context, LX/0ClA, UserSession, String, boolean)V` via `UnlockPlusBenefitsPatch.kt` dengan `invoke-static {p1, p2}, InstaAppIconManager;->applyIcon(Context, Object)V`.
-   - *Status Saat Ini*: Rilis **`v1.0.18`** (`patches-1.0.18.mpp`) berhasil dirilis via CI Run #35. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.18_59patches.apk`** telah dipatch dan diaudit (103 calls checked, **0 warnings / 0 VerifyError**, `InstaAppIconManager` terverifikasi di `classes.dex`).
+   - *Status*: Rilis **`v1.0.18`** (`patches-1.0.18.mpp`) berhasil dirilis via CI Run #35.
+
+7. **Tahap 7: Perbaikan Pop-up Dialog Paywall ("Belum Plus") & Unconditional Unlock Custom App Icon (Rilis v1.0.19 - Terkini)**
+   - *Analisis Masalah Reverse Engineering*:
+     1. Layar *Ubah Ikon Aplikasi Anda* (`LX/0EGZ;` / `AuraAppIconPickerFragment`) memeriksa hak akses benefit Plus melalui `LX/01oH;->A00(LX/07pc;->A05, UserSession)` -> `LX/07pt;->A0D(String)Z` dengan parameter `"CUSTOM_APP_ICON"`.
+     2. Pada `Settings.java`, pengaturan `UNLOCK_PLUS_BENEFITS` sebelumnya disetel `false` secara default.
+     3. Hook pada `UnlockPlusBenefitsPatch.kt` hanya memeriksa `Pref.unlockPlusBenefits()`. Karena default bernilai `false`, bytecode melompat ke logika asli Instagram yang mengembalikan `false`.
+     4. Akibatnya, icon non-default ditandai dengan status **LOCKED (0)** oleh ViewModel `LX/0EKv;` (`A00`). Saat tombol **"Pilih ikon"** diklik, `LX/0EKv;->A0w` mendeteksi icon masih berstatus terkunci (`state == A00`) lalu meluncurkan coroutine `LX/0Oqd` yang memunculkan **dialog paywall/upsell ("belum plus")** dan membatalkan aktivasi icon.
+   - *Solusi & Implementasi*:
+     1. Menambahkan method pembantu di `Pref.java`: `public static boolean isBenefitAllowed(String benefit)` yang mengembalikan `true` seketika tanpa syarat untuk `"CUSTOM_APP_ICON"` / `"custom_app_icon"` dan mendelegasikan ke `unlockPlusBenefits()` untuk benefit lainnya.
+     2. Mengubah nilai default `Settings.UNLOCK_PLUS_BENEFITS` dari `false` menjadi `true` agar seluruh benefit Plus lainnya (font cerita, preview, dll.) juga aktif out-of-the-box.
+     3. Memperbarui hook pada `ActiveBenefitCheckerFingerprint.method` (`LX/07pt;->A0D(String)Z`) via `UnlockPlusBenefitsPatch.kt` menjadi `invoke-static {p1}, Pref;->isBenefitAllowed(String)Z`.
+     4. Menambahkan method logger `d(String, Object)` pada `PikoLog.java`.
+   - *Status Saat Ini*: Rilis **`v1.0.19`** (`patches-1.0.19.mpp`) berhasil dirilis via CI Run #38. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.19_59patches.apk`** telah dipatch dan diaudit (103 calls checked, **0 warnings / 0 VerifyError**, `isBenefitAllowed` terverifikasi aktif di `classes.dex`).
 
 ---
 
@@ -336,4 +349,24 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
   - Memanggil `pm.setComponentEnabledSetting(targetComponent, COMPONENT_ENABLED_STATE_ENABLED, DONT_KILL_APP)` seketika.
   - Menonaktifkan 13 alias lainnya (`COMPONENT_ENABLED_STATE_DISABLED`).
   - Menampilkan konfirmasi instan via `PikoUtils.toast` dan mencatat debug log ke `piko_debug.log`.
+
+#### 7. Arsitektur UI Icon Picker & Bypass Paywall Dialog ("Belum Plus")
+* **File Smali Acuan**:
+  - `unknown/base/smali_classes9/X/0EGZ.smali` (`AuraAppIconPickerFragment`)
+  - `unknown/base/smali_classes9/X/0EKv.smali` (ViewModel: `AuraAppIconPickerViewModel`)
+  - `unknown/base/smali_classes2/X/01oH.smali` (Benefit Checker Helper: `A00(LX/07pc, UserSession)Z`)
+  - `unknown/base/smali/X/07pt.smali` (Benefit Evaluator: `A0D(String)Z`)
+  - `unknown/base/smali_classes3/X/06Pb.smali` (Service Layer: `A02`)
+* **Alur Logika Pemeriksaan Benefit**:
+  - UI memanggil `LX/01oH;->A00(LX/07pc;->A05, UserSession)` dengan enum `LX/07pc;->A05` (`CUSTOM_APP_ICON`).
+  - `A00` mengambil field `A00` dari enum (string `"CUSTOM_APP_ICON"`) dan memanggil instance method `LX/07pt;->A0D(Ljava/lang/String;)Z`.
+  - Jika `A0D` mengembalikan `false`:
+    1. Di `LX/0EKv;->A00`: icon non-default ditandai dengan state `LX/0008;->A00` (integer 0, alias **LOCKED**).
+    2. Di `LX/0EKv;->A0w`: saat event `LX/0dcX` (klik tombol "Pilih ikon") diterima, jika `state == A00`, ViewModel memeriksa kembali `LX/01oH;->A00`. Karena `false`, sistem meluncurkan coroutine `LX/0Oqd` yang menampilkan **dialog paywall/upsell ("belum plus")**.
+    3. Di `LX/06Pb;->A02`: jika benefit `false`, Instagram menyimpan `"has_custom_app_icon_benefit_" + userId = false` di preferensi `"aura_app_icon_benefit"` dan mereset icon kembali ke default (`MainTabActivity`).
+  - Jika `A0D` mengembalikan `true`:
+    1. Icon ditandai dengan state `LX/0008;->A01` / `A0C` (**UNLOCKED & SELECTED**).
+    2. Tombol "Pilih ikon" langsung meluncurkan `LX/0Oqc` (case 42) yang memanggil `LX/06Pb;->A02` -> `LX/07qq;->A02`.
+    3. Hook Piko pada `LX/07qq;->A02` seketika memicu `InstaAppIconManager.applyIcon`, mengaktifkan launcher alias yang dipilih tanpa jeda dan tanpa dialog pop-up paywall.
+    4. `LX/06Pb;->A02` menyimpan status kepemilikan benefit aktif di shared preferences, memastikan icon tidak pernah di-reset oleh sistem bawaan.
 
