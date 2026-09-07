@@ -1,3 +1,10 @@
+## [1.0.18](https://github.com/Rhdevs71/dududu/compare/v1.0.17...v1.0.18) (2026-09-07)
+
+### 🐛 Bug Fixes
+
+* **appicon:** fix custom app icon switching by directly enabling activity alias via InstaAppIconManager ([2c86617](https://github.com/Rhdevs71/dududu/commit/2c8661778126cd9b97f6856e7de7004d4478f9b2))
+* **appicon:** fix fingerprint parameter typing in UnlockPlusBenefitsPatch ([08eca8b](https://github.com/Rhdevs71/dududu/commit/08eca8bcd448075df34507fbbccd70c9156eceaf))
+
 ## [1.0.17](https://github.com/Rhdevs71/dududu/compare/v1.0.16...v1.0.17) (2026-09-06)
 
 ### 🐛 Bug Fixes
