@@ -18,7 +18,11 @@ import app.morphe.patcher.util.smali.ExternalLabel
 
 import app.crimera.patches.instagram.utils.Constants.PATCHES_DESCRIPTOR
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.extensions.InstructionExtensions.instructions
+import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
 
 internal object ActiveBenefitCheckerClassFingerprint : Fingerprint(
     strings = listOf("is_benefit_active"),
@@ -43,6 +47,26 @@ internal object AppIconSwitchFingerprint : Fingerprint(
     custom = { methodDef, _ ->
         methodDef.parameters.size == 5 && methodDef.parameters[0].type == "Landroid/content/Context;"
     },
+)
+
+internal object AppIconPickerViewModelFingerprint : Fingerprint(
+    returnType = "V",
+    custom = { methodDef, classDef ->
+        if (methodDef.parameters.size == 2 && methodDef.parameters[1].type == classDef.type) {
+            val instructions = methodDef.implementation?.instructions ?: return@Fingerprint false
+            instructions.any {
+                it is ReferenceInstruction && it.reference.toString().contains("0GuK;->A06")
+            }
+        } else {
+            false
+        }
+    },
+)
+
+internal object MetaSubscriptionUpsellFingerprint : Fingerprint(
+    strings = listOf("com.bloks.www.mv.unified_entry_point.controller"),
+    parameters = listOf("Landroidx/fragment/app/FragmentActivity;", "Lcom/instagram/common/session/UserSession;", "Ljava/lang/String;"),
+    returnType = "V",
 )
 
 @Suppress("unused")
@@ -77,6 +101,25 @@ val unlockPlusBenefitsPatch =
                     0,
                     """
                     invoke-static {p1, p2}, $PATCHES_DESCRIPTOR/appicon/InstaAppIconManager;->applyIcon(Landroid/content/Context;Ljava/lang/Object;)V
+                    """.trimIndent(),
+                )
+            }
+
+            AppIconPickerViewModelFingerprint.method.apply {
+                val targetIndex = instructions.indexOfFirst {
+                    it is ReferenceInstruction && it.reference.toString().contains("0GuK;->A06")
+                }
+                if (targetIndex >= 0) {
+                    val reg = (instructions[targetIndex] as? OneRegisterInstruction)?.registerA ?: 0
+                    replaceInstruction(targetIndex, "const/4 v$reg, 0")
+                }
+            }
+
+            MetaSubscriptionUpsellFingerprint.method.apply {
+                addInstructions(
+                    0,
+                    """
+                    return-void
                     """.trimIndent(),
                 )
             }

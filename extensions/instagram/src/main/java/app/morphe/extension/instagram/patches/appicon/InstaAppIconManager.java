@@ -44,7 +44,11 @@ public class InstaAppIconManager {
      * @param iconEnum Selected enum instance from LX/0ClA;
      */
     public static void applyIcon(Context context, Object iconEnum) {
+        if (context == null) {
+            context = PikoUtils.getContext();
+        }
         if (context == null || iconEnum == null) {
+            PikoLog.e(TAG, "Cannot apply icon: context or iconEnum is null (context=" + context + ", iconEnum=" + iconEnum + ")", null);
             return;
         }
 
