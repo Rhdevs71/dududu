@@ -1,3 +1,10 @@
+## [1.0.20](https://github.com/Rhdevs71/dududu/compare/v1.0.19...v1.0.20) (2026-09-07)
+
+### 🐛 Bug Fixes
+
+* **appicon:** resolve kotlin lambda return syntax in fingerprint ([b855df9](https://github.com/Rhdevs71/dududu/commit/b855df9680461a6c916576c980d05d945b25b9c5))
+* **appicon:** unlock icon picker status and disable plus upsell dialog ([317a0ac](https://github.com/Rhdevs71/dududu/commit/317a0ac259a5f6d0404aa72367fc6f4a60100ee6))
+
 ## [1.0.19](https://github.com/Rhdevs71/dududu/compare/v1.0.18...v1.0.19) (2026-09-07)
 
 ### 🐛 Bug Fixes
