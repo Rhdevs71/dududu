@@ -10,6 +10,10 @@ import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.shared.Logger;
 
 public class PikoLog {
+    public static void d(String tag, Object msg) {
+        PikoUtils.logger(tag, msg);
+    }
+
     public static void e(String tag, Object error) {
         PikoUtils.logger(tag, error);
     }
