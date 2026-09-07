@@ -53,10 +53,10 @@ internal object AppIconPickerViewModelFingerprint : Fingerprint(
     returnType = "V",
     custom = { methodDef, classDef ->
         if (methodDef.parameters.size == 2 && methodDef.parameters[1].type == classDef.type) {
-            val instructions = methodDef.implementation?.instructions ?: return@Fingerprint false
-            instructions.any {
+            val instructions = methodDef.implementation?.instructions
+            instructions?.any {
                 it is ReferenceInstruction && it.reference.toString().contains("0GuK;->A06")
-            }
+            } ?: false
         } else {
             false
         }
