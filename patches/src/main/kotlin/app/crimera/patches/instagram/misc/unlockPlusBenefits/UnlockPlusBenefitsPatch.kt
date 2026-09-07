@@ -16,6 +16,8 @@ import app.morphe.patcher.extensions.InstructionExtensions.getInstruction
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.patcher.util.smali.ExternalLabel
 
+import app.crimera.patches.instagram.utils.Constants.PATCHES_DESCRIPTOR
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import com.android.tools.smali.dexlib2.AccessFlags
 
 internal object ActiveBenefitCheckerClassFingerprint : Fingerprint(
@@ -29,6 +31,16 @@ internal object ActiveBenefitCheckerFingerprint : Fingerprint(
     custom = { methodDef, _ ->
         AccessFlags.PUBLIC.isSet(methodDef.accessFlags)
     },
+)
+
+internal object AppIconSwitchManagerClassFingerprint : Fingerprint(
+    strings = listOf("AuraAppIconSwitchManager", "Failed to get current app icon"),
+)
+
+internal object AppIconSwitchFingerprint : Fingerprint(
+    classFingerprint = AppIconSwitchManagerClassFingerprint,
+    parameters = listOf("Landroid/content/Context;", null, "Lcom/instagram/common/session/UserSession;", "Ljava/lang/String;", "Z"),
+    returnType = "V",
 )
 
 @Suppress("unused")
@@ -56,6 +68,15 @@ val unlockPlusBenefitsPatch =
                 )
 
                 enableSettings("unlockPlusBenefits")
+            }
+
+            AppIconSwitchFingerprint.method.apply {
+                addInstructions(
+                    0,
+                    """
+                    invoke-static {p1, p2}, $PATCHES_DESCRIPTOR/appicon/InstaAppIconManager;->applyIcon(Landroid/content/Context;Ljava/lang/Object;)V
+                    """.trimIndent(),
+                )
             }
         }
     }
