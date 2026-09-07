@@ -39,8 +39,10 @@ internal object AppIconSwitchManagerClassFingerprint : Fingerprint(
 
 internal object AppIconSwitchFingerprint : Fingerprint(
     classFingerprint = AppIconSwitchManagerClassFingerprint,
-    parameters = listOf("Landroid/content/Context;", null, "Lcom/instagram/common/session/UserSession;", "Ljava/lang/String;", "Z"),
     returnType = "V",
+    custom = { methodDef, _ ->
+        methodDef.parameters.size == 5 && methodDef.parameters[0].type == "Landroid/content/Context;"
+    },
 )
 
 @Suppress("unused")
