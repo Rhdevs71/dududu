@@ -72,7 +72,7 @@
      2. Menginjeksi hook di awal method `LX/07qq;->A02(Context, LX/0ClA, UserSession, String, boolean)V` via `UnlockPlusBenefitsPatch.kt` dengan `invoke-static {p1, p2}, InstaAppIconManager;->applyIcon(Context, Object)V`.
    - *Status*: Rilis **`v1.0.18`** (`patches-1.0.18.mpp`) berhasil dirilis via CI Run #35.
 
-7. **Tahap 7: Perbaikan Pop-up Dialog Paywall ("Belum Plus") & Unconditional Unlock Custom App Icon (Rilis v1.0.19 - Terkini)**
+7. **Tahap 7: Perbaikan Pop-up Dialog Paywall ("Belum Plus") & Unconditional Unlock Custom App Icon (Rilis v1.0.19)**
    - *Analisis Masalah Reverse Engineering*:
      1. Layar *Ubah Ikon Aplikasi Anda* (`LX/0EGZ;` / `AuraAppIconPickerFragment`) memeriksa hak akses benefit Plus melalui `LX/01oH;->A00(LX/07pc;->A05, UserSession)` -> `LX/07pt;->A0D(String)Z` dengan parameter `"CUSTOM_APP_ICON"`.
      2. Pada `Settings.java`, pengaturan `UNLOCK_PLUS_BENEFITS` sebelumnya disetel `false` secara default.
@@ -83,7 +83,21 @@
      2. Mengubah nilai default `Settings.UNLOCK_PLUS_BENEFITS` dari `false` menjadi `true` agar seluruh benefit Plus lainnya (font cerita, preview, dll.) juga aktif out-of-the-box.
      3. Memperbarui hook pada `ActiveBenefitCheckerFingerprint.method` (`LX/07pt;->A0D(String)Z`) via `UnlockPlusBenefitsPatch.kt` menjadi `invoke-static {p1}, Pref;->isBenefitAllowed(String)Z`.
      4. Menambahkan method logger `d(String, Object)` pada `PikoLog.java`.
-   - *Status Saat Ini*: Rilis **`v1.0.19`** (`patches-1.0.19.mpp`) berhasil dirilis via CI Run #38. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.19_59patches.apk`** telah dipatch dan diaudit (103 calls checked, **0 warnings / 0 VerifyError**, `isBenefitAllowed` terverifikasi aktif di `classes.dex`).
+   - *Status*: Rilis **`v1.0.19`** (`patches-1.0.19.mpp`) berhasil dirilis via CI Run #38. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.19_59patches.apk`** telah dipatch dan diaudit.
+
+8. **Tahap 8: Perbaikan Final Custom App Icon IG Plus & Penonaktifan Permanen Dialog Paywall (Rilis v1.0.20 - Terkini)**
+   - *Analisis Masalah Reverse Engineering*:
+     1. Pada v1.0.19 pengguna melaporkan popup dialog *"belum plus"* masih muncul dan pergantian icon gagal.
+     2. Melalui disassembly mendalam, ditemukan bahwa pada `LX/0EKv;->A00`, saat icon di grid diklik, status dibaca dari model `LX/0CJd;->A01` (`LX/0GuK;`).
+     3. Karena akun non-subscriber, respon server GraphQL menandai status icon sebagai `LX/0GuK;->A06` (`IG_PLUS_LOCKED`).
+     4. Instruksi `if-eq v1, v0, offset=20` (dimana `v0` adalah `A06`) **MELOMPATI** pengecekan benefit lokal `LX/01oH;->A00` langsung ke state `A0C` (LOCKED)!
+     5. Akibatnya saat tombol *"Pilih ikon"* diklik, `LX/0EKv;->A0w` melihat status masih `A0C` (bukan `A00`), lalu meluncurkan coroutine Case 42 (`LX/0Oqc`). Case 42 mengemisikan `LX/0KmE` yang memanggil `LX/09WQ;->A01` -> `LX/0Hff;->A00` -> memunculkan pop-up Bloks paywall `"com.bloks.www.mv.unified_entry_point.controller"` ("Belum Plus")!
+   - *Solusi & Implementasi*:
+     1. Menambahkan `AppIconPickerViewModelFingerprint` di `UnlockPlusBenefitsPatch.kt` untuk menargetkan `LX/0EKv;->A00`.
+     2. Mengganti instruksi `sget-object v0, LX/0GuK;->A06:LX/0GuK;` dengan `const/4 v0, 0` via `replaceInstruction`. Karena perbandingan `v1 == v0` selalu false, Dalvik tidak pernah melompat ke state LOCKED dan icon langsung disetel ke status **`A00` (AVAILABLE & SELECTABLE)**.
+     3. Menambahkan `MetaSubscriptionUpsellFingerprint` untuk menargetkan controller dialog upsell paywall Bloks (`LX/0Hff;->A00`) dan menginjeksi `return-void` di index 0 untuk membungkam dialog secara permanen.
+     4. Memperkuat `InstaAppIconManager.java` dengan fallback context otomatis ke `PikoUtils.getContext()` dan logging diagnostik mendalam.
+   - *Status Saat Ini*: Rilis **`v1.0.20`** (`patches-1.0.20.mpp`) berhasil dirilis via CI Run #34117557712. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.20_59patches.apk`** telah dipatch dan diaudit (103 calls checked, **0 warnings / 0 VerifyError**, verifikasi Dalvik menunjukkan `const/4 v0, 0` di `LX/0EKv;->A00` dan `return-void` di `LX/0Hff;->A00`).
 
 ---
 
@@ -259,10 +273,10 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
 3. **Master Target APK**:
    - Path: `c:\Users\Rhdevs\Downloads\apknya.apkm` (Instagram Android versi `444.0.0.46.85`)
 4. **Patched APK Terkini**:
-   - Path: `C:\Users\Rhdevs\Downloads\instagram_v1.0.18_59patches.apk` (151,525,584 bytes)
+   - Path: `C:\Users\Rhdevs\Downloads\instagram_v1.0.20_59patches.apk` (151,525,892 bytes)
 5. **Patching Engine & Release MPP**:
    - CLI: `C:\Users\Rhdevs\Downloads\morphe-cli.jar`
-   - Bundle Terkini: `C:\Users\Rhdevs\Downloads\patches-1.0.18.mpp` (Rilis GitHub Actions Run #35, tag `v1.0.18`)
+   - Bundle Terkini: `C:\Users\Rhdevs\Downloads\patches-1.0.20.mpp` (Rilis GitHub Actions tag `v1.0.20`)
 
 ---
 
