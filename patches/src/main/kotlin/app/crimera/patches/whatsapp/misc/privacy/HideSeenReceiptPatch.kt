@@ -27,9 +27,8 @@ val hideSeenReceiptPatch =
         compatibleWith(COMPATIBILITY_WHATSAPP)
 
         execute {
-            SendReadReceiptJobFingerprint.result?.let { result ->
-                val method = result.mutableMethod
-                method.addInstructions(
+            SendReadReceiptJobFingerprint.method.apply {
+                addInstructions(
                     0,
                     """
                     const/4 v0, 0
@@ -38,7 +37,7 @@ val hideSeenReceiptPatch =
                     if-nez v0, :send_receipt_normally
                     return-void
                     :send_receipt_normally
-                    """,
+                    """.trimIndent(),
                 )
             }
         }

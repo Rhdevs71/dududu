@@ -27,9 +27,8 @@ val antiViewOncePatch =
         compatibleWith(COMPATIBILITY_WHATSAPP)
 
         execute {
-            ViewOnceFingerprint.result?.let { result ->
-                val method = result.mutableMethod
-                method.addInstructions(
+            ViewOnceFingerprint.method.apply {
+                addInstructions(
                     0,
                     """
                     invoke-static {}, $PREF_CLASS->antiViewOnce()Z
@@ -37,7 +36,7 @@ val antiViewOncePatch =
                     if-eqz v0, :keep_view_once
                     return-void
                     :keep_view_once
-                    """,
+                    """.trimIndent(),
                 )
             }
         }

@@ -27,11 +27,8 @@ val antiRevokePatch =
         compatibleWith(COMPATIBILITY_WHATSAPP)
 
         execute {
-            AntiRevokeFingerprint.result?.let { result ->
-                val method = result.mutableMethod
-                // Inject at the beginning of revocation handler:
-                // If shouldPreventRevocation returns true, return early without deleting
-                method.addInstructions(
+            AntiRevokeFingerprint.method.apply {
+                addInstructions(
                     0,
                     """
                     const/4 v0, 0
@@ -40,7 +37,7 @@ val antiRevokePatch =
                     if-eqz v0, :continue_normal_flow
                     return-void
                     :continue_normal_flow
-                    """,
+                    """.trimIndent(),
                 )
             }
         }
