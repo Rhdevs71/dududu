@@ -1,3 +1,9 @@
+## [1.1.0](https://github.com/Rhdevs71/dududu/compare/v1.0.21...v1.1.0) (2026-09-08)
+
+### ✨ New Features
+
+* neutralize custom app icon locked status in clinit and Compose click handler, safe register range in HookReelOverflowMenuButton ([361afe7](https://github.com/Rhdevs71/dududu/commit/361afe71d56300694333e71ac1521978b0da6511))
+
 ## [1.0.21](https://github.com/Rhdevs71/dududu/compare/v1.0.20...v1.0.21) (2026-09-08)
 
 ### 🐛 Bug Fixes
