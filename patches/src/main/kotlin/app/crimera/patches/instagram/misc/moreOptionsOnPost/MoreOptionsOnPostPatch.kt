@@ -30,5 +30,6 @@ val moreOptionsOnPostPatch =
             addOverflowMenuButtonAttributes("PIKO_MORE_POST_OPTION", "morePostOptionOverflowButton")
 
             enableSettings("moreOptionsOnPost")
+            enableSettings("reelsPlaybackSpeed")
         }
     }

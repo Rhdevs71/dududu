@@ -21,6 +21,8 @@ import app.morphe.extension.shared.Utils;
 import app.morphe.extension.shared.Logger;
 import app.morphe.extension.instagram.utils.PikoLog;
 
+import app.morphe.extension.instagram.utils.Pref;
+import app.morphe.extension.instagram.patches.video.PlaybackSpeedController;
 import app.morphe.extension.instagram.patches.download.DownloadUtils;
 import app.morphe.extension.instagram.entity.InstagramDialogBox;
 import app.morphe.extension.instagram.entity.MediaData;
@@ -42,6 +44,9 @@ public class MoreOptionsOnPostPatch {
             options.add(str("piko_copy_post_owner_username"));
             options.add(str("piko_copy_post_owner_fullname"));
             options.add(str("piko_download_options"));
+            if (Pref.reelsPlaybackSpeed()) {
+                options.add(str("piko_playback_speed"));
+            }
             CharSequence[] items = options.toArray(new CharSequence[0]);
 
             dialog.addDialogMenuItems(items, new DialogInterface.OnClickListener() {
@@ -65,6 +70,9 @@ public class MoreOptionsOnPostPatch {
 
                         } else if (selectedOption.equals(str("piko_download_options"))) {
                             DownloadUtils.downloadPost(context, userSession, mediaObject, currentMediaIndex);
+
+                        } else if (selectedOption.equals(str("piko_playback_speed"))) {
+                            PlaybackSpeedController.showSpeedDialog(context);
 
                         }
                         if (stringToCopy != null && stringToCopy.length() > 0) {

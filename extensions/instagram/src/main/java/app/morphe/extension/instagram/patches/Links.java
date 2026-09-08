@@ -130,6 +130,10 @@ public class Links {
                     shouldBlockUri = Pref.viewStoriesAnonymously();
                 } else if (path.contains("/heartbeat_and_get_viewer_count/")) {
                     shouldBlockUri = Pref.viewLiveAnonymously();
+                } else if (path.contains("/presence/report_activity/")
+                        || path.contains("/presence/set_presence/")
+                        || path.contains("/threads/presence/report/")) {
+                    shouldBlockUri = Pref.hideOnlineStatus();
                 } else if (path.contains("/feed/reels_tray/")
                         || path.contains("feed/get_latest_reel_media/")
                         || path.contains("direct_v2/pending_inbox/?visual_message")

@@ -98,4 +98,10 @@ public class Settings {
 
     public static final StringSetting FILTER_STORY_MIN_STORY_ITEMS = new StringSetting("filter_story_min_story_items", "1");
     public static final StringSetting FILTER_STORY_MAX_STORY_ITEMS = new StringSetting("filter_story_max_story_items", "9999");
+
+    // Phase 1 Features
+    public static final BooleanSetting HIDE_ONLINE_STATUS = new BooleanSetting("hide_online_status", false);
+    public static final BooleanSetting REELS_PLAYBACK_SPEED = new BooleanSetting("reels_playback_speed", true);
+    public static final BooleanSetting SAVE_EDITED_MESSAGES = new BooleanSetting("save_edited_messages", true);
+    public static final BooleanSetting APP_LOCK = new BooleanSetting("enable_app_lock", false);
 }

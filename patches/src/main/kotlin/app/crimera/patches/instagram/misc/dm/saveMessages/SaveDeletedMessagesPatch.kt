@@ -228,5 +228,6 @@ val saveDeletedMessagesPatch =
             }
 
             enableSettings("saveDeletedMessages")
+            enableSettings("saveEditedMessages")
         }
     }

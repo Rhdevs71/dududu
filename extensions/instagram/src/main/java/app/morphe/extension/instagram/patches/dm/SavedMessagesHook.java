@@ -48,7 +48,7 @@ public class SavedMessagesHook {
     /** Hook 6: harvest participant id→username from the thread deserializer's user list. */
     public static void noteThreadUsers(final java.util.List<?> users) {
         if (users == null || users.isEmpty()) return;
-        if (!Pref.saveDeletedMessages()) return;
+        if (!Pref.saveDeletedMessages() && !Pref.saveEditedMessages()) return;
         final java.util.ArrayList<Object> copy;
         try { copy = new java.util.ArrayList<Object>(users); } catch (Throwable t) { return; }
         getWorker().post(new Runnable() { @Override public void run() {
@@ -201,7 +201,7 @@ public class SavedMessagesHook {
     public static void onMessageReceived(final Object item, final String threadIdHint) {
         // Runs on the MQTT thread — return instantly; all work is posted to sWorker.
         if (item == null) return;
-        if (!Pref.saveDeletedMessages()) return;
+        if (!Pref.saveDeletedMessages() && !Pref.saveEditedMessages()) return;
         // Class guard: only X.* (obfuscated IG classes) are DirectItem candidates.
         if (!item.getClass().getName().startsWith("X.")) return;
 
@@ -221,16 +221,19 @@ public class SavedMessagesHook {
             if (isOwnSender(senderId)) return;
             String messageId  = di.getItemId();
             boolean deleted = di.isHideInThread();
-            // dedup key includes deletion state — alive vs unsent are different events
-            if (messageId != null
-                    && SEEN_ITEM_IDS.put(messageId + (deleted ? ":1" : ":0"), Boolean.TRUE) != null) return;
+            String content    = di.getText();
+            // dedup key includes deletion state and content hash so edits can pass through
+            String dedupKey = messageId + (deleted ? ":1" : ":0");
+            if (Pref.saveEditedMessages() && content != null) {
+                dedupKey += ":" + content.hashCode();
+            }
+            if (messageId != null && SEEN_ITEM_IDS.put(dedupKey, Boolean.TRUE) != null) return;
             String threadId   = di.getThreadId();
             PikoMessageDb db = PikoMessageDb.getInstance(PikoUtils.getContext());
             // sender name: id→handle directory first, then thread title, then open-chat title
             String senderUser = db.getUsername(senderId);
             if (senderUser == null) senderUser = db.getThreadUsername(threadId);
             if (senderUser == null) senderUser = openChatTitleFor(db, threadId);
-            String content    = di.getText();
             String type       = di.getItemType();
             if (type != null) type = type.trim().toLowerCase();
             long   timestamp  = di.getTimestampMs();

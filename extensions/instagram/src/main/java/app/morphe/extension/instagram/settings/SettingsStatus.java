@@ -87,8 +87,24 @@ public class SettingsStatus {
     public static void saveDeletedMessages() {
         saveDeletedMessages = true;
     }
+    public static boolean hideOnlineStatus = false;
+    public static void hideOnlineStatus() {
+        hideOnlineStatus = true;
+    }
+    public static boolean reelsPlaybackSpeed = false;
+    public static void reelsPlaybackSpeed() {
+        reelsPlaybackSpeed = true;
+    }
+    public static boolean saveEditedMessages = false;
+    public static void saveEditedMessages() {
+        saveEditedMessages = true;
+    }
+    public static boolean appLock = false;
+    public static void appLock() {
+        appLock = true;
+    }
     public static boolean ghostSection() {
-        return (viewStoriesAnonymously || viewLiveAnonymously || disableScreenshotDetection || disableTypingStatus || viewDmAnonymously);
+        return (viewStoriesAnonymously || viewLiveAnonymously || disableScreenshotDetection || disableTypingStatus || viewDmAnonymously || hideOnlineStatus);
     }
 
     public static boolean disableStories = false;
@@ -306,6 +322,10 @@ public class SettingsStatus {
         FLAGS.put(str("piko_category_filter_content"),SettingsStatus.storyFilters);
         FLAGS.put(str("piko_category_rec_flags"),SettingsStatus.recommendedFlags);
 
+        FLAGS.put(str("piko_hide_online_status"), SettingsStatus.hideOnlineStatus);
+        FLAGS.put(str("piko_reels_playback_speed"), SettingsStatus.reelsPlaybackSpeed);
+        FLAGS.put(str("piko_save_edited_messages"), SettingsStatus.saveEditedMessages);
+        FLAGS.put(str("piko_enable_app_lock"), SettingsStatus.appLock);
     }
 
     public static void load() {

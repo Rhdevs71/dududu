@@ -246,6 +246,15 @@ public class ScreenBuilder {
                             Settings.SAVE_DELETED_MESSAGES
                     )
             );
+            if (SettingsStatus.saveEditedMessages) {
+                addPreference(
+                        helper.switchPreference(
+                                str("piko_save_edited_messages"),
+                                str("piko_save_edited_messages_desc"),
+                                Settings.SAVE_EDITED_MESSAGES
+                        )
+                );
+            }
             addPreference(
                     helper.buttonPreference(
                             str("piko_view_deleted_messages"),
@@ -313,6 +322,15 @@ public class ScreenBuilder {
                             str("piko_view_dm_anonymously"),
                             "",
                             Settings.VIEW_DM_ANONYMOUSLY
+                    )
+            );
+        }
+        if (SettingsStatus.hideOnlineStatus) {
+            addPreference(
+                    helper.switchPreference(
+                            str("piko_hide_online_status"),
+                            str("piko_hide_online_status_desc"),
+                            Settings.HIDE_ONLINE_STATUS
                     )
             );
         }
@@ -427,6 +445,15 @@ public class ScreenBuilder {
                             str("piko_disable_reels_scrolling_desc"),
                             Settings.DISABLE_REELS_SCROLLING
                 )
+            );
+        }
+        if (SettingsStatus.reelsPlaybackSpeed) {
+            addPreference(
+                    helper.switchPreference(
+                            str("piko_reels_playback_speed"),
+                            str("piko_reels_playback_speed_desc"),
+                            Settings.REELS_PLAYBACK_SPEED
+                    )
             );
         }
         if (SettingsStatus.disableSwipeToCreate) {
@@ -681,6 +708,15 @@ public class ScreenBuilder {
                             str("piko_remove_empty_bottom_space"),
                             "",
                             Settings.REMOVE_EMPTY_BOTTOM_SPACE
+                    )
+            );
+        }
+        if (SettingsStatus.appLock) {
+            addPreference(
+                    helper.switchPreference(
+                            str("piko_enable_app_lock"),
+                            str("piko_enable_app_lock_desc"),
+                            Settings.APP_LOCK
                     )
             );
         }

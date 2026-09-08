@@ -14,6 +14,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import app.morphe.extension.instagram.utils.Pref;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 public class PikoMessageDb extends SQLiteOpenHelper {
 
@@ -44,37 +46,30 @@ public class PikoMessageDb extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(
-            "CREATE TABLE " + TABLE + " (" +
-            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "message_id TEXT UNIQUE NOT NULL," +
-            "thread_id TEXT NOT NULL," +
-            "sender_id TEXT," +
-            "sender_username TEXT," +
-            "content TEXT," +
-            "message_type TEXT," +
-            "timestamp INTEGER NOT NULL," +
-            "is_deleted INTEGER DEFAULT 0" +
-            ")"
-        );
-        db.execSQL("CREATE INDEX idx_thread_id ON " + TABLE + "(thread_id)");
-        db.execSQL("CREATE INDEX idx_is_deleted ON " + TABLE + "(is_deleted)");
-        createDirTable(db);
-    }
-
-    private void createDirTable(SQLiteDatabase db) {
-        db.execSQL(
-            "CREATE TABLE IF NOT EXISTS " + DIR_TABLE + " (" +
-            "sender_id TEXT PRIMARY KEY," +
-            "username TEXT NOT NULL" +
-            ")"
-        );
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE + " ("
+                + "message_id TEXT PRIMARY KEY, "
+                + "thread_id TEXT, "
+                + "sender_id TEXT, "
+                + "sender_username TEXT, "
+                + "content TEXT, "
+                + "message_type TEXT, "
+                + "timestamp INTEGER, "
+                + "is_deleted INTEGER DEFAULT 0)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_thread ON " + TABLE + "(thread_id)");
+        db.execSQL("CREATE INDEX IF NOT EXISTS idx_timestamp ON " + TABLE + "(timestamp)");
+        // Sender directory table (sender_id → username).
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + DIR_TABLE + " ("
+                + "sender_id TEXT PRIMARY KEY, "
+                + "username TEXT)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Additive upgrade: keep captured messages, just add the new directory table.
-        if (oldVersion < 2) createDirTable(db);
+        if (oldVersion < 2) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS " + DIR_TABLE + " ("
+                    + "sender_id TEXT PRIMARY KEY, "
+                    + "username TEXT)");
+        }
     }
 
     /**
@@ -104,11 +99,39 @@ public class PikoMessageDb extends SQLiteOpenHelper {
             // the media untappable ("media not available"). Any http(s) value upgrades the content.
             if (content != null && content.startsWith("http")) {
                 upgradeContentToUrl(db, messageId, content);
+            } else if (Pref.saveEditedMessages()) {
+                handleEditedContent(db, messageId, content);
+                fillIfEmpty(db, messageId, "content", content);
             } else {
                 fillIfEmpty(db, messageId, "content", content);
             }
             fillIfEmpty(db, messageId, "sender_username", senderUsername);
             fillIfEmpty(db, messageId, "sender_id", senderId);
+        }
+    }
+
+    private void handleEditedContent(SQLiteDatabase db, String messageId, String newContent) {
+        if (newContent == null || newContent.trim().isEmpty() || newContent.startsWith("http")) return;
+        Cursor cursor = null;
+        try {
+            cursor = db.query(TABLE, new String[]{"content"}, "message_id = ?", new String[]{messageId}, null, null, null);
+            if (cursor != null && cursor.moveToFirst()) {
+                String existingContent = cursor.getString(0);
+                if (existingContent != null && !existingContent.trim().isEmpty()
+                        && !existingContent.equals(newContent)
+                        && !existingContent.startsWith("http")
+                        && !existingContent.contains("[Teks Asli]:")) {
+                    String combined = newContent + "\n\n✏️ [Teks Asli]: " + existingContent;
+                    ContentValues cv = new ContentValues();
+                    cv.put("content", combined);
+                    db.update(TABLE, cv, "message_id = ?", new String[]{messageId});
+                    PikoLog.d("PikoMessageDb", "Anti-Edited: Message " + messageId + " preserved original content.");
+                }
+            }
+        } catch (Throwable t) {
+            PikoLog.e("PikoMessageDb", "handleEditedContent error", t);
+        } finally {
+            if (cursor != null) cursor.close();
         }
     }
 

@@ -335,4 +335,17 @@
     <string name="piko_media_like">suka</string>
     <string name="piko_media_link">tautan</string>
     <string name="piko_media_activity">aktivitas</string>
+
+    <!-- Phase 1 Strings -->
+    <string name="piko_hide_online_status">Sembunyikan status online</string>
+    <string name="piko_hide_online_status_desc">Mencegah pengiriman status aktif/titik hijau ke orang lain saat Anda membuka Instagram (Anda tetap bisa melihat status orang lain)</string>
+    <string name="piko_save_edited_messages">Simpan riwayat pesan yang diedit</string>
+    <string name="piko_save_edited_messages_desc">Mencatat dan menampilkan teks pesan asli sebelum diedit oleh pengirim</string>
+    <string name="piko_edited_tag">[Diedit]</string>
+    <string name="piko_original_text">Teks asli</string>
+    <string name="piko_reels_playback_speed">Aktifkan kontrol kecepatan video</string>
+    <string name="piko_reels_playback_speed_desc">Memungkinkan mengubah kecepatan pemutaran video (0.5x - 2.0x) dari pilihan postingan/reels</string>
+    <string name="piko_playback_speed">Kecepatan pemutaran</string>
+    <string name="piko_enable_app_lock">Kunci aplikasi (Sidik Jari / PIN)</string>
+    <string name="piko_enable_app_lock_desc">Kunci aplikasi Instagram dengan autentikasi sidik jari atau keamanan perangkat</string>
 </resources>

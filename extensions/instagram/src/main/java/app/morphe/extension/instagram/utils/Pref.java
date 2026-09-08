@@ -345,5 +345,21 @@ public class Pref {
         return Integer.valueOf(SharedPref.getStringPref(Settings.FILTER_STORY_MAX_STORY_ITEMS));
     }
 
+    public static boolean hideOnlineStatus() {
+        return SharedPref.getBooleanPref(Settings.HIDE_ONLINE_STATUS) || Pref.getTurnOnAllGhostModes();
+    }
+
+    public static boolean reelsPlaybackSpeed() {
+        return SharedPref.getBooleanPref(Settings.REELS_PLAYBACK_SPEED);
+    }
+
+    public static boolean saveEditedMessages() {
+        return SharedPref.getBooleanPref(Settings.SAVE_EDITED_MESSAGES);
+    }
+
+    public static boolean appLock() {
+        return SharedPref.getBooleanPref(Settings.APP_LOCK);
+    }
+
     //end
 }

@@ -363,4 +363,17 @@
     <string name="piko_media_like">like</string>
     <string name="piko_media_link">link</string>
     <string name="piko_media_activity">activity</string>
+
+    <!-- Phase 1 Strings -->
+    <string name="piko_hide_online_status">Hide online status</string>
+    <string name="piko_hide_online_status_desc">Prevents sending active presence/green dot to others while keeping others\' presence visible</string>
+    <string name="piko_save_edited_messages">Save edited message history</string>
+    <string name="piko_save_edited_messages_desc">Tracks and displays original message text when a message is edited by the sender</string>
+    <string name="piko_edited_tag">[Edited]</string>
+    <string name="piko_original_text">Original text</string>
+    <string name="piko_reels_playback_speed">Enable video playback speed</string>
+    <string name="piko_reels_playback_speed_desc">Allows changing video playback speed (0.5x - 2.0x) from post options</string>
+    <string name="piko_playback_speed">Playback speed</string>
+    <string name="piko_enable_app_lock">App lock (Biometric / PIN)</string>
+    <string name="piko_enable_app_lock_desc">Lock Instagram application with biometric or device security</string>
 </resources>
