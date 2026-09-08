@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/Rhdevs71/dududu/compare/v1.1.0...v1.1.1) (2026-09-08)
+
+### 🐛 Bug Fixes
+
+* **reels:** allocate safe register without clobbering button adder v1 in HookReelOverflowMenuButton ([9ae2b44](https://github.com/Rhdevs71/dududu/commit/9ae2b44061237a4092d39377ed5b553c01e19a28))
+
 ## [1.1.0](https://github.com/Rhdevs71/dududu/compare/v1.0.21...v1.1.0) (2026-09-08)
 
 ### ✨ New Features

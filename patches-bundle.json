@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-08T06:29:30",
-  "description": "## [1.1.0](https://github.com/Rhdevs71/dududu/compare/v1.0.21...v1.1.0) (2026-09-08)\n\n### ✨ New Features\n\n* neutralize custom app icon locked status in clinit and Compose click handler, safe register range in HookReelOverflowMenuButton ([361afe7](https://github.com/Rhdevs71/dududu/commit/361afe71d56300694333e71ac1521978b0da6511))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.1.0/patches-1.1.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.1.0/patches-1.1.0.mpp.asc",
-  "version": "1.1.0"
+  "created_at": "2026-09-08T07:19:46",
+  "description": "## [1.1.1](https://github.com/Rhdevs71/dududu/compare/v1.1.0...v1.1.1) (2026-09-08)\n\n### 🐛 Bug Fixes\n\n* **reels:** allocate safe register without clobbering button adder v1 in HookReelOverflowMenuButton ([9ae2b44](https://github.com/Rhdevs71/dududu/commit/9ae2b44061237a4092d39377ed5b553c01e19a28))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.1.1/patches-1.1.1.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.1.1/patches-1.1.1.mpp.asc",
+  "version": "1.1.1"
 }
