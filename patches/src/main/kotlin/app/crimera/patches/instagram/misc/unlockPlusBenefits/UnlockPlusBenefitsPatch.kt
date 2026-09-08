@@ -21,8 +21,10 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.extensions.InstructionExtensions.replaceInstruction
 import com.android.tools.smali.dexlib2.AccessFlags
+import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
 
 internal object ActiveBenefitCheckerClassFingerprint : Fingerprint(
     strings = listOf("is_benefit_active"),
@@ -49,18 +51,8 @@ internal object AppIconSwitchFingerprint : Fingerprint(
     },
 )
 
-internal object AppIconPickerViewModelFingerprint : Fingerprint(
-    returnType = "V",
-    custom = { methodDef, classDef ->
-        if (methodDef.parameters.size == 2 && methodDef.parameters[1].type == classDef.type) {
-            val instructions = methodDef.implementation?.instructions
-            instructions?.any {
-                it is ReferenceInstruction && it.reference.toString().contains("0GuK;->A06")
-            } ?: false
-        } else {
-            false
-        }
-    },
+internal object AuraAppIconPickerFragmentFingerprint : Fingerprint(
+    strings = listOf("AuraAppIconPickerFragment"),
 )
 
 internal object MetaSubscriptionUpsellFingerprint : Fingerprint(
@@ -105,13 +97,29 @@ val unlockPlusBenefitsPatch =
                 )
             }
 
-            AppIconPickerViewModelFingerprint.method.apply {
-                val targetIndex = instructions.indexOfFirst {
-                    it is ReferenceInstruction && it.reference.toString().contains("0GuK;->A06")
-                }
-                if (targetIndex >= 0) {
-                    val reg = (instructions[targetIndex] as? OneRegisterInstruction)?.registerA ?: 0
-                    replaceInstruction(targetIndex, "const/4 v$reg, 0")
+            AuraAppIconPickerFragmentFingerprint.classDef.apply {
+                val onViewCreated = methods.firstOrNull { it.name == "onViewCreated" }
+                val viewModelCall = onViewCreated?.implementation?.instructions
+                    ?.filterIsInstance<ReferenceInstruction>()
+                    ?.mapNotNull { it.reference as? MethodReference }
+                    ?.firstOrNull {
+                        it.parameterTypes.size == 2 &&
+                            it.parameterTypes[1] == it.definingClass &&
+                            it.returnType == "V"
+                    }
+                if (viewModelCall != null) {
+                    val viewModelClass = mutableClassDefByOrNull(viewModelCall.definingClass)
+                    val targetMethod = viewModelClass?.methods?.firstOrNull { it.name == viewModelCall.name }
+                    targetMethod?.apply {
+                        val instList = implementation?.instructions?.toList() ?: return@apply
+                        for (i in 0 until instList.size - 1) {
+                            if (instList[i].opcode == Opcode.SGET_OBJECT && instList[i + 1].opcode == Opcode.IF_EQ) {
+                                val reg = (instList[i] as? OneRegisterInstruction)?.registerA ?: 0
+                                replaceInstruction(i, "const/4 v$reg, 0")
+                                break
+                            }
+                        }
+                    }
                 }
             }
 

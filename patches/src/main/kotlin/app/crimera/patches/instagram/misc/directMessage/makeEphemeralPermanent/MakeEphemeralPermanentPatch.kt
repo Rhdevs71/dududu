@@ -71,20 +71,25 @@ val makeEphemeralPermanentPatch =
                     val lastIfEqIndex = midIfEqInstruction.location.index
                     val registers = midIfEqInstruction.registersUsed
                     val registerA = registers[0]
-                    val registerB = registers[1]
+                    val regA = if (registerA > 15) "v0" else "v$registerA"
+                    val regB = if (registerB > 15) "v1" else "v$registerB"
+                    val moveA = if (registerA > 15) "move/from16 v0, v$registerA\n" else ""
+                    val moveB = if (registerB > 15) "move/from16 v1, v$registerB\n" else ""
+                    val regObj = if (ephemeralMediaClassRegister > 15) "v2" else "v$ephemeralMediaClassRegister"
+                    val moveObj = if (ephemeralMediaClassRegister > 15) "move-object/from16 v2, v$ephemeralMediaClassRegister\n" else ""
 
                     addInstructionsWithLabels(
                         lastIfEqIndex,
                         """
-                        if-ne v$registerA, v$registerB, :piko
+                        ${moveA}${moveB}if-ne $regA, $regB, :piko
                         
-                        iget-object v0, v$ephemeralMediaClassRegister, $ephemeralMediaClassName->$expireAtFieldName:Ljava/lang/Long;
-                        iget-object v1, v$ephemeralMediaClassRegister, $ephemeralMediaClassName->$viewModeFieldName:Ljava/lang/String;
+                        ${moveObj}iget-object v0, $regObj, $ephemeralMediaClassName->$expireAtFieldName:Ljava/lang/Long;
+                        iget-object v1, $regObj, $ephemeralMediaClassName->$viewModeFieldName:Ljava/lang/String;
                         
                         invoke-static {v0, v1}, $PATCHES_DESCRIPTOR/dm/EphemeralMediaPatch;->makeEphemeralMediaPermanent(Ljava/lang/Long;Ljava/lang/String;)Ljava/lang/String;
                         move-result-object v1                        
                         
-                        iput-object v1, v$ephemeralMediaClassRegister, $ephemeralMediaClassName->$viewModeFieldName:Ljava/lang/String;
+                        iput-object v1, $regObj, $ephemeralMediaClassName->$viewModeFieldName:Ljava/lang/String;
                         return-object v$ephemeralMediaClassRegister
                         """.trimIndent(),
                         ExternalLabel("piko", midIfEqInstruction),
