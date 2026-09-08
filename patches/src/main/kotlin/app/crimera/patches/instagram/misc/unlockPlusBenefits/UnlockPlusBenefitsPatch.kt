@@ -24,7 +24,9 @@ import com.android.tools.smali.dexlib2.AccessFlags
 import com.android.tools.smali.dexlib2.Opcode
 import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.FieldReference
 import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+import com.android.tools.smali.dexlib2.iface.reference.TypeReference
 
 internal object ActiveBenefitCheckerClassFingerprint : Fingerprint(
     strings = listOf("is_benefit_active"),
@@ -110,13 +112,65 @@ val unlockPlusBenefitsPatch =
                 if (viewModelCall != null) {
                     val viewModelClass = mutableClassDefByOrNull(viewModelCall.definingClass)
                     val targetMethod = viewModelClass?.methods?.firstOrNull { it.name == viewModelCall.name }
+                    var statusFieldRef: FieldReference? = null
                     targetMethod?.apply {
                         val instList = implementation?.instructions?.toList() ?: return@apply
                         for (i in 0 until instList.size - 1) {
                             if (instList[i].opcode == Opcode.SGET_OBJECT && instList[i + 1].opcode == Opcode.IF_EQ) {
                                 val reg = (instList[i] as? OneRegisterInstruction)?.registerA ?: 0
+                                statusFieldRef = (instList[i] as? ReferenceInstruction)?.reference as? FieldReference
                                 replaceInstruction(i, "const/4 v$reg, 0")
                                 break
+                            }
+                        }
+                    }
+
+                    // 1. In LX/0GuK (status enum), neutralize A06 in <clinit> so it points to null
+                    if (statusFieldRef != null) {
+                        val statusEnumClass = mutableClassDefByOrNull(statusFieldRef!!.definingClass)
+                        val clinit = statusEnumClass?.methods?.firstOrNull { it.name == "<clinit>" }
+                        clinit?.apply {
+                            val instList = implementation?.instructions?.toList() ?: return@apply
+                            val retIdx = instList.indexOfLast { it.opcode == Opcode.RETURN_VOID }
+                            if (retIdx >= 0) {
+                                addInstructions(
+                                    retIdx,
+                                    """
+                                    const/4 v0, 0
+                                    sput-object v0, ${statusFieldRef!!.definingClass}->${statusFieldRef!!.name}:${statusFieldRef!!.type}
+                                    """.trimIndent(),
+                                )
+                            }
+                        }
+                    }
+
+                    // 2. In LX/0RAH (click handler lambda), neutralize SGET_OBJECT + IF_NE check
+                    val onCreateView = methods.firstOrNull { it.name == "onCreateView" }
+                    val f3uType = onCreateView?.implementation?.instructions
+                        ?.filterIsInstance<ReferenceInstruction>()
+                        ?.mapNotNull { (it.reference as? TypeReference)?.type }
+                        ?.firstOrNull()
+                    if (f3uType != null) {
+                        val f3uClass = mutableClassDefByOrNull(f3uType)
+                        val f3uInvoke = f3uClass?.methods?.firstOrNull { it.name == "invoke" }
+                        val rahType = f3uInvoke?.implementation?.instructions
+                            ?.filterIsInstance<ReferenceInstruction>()
+                            ?.mapNotNull { (it.reference as? TypeReference)?.type }
+                            ?.firstOrNull { it.startsWith("LX/0R") }
+                        if (rahType != null) {
+                            val rahClass = mutableClassDefByOrNull(rahType)
+                            val rahInvoke = rahClass?.methods?.firstOrNull { it.name == "invoke" }
+                            rahInvoke?.apply {
+                                val instList = implementation?.instructions?.toList() ?: return@apply
+                                for (i in 0 until instList.size - 1) {
+                                    if (instList[i].opcode == Opcode.SGET_OBJECT && instList[i + 1].opcode == Opcode.IF_NE) {
+                                        val ref = (instList[i] as? ReferenceInstruction)?.reference as? FieldReference
+                                        if (statusFieldRef == null || (ref?.definingClass == statusFieldRef!!.definingClass && ref?.name == statusFieldRef!!.name)) {
+                                            val reg = (instList[i] as? OneRegisterInstruction)?.registerA ?: 0
+                                            replaceInstruction(i, "const/4 v$reg, 0")
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
