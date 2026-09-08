@@ -64,7 +64,36 @@ val hookReelOverflowMenuButton =
                     ).registersUsed[0]
 
                 val safeRegisterOne = if (freeRegisterOne <= 15) freeRegisterOne else 2
-                val safeRegisterTwo = if (freeRegisterTwo <= 15 && freeRegisterTwo != safeRegisterOne) freeRegisterTwo else (if (safeRegisterOne == 2) 1 else 2)
+
+                val reservedRegisters = setOf(
+                    selfClassRegister,
+                    buttonAdderInstanceRegister,
+                    mediaObjectRegister,
+                    safeRegisterOne,
+                )
+
+                var safeRegisterTwo = -1
+                if (freeRegisterTwo <= 15 && freeRegisterTwo !in reservedRegisters) {
+                    safeRegisterTwo = freeRegisterTwo
+                } else {
+                    for (r in 0..15) {
+                        if (r in reservedRegisters) continue
+                        var isUsedBefore = false
+                        for (i in 0..mediaObjectFromParameterIndex) {
+                            if (r in getInstruction(i).registersUsed) {
+                                isUsedBefore = true
+                                break
+                            }
+                        }
+                        if (!isUsedBefore) {
+                            safeRegisterTwo = r
+                            break
+                        }
+                    }
+                }
+                if (safeRegisterTwo == -1) {
+                    safeRegisterTwo = 5
+                }
 
                 addInstructions(
                     mediaObjectFromParameterIndex + 1,
