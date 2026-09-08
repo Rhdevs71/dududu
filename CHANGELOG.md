@@ -1,3 +1,10 @@
+## [1.0.21](https://github.com/Rhdevs71/dududu/compare/v1.0.20...v1.0.21) (2026-09-08)
+
+### 🐛 Bug Fixes
+
+* define registerB in MakeEphemeralPermanentPatch ([0974f04](https://github.com/Rhdevs71/dududu/commit/0974f049e67d9efde4567182b1bc969723909e9e))
+* resolve unlockPlusBenefits fingerprint matching and Dalvik register range ([6188a6a](https://github.com/Rhdevs71/dududu/commit/6188a6af5fcd7fcf3574fca06e20bcb47418b8d1))
+
 ## [1.0.20](https://github.com/Rhdevs71/dududu/compare/v1.0.19...v1.0.20) (2026-09-07)
 
 ### 🐛 Bug Fixes
