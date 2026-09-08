@@ -1,3 +1,9 @@
+## [1.3.1](https://github.com/Rhdevs71/dududu/compare/v1.3.0...v1.3.1) (2026-09-08)
+
+### 🐛 Bug Fixes
+
+* **whatsapp:** update AntiRevoke fingerprint string and return-object signature ([823669c](https://github.com/Rhdevs71/dududu/commit/823669c7dd20727c0e51a7e0dd1fcb0421021301))
+
 ## [1.3.0](https://github.com/Rhdevs71/dududu/compare/v1.2.0...v1.3.0) (2026-09-08)
 
 ### 🐛 Bug Fixes
