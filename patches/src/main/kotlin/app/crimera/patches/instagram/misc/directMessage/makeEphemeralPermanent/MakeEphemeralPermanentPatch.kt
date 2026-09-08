@@ -71,6 +71,7 @@ val makeEphemeralPermanentPatch =
                     val lastIfEqIndex = midIfEqInstruction.location.index
                     val registers = midIfEqInstruction.registersUsed
                     val registerA = registers[0]
+                    val registerB = registers[1]
                     val regA = if (registerA > 15) "v0" else "v$registerA"
                     val regB = if (registerB > 15) "v1" else "v$registerB"
                     val moveA = if (registerA > 15) "move/from16 v0, v$registerA\n" else ""
