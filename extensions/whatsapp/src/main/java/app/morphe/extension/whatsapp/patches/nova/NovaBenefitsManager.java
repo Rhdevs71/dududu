@@ -24,6 +24,14 @@ public class NovaBenefitsManager {
         return originalResult;
     }
 
+    public static boolean isBenefitAllowed(String benefitName) {
+        if (WhatsAppPref.unlockNovaPlus()) {
+            WhatsAppLog.d(TAG, "Unlocking Nova Benefit: " + benefitName);
+            return true;
+        }
+        return true; // Default allow for Plus
+    }
+
     /**
      * Intercepts subscription check flags.
      */

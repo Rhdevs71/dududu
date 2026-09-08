@@ -46,12 +46,17 @@ public class Pref {
     }
 
     public static boolean isBenefitAllowed(String benefit) {
-        if (benefit != null && (
-            benefit.equalsIgnoreCase("CUSTOM_APP_ICON") ||
-            benefit.equalsIgnoreCase("custom_app_icon")
-        )) {
-            PikoLog.d("BenefitChecker", "Unlocking custom app icon benefit unconditionally");
-            return true;
+        if (benefit != null) {
+            String b = benefit.toLowerCase();
+            if (b.contains("custom_app_icon") ||
+                b.contains("custom_profile_bio_font") ||
+                b.contains("bio_font") ||
+                b.contains("biography_font") ||
+                b.contains("story_font") ||
+                b.contains("font_pack")) {
+                PikoLog.d("BenefitChecker", "Unlocking benefit unconditionally: " + benefit);
+                return true;
+            }
         }
         return unlockPlusBenefits();
     }

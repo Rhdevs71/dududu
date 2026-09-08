@@ -63,6 +63,17 @@ internal object MetaSubscriptionUpsellFingerprint : Fingerprint(
     returnType = "V",
 )
 
+internal object SetBiographyRequestBuilderFingerprint : Fingerprint(
+    strings = listOf("accounts/set_biography/", "raw_text"),
+    parameters = listOf(
+        "Lcom/instagram/common/session/UserSession;",
+        "Ljava/lang/String;",
+        "Ljava/lang/String;",
+        "Ljava/lang/String;",
+        "Ljava/lang/String;",
+    ),
+)
+
 @Suppress("unused")
 val unlockPlusBenefitsPatch =
     bytecodePatch(
@@ -182,6 +193,18 @@ val unlockPlusBenefitsPatch =
                     0,
                     """
                     return-void
+                    """.trimIndent(),
+                )
+            }
+
+            SetBiographyRequestBuilderFingerprint.method.apply {
+                addInstructions(
+                    0,
+                    """
+                    invoke-static {p1, p4}, $PATCHES_DESCRIPTOR/userprofile/BioFontTransformer;->transformBio(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+                    move-result-object p1
+                    invoke-static {p4}, $PATCHES_DESCRIPTOR/userprofile/BioFontTransformer;->sanitizeFontParam(Ljava/lang/String;)Ljava/lang/String;
+                    move-result-object p4
                     """.trimIndent(),
                 )
             }
