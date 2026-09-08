@@ -85,19 +85,22 @@
      4. Menambahkan method logger `d(String, Object)` pada `PikoLog.java`.
    - *Status*: Rilis **`v1.0.19`** (`patches-1.0.19.mpp`) berhasil dirilis via CI Run #38. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.19_59patches.apk`** telah dipatch dan diaudit.
 
-8. **Tahap 8: Perbaikan Final Custom App Icon IG Plus & Penonaktifan Permanen Dialog Paywall (Rilis v1.0.20 - Terkini)**
+8. **Tahap 8: Perbaikan Custom App Icon IG Plus (Rilis v1.0.20 - v1.0.21)**
+   - Perbaikan awal ViewModel `LX/0EKv;->A00` dan pembungkaman Bloks paywall `LX/0Hff;->A00`.
+   - Perbaikan register range smali di `MakeEphemeralPermanentPatch.kt`.
+
+9. **Tahap 9: Penonaktifan Permanen Dialog Upsell Paywall Custom App Icon di Layer Jetpack Compose & Eliminasi Warning Register v23 (Rilis v1.0.22 - Terkini)**
    - *Analisis Masalah Reverse Engineering*:
-     1. Pada v1.0.19 pengguna melaporkan popup dialog *"belum plus"* masih muncul dan pergantian icon gagal.
-     2. Melalui disassembly mendalam, ditemukan bahwa pada `LX/0EKv;->A00`, saat icon di grid diklik, status dibaca dari model `LX/0CJd;->A01` (`LX/0GuK;`).
-     3. Karena akun non-subscriber, respon server GraphQL menandai status icon sebagai `LX/0GuK;->A06` (`IG_PLUS_LOCKED`).
-     4. Instruksi `if-eq v1, v0, offset=20` (dimana `v0` adalah `A06`) **MELOMPATI** pengecekan benefit lokal `LX/01oH;->A00` langsung ke state `A0C` (LOCKED)!
-     5. Akibatnya saat tombol *"Pilih ikon"* diklik, `LX/0EKv;->A0w` melihat status masih `A0C` (bukan `A00`), lalu meluncurkan coroutine Case 42 (`LX/0Oqc`). Case 42 mengemisikan `LX/0KmE` yang memanggil `LX/09WQ;->A01` -> `LX/0Hff;->A00` -> memunculkan pop-up Bloks paywall `"com.bloks.www.mv.unified_entry_point.controller"` ("Belum Plus")!
+     1. Pengguna melaporkan bahwa saat ikon di grid disentuh/diklik, langsung muncul popup dialog upsell paywall: *"Buka ikon aplikasi kustom. Pilih ikon yang cocok dengan gaya Anda..."*. Ikon tidak terpilih dan tombol tidak bekerja.
+     2. Melalui reverse engineering Jetpack Compose (`classes9.dex` & `classes14.dex`), ditemukan bahwa cell ikon dibangun oleh Composable `LX/0Wn3;->A01` (`AuraAppIconCell`) dan callback klik ditangani oleh lambda `LX/0RAH;->invoke`.
+     3. Pada `LX/0RAH;->invoke` baris [287]-[297], Dalvik membaca status ikon `LX/0CJd;->A01` (`LX/0GuK`) dan membandingkannya dengan `sget-object v0, LX/0GuK;->A06:LX/0GuK;` (`IG_PLUS_LOCKED`).
+     4. Karena akun non-subscriber, status ikon cocok dengan `A06`. Handler klik **langsung memicu coroutine Case 42** yang memunculkan dialog upsell paywall Bloks/Compose lalu melompat keluar (`goto/16`), **tanpa pernah memanggil** `LX/0EKv;->A00` (method pemilihan ikon)!
+     5. Di `HookReelOverflowMenuButton.kt`, register `freeRegisterTwo` terdeteksi bernilai `23`. Smali 22c (`iget-object`) dan 35c (`invoke-static`) hanya mendukung register 4-bit (`v0..v15`), memicu 2 peringatan `[WARN] [STDIO]: Invalid register: v23`.
    - *Solusi & Implementasi*:
-     1. Menambahkan `AppIconPickerViewModelFingerprint` di `UnlockPlusBenefitsPatch.kt` untuk menargetkan `LX/0EKv;->A00`.
-     2. Mengganti instruksi `sget-object v0, LX/0GuK;->A06:LX/0GuK;` dengan `const/4 v0, 0` via `replaceInstruction`. Karena perbandingan `v1 == v0` selalu false, Dalvik tidak pernah melompat ke state LOCKED dan icon langsung disetel ke status **`A00` (AVAILABLE & SELECTABLE)**.
-     3. Menambahkan `MetaSubscriptionUpsellFingerprint` untuk menargetkan controller dialog upsell paywall Bloks (`LX/0Hff;->A00`) dan menginjeksi `return-void` di index 0 untuk membungkam dialog secara permanen.
-     4. Memperkuat `InstaAppIconManager.java` dengan fallback context otomatis ke `PikoUtils.getContext()` dan logging diagnostik mendalam.
-   - *Status Saat Ini*: Rilis **`v1.0.20`** (`patches-1.0.20.mpp`) berhasil dirilis via CI Run #34117557712. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.20_59patches.apk`** telah dipatch dan diaudit (103 calls checked, **0 warnings / 0 VerifyError**, verifikasi Dalvik menunjukkan `const/4 v0, 0` di `LX/0EKv;->A00` dan `return-void` di `LX/0Hff;->A00`).
+     1. Menetralkan field static enum `LX/0GuK;->A06` di method `<clinit>` tepat sebelum `return-void` dengan menyetel `const/4 v0, 0` lalu `sput-object v0, LX/0GuK;->A06`. Karena seluruh objek ikon berstatus enum non-null, maka perbandingan `icon.status == LX/0GuK.A06` di SEMUA tempat otomatis bernilai **FALSE**!
+     2. Menetralkan instruksi perbandingan `sget-object v0, LX/0GuK;->A06` langsung di lambda klik `LX/0RAH;->invoke` menjadi `const/4 v0, 0`. Perbandingan `if-ne` selalu lolos ke pemilihan ikon (`LX/0EKv;->A00`) dan melewatkan seluruh blok popup upsell Case 42.
+     3. Membatasi register di `HookReelOverflowMenuButton.kt` ke 4-bit safe registers (`safeRegisterOne`, `safeRegisterTwo`) untuk memusnahkan warning STDIO invalid register `v23`.
+   - *Status Saat Ini*: Rilis **`v1.0.22`** (`patches-1.0.22.mpp`) berhasil dirilis via CI Run #45. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.22_59patches.apk`** telah dipatch dan diaudit (**104 calls checked, 0 warnings / 0 VerifyError**, verifikasi Dalvik menunjukkan `sput-object v0, LX/0GuK;->A06` di `<clinit>`, `const/4 v0, 0` di `LX/0RAH;->invoke`, dan pemanggilan `AddReelButton` bebas dari warning `v23`).
 
 ---
 
