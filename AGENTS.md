@@ -102,7 +102,7 @@
      3. Membatasi register di `HookReelOverflowMenuButton.kt` ke 4-bit safe registers (`safeRegisterOne`, `safeRegisterTwo`) untuk memusnahkan warning STDIO invalid register `v23`.
    - *Status*: Rilis **`v1.0.22`** (`patches-1.0.22.mpp`) berhasil dirilis via CI Run #45. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.22_59patches.apk`** telah dipatch dan diaudit (**104 calls checked, 0 warnings / 0 VerifyError**, verifikasi Dalvik menunjukkan `sput-object v0, LX/0GuK;->A06` di `<clinit>`, `const/4 v0, 0` di `LX/0RAH;->invoke`, dan pemanggilan `AddReelButton` bebas dari warning `v23`).
 
-10. **Tahap 10: Perbaikan Dalvik VerifyError pada Reels Controller `X.09qJ.A09` (Rilis v1.1.1 / v1.0.23 - Terkini)**
+10. **Tahap 10: Perbaikan Dalvik VerifyError pada Reels Controller `X.09qJ.A09` (Rilis v1.1.1 / v1.0.23)**
     - *Analisis Masalah Reverse Engineering*:
       1. Pengguna melaporkan bahwa fitur ganti icon IG Plus telah bekerja dengan sempurna, namun terjadi crash fatal saat membuka Reels:
          `java.lang.VerifyError: Verifier rejected class X.09qJ: void X.09qJ.A09(...) [0x16F] register v1 has type Reference: androidx.fragment.app.FragmentActivity but expected Reference: X.0CJF`.
@@ -112,7 +112,80 @@
       1. Melindungi register aktif `v0`, `v1`, `v4`, dan `v2` dalam `reservedRegisters`.
       2. Mengalokasikan `safeRegisterTwo` ke register 4-bit aman yang belum digunakan sebelum titik injeksi (memilih `v5` yang belum diinisialisasi hingga baris [33] di mana ia ditimpa oleh `move-object/from16 v5, v23`).
       3. Register `v1` tetap utuh memegang `LX/0CJF`.
-    - *Status Saat Ini*: Rilis **`v1.1.1`** (`patches-1.1.1.mpp` / `patches-1.0.23.mpp`) berhasil dirilis via CI Run #46. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.23_59patches.apk`** telah dipatch dan diaudit (**104 calls checked, 0 warnings / 0 VerifyError**, verifikasi Dalvik menunjukkan `v1` utuh dan pemanggilan menggunakan `v5, v1, v4, v2`).
+    - *Status*: Rilis **`v1.1.1`** (`patches-1.1.1.mpp` / `patches-1.0.23.mpp`) berhasil dirilis via CI Run #46. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.23_59patches.apk`** telah dipatch dan diaudit (**104 calls checked, 0 warnings / 0 VerifyError**).
+
+11. **Tahap 11: Implementasi 4 Fitur Baru Instagram Piko (Fase 1) & Riset Arsitektur WhatsApp Plus / WaEnhancer (Fase 2) (Rilis v1.2.0 - Terkini)**
+    - *Fitur Baru Fase 1 yang Diimplementasikan*:
+      1. **Ghost Online Presence (`HideOnlineStatusPatch.kt`, `GhostPresenceHook.java`, `Links.java`)**:
+         - Memblokir endpoint pelaporan status online ke server Meta (`/presence/report_activity/`, `/presence/set_presence/`, `/presence/thread_presence/`, `/presence/batch_fetch_presence/`, serta MQTT table routing `/presence`, `/flash_send_thread_presence`, `/t_update_presence_extra_data`).
+         - Menjaga endpoint pembacaan status online (`direct_v2/get_presence/`, `direct_v2/get_presence_active_now/`) tetap aktif agar pengguna tetap bisa melihat titik hijau / waktu aktif orang lain secara sepihak (one-way stealth mode).
+      2. **Video & Reels Playback Speed Controller (`PlaybackSpeedController.java`, `MoreOptionsOnPostPatch.java`)**:
+         - Menambahkan opsi kecepatan putar video (`0.5x`, `0.75x`, `1.0x (Normal)`, `1.25x`, `1.5x`, `2.0x`) pada menu opsi postingan feed dan Reels video.
+         - Terintegrasi langsung dengan dialog native Piko dan toast konfirmasi.
+      3. **Anti-Edited Direct Messages Tracker (`PikoMessageDb.java`, `SavedMessagesHook.java`)**:
+         - Memperbarui dedup `SEEN_ITEM_IDS` dengan hash konten (`content.hashCode()`) agar pesan yang diedit oleh lawan bicara tidak dibuang oleh filter duplikasi MQTT.
+         - Pada layer SQLite `PikoMessageDb.java`, saat terjadi conflict `rowId == -1`, teks lama dibandingkan dengan teks baru. Jika berbeda dan `saveEditedMessages()` aktif, teks lama disimpan dan ditampilkan sebagai: `[Teks Baru]\n\n✏️ [Teks Asli]: [Teks Lama]` di ruang obrolan dan Vault Deleted Messages.
+      4. **App Lock Biometrik & Device PIN (`PikoAppLockManager.java`, `AppLockPatch.kt`)**:
+         - Menambahkan hook lifecycle Android pada `IgFragmentActivity->onResume()` dan `IgFragmentActivity->onStop()`.
+         - Mengintegrasikan native Android `BiometricPrompt` yang mendukung autentikator ganda (`BIOMETRIC_STRONG | DEVICE_CREDENTIAL`) di Android 10 - 15 SDK 35.
+         - Jika autentikasi ditolak atau dibatalkan, aplikasi langsung diminimalkan ke background (`activity.moveTaskToBack(true)`).
+         - Mengunci kembali aplikasi secara otomatis saat aplikasi keluar ke background (`activeActivitiesCount <= 0`).
+    - *Riset Mendalam Fase 2: WhatsApp Plus & WaEnhancer (`Rhdevs71/apahayo`)*:
+      1. **Target WhatsApp**: `C:\Users\Rhdevs\Downloads\wa` (WhatsApp Messenger v2.26.35.71, Target SDK 36 Android 16).
+      2. **Arsitektur WhatsApp Plus Resmi Meta (Nova)**:
+         - Ditemukan class controller: `com.whatsapp.nova.manager.PromoEligibilityManager` (`smali_classes8`).
+         - Enum Benefit Plus: `LX/30G;` (`smali_classes3`) & `LX/AHV;` (`smali_classes6`):
+           - `CUSTOM_APP_THEME`: Tema kustom aplikasi.
+           - `CUSTOM_APP_ICON`: Ubah icon launcher (mirip IG Plus).
+           - `PIN_MORE_CHATS`: Pin lebih dari 3 obrolan.
+           - `ENHANCED_LISTS`: Filter dan daftar kontak lanjutan.
+           - `PREMIUM_STICKERS`: Stiker eksklusif Nova.
+           - `CUSTOM_RINGTONES`: Nada dering khusus.
+           - `ONBOARDING` & `SUBSCRIPTIONS_HUB`: Layar manajemen langganan Plus.
+      3. **Modul Xposed WaEnhancer**:
+         - Memuat 60+ fitur privasi, downloader, dan kustomisasi di `FeatureLoader.kt` yang siap diadaptasi ke Morphe non-root (Anti-Revoke message, Status saver, Anti-View Once, Hide Blue Tick, Freeze Last Seen, dll.).
+    - *Status*: Rilis **`v1.2.0`** (`patches-1.2.0.mpp`) berhasil dirilis via CI Run #47 (`34203435672`). APK **`C:\Users\Rhdevs\Downloads\instagram_v1.2.0_60patches.apk`** telah dipatch dan diaudit (**106 calls checked, 0 warnings / 0 VerifyError**, verifikasi Dalvik menunjukkan seluruh 61 patch aktif sempurna).
+
+12. **Tahap 12: Implementasi Modul Ekstensi WhatsApp Piko, Nova (Plus) Unlocked, Fitur WaEnhancer, & Clone Patch (Rilis v1.3.1 - Terkini)**
+    - *Fitur WhatsApp Piko yang Diimplementasikan*:
+      1. **Tambalan Clone WhatsApp (`ClonePatch.kt` & `WhatsAppPackageSpoofer.java`)**:
+         - Mengubah package name target dari `com.whatsapp` menjadi `com.whatsapp.pikoo` agar dapat diinstal berdampingan (dual-app / kloning) dengan WhatsApp original tanpa timpa/bentrok.
+         - Mengubah seluruh 19 content provider authorities dengan prefix `com.whatsapp.pikoo.` (mencegah error instalasi `INSTALL_FAILED_CONFLICTING_PROVIDER`).
+         - Mengubah seluruh 9 custom permissions menjadi `com.whatsapp.pikoo.permission.*`.
+         - Mengganti nama aplikasi di launcher menjadi `Piko WhatsApp`.
+         - Mengimplementasikan `WhatsAppPackageSpoofer.java` untuk memalsukan `Context.getPackageName()` kembali ke `com.whatsapp` agar proteksi internal JNI/crypto Signal Meta tetap berfungsi.
+      2. **WhatsApp Plus (Nova) Unlocked (`UnlockNovaPatch.kt` & `NovaBenefitsManager.java`)**:
+         - Mengaktifkan status kelayakan fitur Plus Meta (Nova) pada `PromoEligibilityManager`.
+         - Membuka benefit resmi Meta: Custom App Theme, Custom App Icon, Unlimited Pinned Chats (melewati batas 3 obrolan), Enhanced Lists, dan stiker eksklusif Nova.
+      3. **Anti-Revoke Messages (`AntiRevokePatch.kt` & `AntiRevokeManager.java`)**:
+         - Mencegat penghapusan pesan yang ditarik/dihapus oleh lawan bicara (`revoke`) pada method `LX/15O;->A00(...)LX/CNA;` (fingerprint `"msgstore/revoking/has-placeholder "`).
+         - Mengembalikan `null` pada alur penghapusan sehingga pesan tetap tersimpan di database lokal pengguna.
+         - Menambahkan penanda visual/badge `🚫 [Dihapus (HH:mm:ss)]` pada pesan yang ditarik.
+      4. **Anti-View Once (`AntiViewOncePatch.kt`)**:
+         - Mencegat flag view-once media pada method query/setter database WhatsApp (`INSERT_VIEW_ONCE_SQL`) sehingga media sekali lihat tidak pernah kedaluwarsa dan bisa dilihat serta disimpan berkali-kali.
+      5. **Ghost Read Receipts / Stealth Mode (`HideSeenReceiptPatch.kt` & `GhostReceiptManager.java`)**:
+         - Memblokir job `SendReadReceiptJob` pengiriman centang biru ke server WhatsApp.
+         - Mendukung mode *Seen on Reply* (centang biru baru dikirim ketika pengguna mengetik dan mengirimkan balasan pesan) serta stealth typing.
+      6. **Status & Media Downloader (`StatusDownloaderPatch.kt` & `WhatsAppMediaDownloader.java`)**:
+         - Menyimpan status foto dan video teman langsung ke direktori `/sdcard/Download/Piko/WhatsApp/` dan memicu `MediaScannerConnection` agar media langsung muncul di galeri.
+      7. **Pusat Debug Logging WhatsApp (`WhatsAppLog.java`)**:
+         - Seluruh error dan event modul WhatsApp dicatat ke file sentral `/sdcard/Download/Piko/piko_debug.log`.
+    - *Status*: Rilis **`v1.3.1`** (`patches-1.3.1.mpp`) berhasil dipublish via CI Run #50 (`34208711845`). APK **`C:\Users\Rhdevs\Downloads\whatsapp_v1.3.1_cloned.apk`** (149 MB) telah dipatch dan ditandatangani dengan Android SDK 35 `apksigner` (v1, v2, v3 schemes valid: true).
+
+13. **Tahap 13: Perbaikan VerifyError X.0PtR.A02 Android 15 di Piko serta Eliminasi Paywall Popup Custom App Icon (IG) & WhatsApp Plus (Tema & Icon) di WaEnhancer (Terkini)**
+    - *Perbaikan VerifyError Piko Instagram Android 15 (`DownloadMediaPatch.kt`)*:
+      - *Masalah*: Crash fatal saat startup: `java.lang.VerifyError: Verifier rejected class X.0PtR: void X.0PtR.A02(...) [0x0] register v0 has type Undefined but expected Reference: android.content.Context`.
+      - *Penyebab*: Injeksi legacy DM media downloader di `DownloadMediaPatch.kt` mencari method void pertama dengan `classDef.methods.first { it.returnType == "V" && it.name != "<init>" }`. Pada Instagram v444, method pertama yang cocok adalah `static void X.0PtR.A02(...)` (12 parameter). Injeksi `iget-object v0, p1, $appActivityField` gagal verifikasi karena `p1` bertipe `X.0Qxb` (bukan instance saver). Register `v0` menjadi Undefined, ditolak ketat oleh ART Verifier Android 15.
+      - *Solusi*: Menghapus blok injeksi legacy usang tersebut di `DownloadMediaPatch.kt` karena fitur DM media downloader dan voice downloader sudah ditangani oleh patch DM modern.
+    - *Perbaikan Custom App Icon Paywall Popup di WaEnhancer (`UnlockPlusBenefitsPatch.kt`)*:
+      - *Masalah*: Saat memilih icon aplikasi kustom di Instagram, muncul dialog popup IG Plus ("Buka ikon aplikasi kustom...") dan icon tidak terpilih.
+      - *Penyebab*: Jetpack Compose callback `LX/0RAH;->invoke` membaca status `LX/0CJd;->A01` (`LX/0GuK;->A06: IG_PLUS_LOCKED`). Jika terkunci, Dalvik langsung mengeksekusi coroutine Case 42 (dialog paywall popup) tanpa memanggil ViewModel `LX/0EKv;->A00`.
+      - *Solusi*: Menginjeksi hook di `LX/0RAH;->invoke` saat instance adalah `LX.0EGZ` untuk langsung memanggil `LX.0EKv.A00(selectedIcon, vm)`, mengeksekusi `applyLauncherIcon`, dan menyetel `param.result = Unit` (membungkam dialog popup). Menetralkan `LX/0GuK` valueOf dan field `A06` menjadi `A05` (`IG_PLUS_AVAILABLE`), serta meng-hook action button `LX/0EKv;->A0w`.
+    - *Perbaikan WhatsApp Plus Paywall Popup (Tema & Icon) di WaEnhancer (`UnlockPremium.kt` & `fragment_general.xml`)*:
+      - *Masalah*: Fitur tema aplikasi dan ganti icon di WhatsApp memunculkan popup langganan WA Plus.
+      - *Penyebab*: `pref_wa_premium` disetel `false` secara default di `fragment_general.xml` sehingga hook `UnlockPremium` dilewati. Selain itu, benefit WhatsApp Nova `CUSTOM_APP_THEME` (`LX/30G.A04` & `LX/0mU.A0A`) dan `CUSTOM_APP_ICON` (`LX/30G.A03` & `LX/0mU.A09`) membutuhkan hook langsung pada model dan `PromoEligibilityManager`.
+      - *Solusi*: Mengubah default `pref_wa_premium` menjadi `true` out-of-the-box di XML dan kode Kotlin. Menambahkan hook pada `LX.30G` model methods, `PromoEligibilityManager`, dan dynamic discovery string `wa_plus_custom_app_theme` & `wa_plus_custom_app_icon`.
+    - *Hasil Build*: APK `C:\Users\Rhdevs\Downloads\RHpatch_v1.5.6_Plus_Fixed.apk` (52 MB) berhasil di-assemble dengan 0 error.
 
 ---
 
