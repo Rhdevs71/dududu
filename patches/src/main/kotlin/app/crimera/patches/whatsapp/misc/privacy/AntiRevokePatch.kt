@@ -14,7 +14,7 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 
 internal object AntiRevokeFingerprint : Fingerprint(
-    strings = listOf("msgstore/edit/revoke"),
+    strings = listOf("msgstore/revoking/has-placeholder "),
 )
 
 @Suppress("unused")
@@ -34,8 +34,9 @@ val antiRevokePatch =
                     const/4 v0, 0
                     invoke-static {v0, v0}, $ANTI_REVOKE_CLASS->shouldPreventRevocation(Ljava/lang/String;Z)Z
                     move-result v0
-                    if-eqz v0, :continue_normal_flow
-                    return-void
+                    if-nez v0, :continue_normal_flow
+                    const/4 v0, 0
+                    return-object v0
                     :continue_normal_flow
                     """.trimIndent(),
                 )
