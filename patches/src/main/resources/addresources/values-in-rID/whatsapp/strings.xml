@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- WhatsApp Piko Settings -->
+    <string name="piko_wa_settings_title">Pengaturan Piko WhatsApp</string>
+
+    <!-- Nova Plus Section -->
+    <string name="piko_wa_category_nova">WhatsApp Plus (Nova)</string>
+    <string name="piko_wa_unlock_nova">Buka WhatsApp Plus</string>
+    <string name="piko_wa_unlock_nova_desc">Membuka Tema Kustom, Ikon Peluncur Kustom, dan pin obrolan tanpa batas.</string>
+
+    <!-- Privacy Section -->
+    <string name="piko_wa_category_privacy">Privasi &amp; Mode Siluman</string>
+    <string name="piko_wa_anti_revoke">Pesan Anti Tarik / Hapus</string>
+    <string name="piko_wa_anti_revoke_desc">Mencegah pesan yang dihapus pengirim menghilang. Pesan tetap terbaca.</string>
+    <string name="piko_wa_anti_view_once">Anti Sekali Lihat (View-Once)</string>
+    <string name="piko_wa_anti_view_once_desc">Melihat foto dan video sekali lihat tanpa batas dan dapat disimpan.</string>
+    <string name="piko_wa_hide_seen_receipt">Sembunyikan Centang Biru</string>
+    <string name="piko_wa_hide_seen_receipt_desc">Menonaktifkan pengiriman tanda centang biru ke pengirim.</string>
+    <string name="piko_wa_seen_on_reply">Centang Biru Saat Membalas</string>
+    <string name="piko_wa_seen_on_reply_desc">Hanya mengirim centang biru setelah Anda mengetik balasan pesan.</string>
+    <string name="piko_wa_hide_typing_status">Sembunyikan Status Mengetik</string>
+    <string name="piko_wa_hide_typing_status_desc">Menyembunyikan indikator \'sedang mengetik...\' dan \'merekam audio...\'.</string>
+
+    <!-- Media Section -->
+    <string name="piko_wa_category_media">Media &amp; Status</string>
+    <string name="piko_wa_status_downloader">Pengunduh Status</string>
+    <string name="piko_wa_status_downloader_desc">Mengunduh foto dan video status kontak langsung ke galeri.</string>
+    <string name="piko_wa_media_quality_hd">Kualitas Media Selalu HD</string>
+    <string name="piko_wa_media_quality_hd_desc">Mengirim foto dan video dalam kualitas asli tanpa kompresi.</string>
+</resources>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- WhatsApp Piko Settings -->
+    <string name="piko_wa_settings_title">Piko WhatsApp Settings</string>
+
+    <!-- Nova Plus Section -->
+    <string name="piko_wa_category_nova">WhatsApp Plus (Nova)</string>
+    <string name="piko_wa_unlock_nova">Unlock WhatsApp Plus</string>
+    <string name="piko_wa_unlock_nova_desc">Unlocks Custom App Themes, Custom Launcher Icons, and unlimited pinned chats.</string>
+
+    <!-- Privacy Section -->
+    <string name="piko_wa_category_privacy">Privacy &amp; Ghost Mode</string>
+    <string name="piko_wa_anti_revoke">Anti-Revoke Messages</string>
+    <string name="piko_wa_anti_revoke_desc">Prevents deleted messages from disappearing. Revoked messages remain visible.</string>
+    <string name="piko_wa_anti_view_once">Anti-View Once</string>
+    <string name="piko_wa_anti_view_once_desc">Allows viewing view-once photos and videos indefinitely.</string>
+    <string name="piko_wa_hide_seen_receipt">Hide Read Receipts</string>
+    <string name="piko_wa_hide_seen_receipt_desc">Disables sending blue ticks to sender.</string>
+    <string name="piko_wa_seen_on_reply">Blue Tick On Reply</string>
+    <string name="piko_wa_seen_on_reply_desc">Sends blue ticks only after you send a reply message.</string>
+    <string name="piko_wa_hide_typing_status">Hide Typing Status</string>
+    <string name="piko_wa_hide_typing_status_desc">Hides \'typing...\' and \'recording audio...\' presence indicator.</string>
+
+    <!-- Media Section -->
+    <string name="piko_wa_category_media">Media &amp; Status</string>
+    <string name="piko_wa_status_downloader">Status Downloader</string>
+    <string name="piko_wa_status_downloader_desc">Enables saving contact stories and statuses to storage.</string>
+    <string name="piko_wa_media_quality_hd">Always HD Media</string>
+    <string name="piko_wa_media_quality_hd_desc">Sends photos and videos in original maximum quality without compression.</string>
+</resources>
