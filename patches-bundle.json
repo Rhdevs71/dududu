@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-08T11:27:09",
-  "description": "## [1.3.2](https://github.com/Rhdevs71/dududu/compare/v1.3.1...v1.3.2) (2026-09-08)\n\n### 🐛 Bug Fixes\n\n* **instagram:** remove broken legacy DM media saver injection to fix VerifyError on Android 15 ([3573038](https://github.com/Rhdevs71/dududu/commit/35730385ac661b25b74b6e6a55c0263bdc8d2c92))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.3.2/patches-1.3.2.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.3.2/patches-1.3.2.mpp.asc",
-  "version": "1.3.2"
+  "created_at": "2026-09-08T13:59:45",
+  "description": "## [1.3.3](https://github.com/Rhdevs71/dududu/compare/v1.3.2...v1.3.3) (2026-09-08)\n\n### 🐛 Bug Fixes\n\n* **instagram:** Unicode bio font transformation and WA Nova unlock multi-fingerprint ([e53af09](https://github.com/Rhdevs71/dududu/commit/e53af09fcde4c3eda758121dd670ee4bb8a248f7))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.3.3/patches-1.3.3.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.3.3/patches-1.3.3.mpp.asc",
+  "version": "1.3.3"
 }

@@ -1,3 +1,9 @@
+## [1.3.3](https://github.com/Rhdevs71/dududu/compare/v1.3.2...v1.3.3) (2026-09-08)
+
+### 🐛 Bug Fixes
+
+* **instagram:** Unicode bio font transformation and WA Nova unlock multi-fingerprint ([e53af09](https://github.com/Rhdevs71/dududu/commit/e53af09fcde4c3eda758121dd670ee4bb8a248f7))
+
 ## [1.3.2](https://github.com/Rhdevs71/dududu/compare/v1.3.1...v1.3.2) (2026-09-08)
 
 ### 🐛 Bug Fixes
