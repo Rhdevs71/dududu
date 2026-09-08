@@ -9,10 +9,14 @@ package app.crimera.patches.whatsapp.misc.nova
 import app.crimera.patches.whatsapp.misc.extension.whatsAppExtensionPatch
 import app.crimera.patches.whatsapp.utils.Constants.COMPATIBILITY_WHATSAPP
 import app.crimera.patches.whatsapp.utils.Constants.NOVA_MANAGER_CLASS
+import app.crimera.patches.whatsapp.utils.Constants.PROMO_ELIGIBILITY_MANAGER
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
-import app.morphe.patcher.extensions.InstructionExtensions.instructions
 import app.morphe.patcher.patch.bytecodePatch
+
+internal object PromoEligibilityFingerprint : Fingerprint(
+    definingClass = PROMO_ELIGIBILITY_MANAGER,
+)
 
 @Suppress("unused")
 val unlockNovaPatch =
@@ -24,23 +28,17 @@ val unlockNovaPatch =
         compatibleWith(COMPATIBILITY_WHATSAPP)
 
         execute {
-            // Find and hook PromoEligibilityManager
-            classes.forEach { classDef ->
-                if (classDef.type == "Lcom/whatsapp/nova/manager/PromoEligibilityManager;") {
-                    val mutableClass = mutableClassDefBy(classDef)
-                    mutableClass.methods.forEach { method ->
-                        // Hook eligibility checkers
-                        if (method.returnType == "Z") {
-                            method.addInstructions(
-                                0,
-                                """
-                                invoke-static {v0}, $NOVA_MANAGER_CLASS->isSubscriber(Z)Z
-                                move-result v0
-                                return v0
-                                """,
-                            )
-                        }
-                    }
+            PromoEligibilityFingerprint.classDef.methods.forEach { method ->
+                if (method.returnType == "Z") {
+                    method.addInstructions(
+                        0,
+                        """
+                        const/4 v0, 1
+                        invoke-static {v0}, $NOVA_MANAGER_CLASS->isSubscriber(Z)Z
+                        move-result v0
+                        return v0
+                        """.trimIndent(),
+                    )
                 }
             }
         }

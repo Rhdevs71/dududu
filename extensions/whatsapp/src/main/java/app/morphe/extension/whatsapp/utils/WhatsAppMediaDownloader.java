@@ -14,7 +14,6 @@ import android.os.Handler;
 import android.os.Looper;
 
 import app.morphe.extension.crimera.PikoUtils;
-import app.morphe.extension.crimera.Utils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,7 +66,7 @@ public class WhatsAppMediaDownloader {
             out.close();
 
             // Scan to gallery
-            Context ctx = Utils.getContext();
+            Context ctx = PikoUtils.getContext();
             if (ctx != null) {
                 MediaScannerConnection.scanFile(
                     ctx,
