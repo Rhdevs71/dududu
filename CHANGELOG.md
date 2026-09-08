@@ -1,3 +1,14 @@
+## [1.3.0](https://github.com/Rhdevs71/dududu/compare/v1.2.0...v1.3.0) (2026-09-08)
+
+### 🐛 Bug Fixes
+
+* **whatsapp:** add AndroidManifest.xml and fix fingerprint method references ([614d542](https://github.com/Rhdevs71/dududu/commit/614d5428114d321b942e35e1ce0f22bf8750f99a))
+* **whatsapp:** use PikoUtils in WhatsAppMediaDownloader and fix UnlockNovaPatch fingerprint ([832d5ff](https://github.com/Rhdevs71/dududu/commit/832d5ffd183d56de7fc6eb05d9b9c4b91611efd7))
+
+### ✨ New Features
+
+* add WhatsApp Piko extension and patches (WhatsApp Plus Nova, Clone com.whatsapp.pikoo, Anti-Revoke, Anti-View Once, Blue Tick Privacy) ([c3686fe](https://github.com/Rhdevs71/dududu/commit/c3686fe1e82624e64da4608e5cdb923e24698b9e))
+
 ## [1.2.0](https://github.com/Rhdevs71/dududu/compare/v1.1.1...v1.2.0) (2026-09-08)
 
 ### ✨ New Features

@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -108,6 +108,66 @@
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Anti-Revoke Messages",
+      "description": "Prevents senders from deleting messages for you in chats and groups. Revoked messages remain visible and are tagged with a deleted icon.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.whatsapp",
+          "name": "WhatsApp",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#25D366",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "2.26.35.71",
+              "versionCodes": {
+                "ARM64_V8A": 263571000
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Anti-View Once",
+      "description": "Allows viewing view-once photos and videos indefinitely and enables saving them.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.whatsapp",
+          "name": "WhatsApp",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#25D366",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "2.26.35.71",
+              "versionCodes": {
+                "ARM64_V8A": 263571000
               },
               "isExperimental": false,
               "minSdk": null,
@@ -461,6 +521,55 @@
           "required": true,
           "type": "kotlin.String",
           "default": "Piko Instagram",
+          "values": null
+        }
+      ]
+    },
+    {
+      "name": "Clone",
+      "description": "Changes the package name and app name for WhatsApp. This allows you to install the patched WhatsApp alongside the original WhatsApp app.\nDefault cloned package: com.whatsapp.pikoo",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.whatsapp",
+          "name": "WhatsApp",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#25D366",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "2.26.35.71",
+              "versionCodes": {
+                "ARM64_V8A": 263571000
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": [
+        {
+          "key": "packageName",
+          "title": "Package name",
+          "description": "A new package name for the patched WhatsApp app.",
+          "required": true,
+          "type": "kotlin.String",
+          "default": "com.whatsapp.pikoo",
+          "values": null
+        },
+        {
+          "key": "appName",
+          "title": "App name",
+          "description": "A new app name (label). Entering \"WhatsApp\" will skip changing the app name.",
+          "required": true,
+          "type": "kotlin.String",
+          "default": "Piko WhatsApp",
           "values": null
         }
       ]
@@ -2430,6 +2539,36 @@
       "options": []
     },
     {
+      "name": "Hide Read Receipts (Blue Ticks)",
+      "description": "Prevents sending read receipts (blue ticks) when viewing messages. Optionally sends blue ticks only when you reply.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.whatsapp",
+          "name": "WhatsApp",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#25D366",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "2.26.35.71",
+              "versionCodes": {
+                "ARM64_V8A": 263571000
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Hide Recommended Users",
       "description": "Hide recommended users that pops up when you follow someone",
       "default": true,
@@ -4204,6 +4343,36 @@
       "options": []
     },
     {
+      "name": "Status & Media Downloader",
+      "description": "Adds the capability to download status photos/videos and media directly to storage (/sdcard/Download/Piko/WhatsApp/).",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.whatsapp",
+          "name": "WhatsApp",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#25D366",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "2.26.35.71",
+              "versionCodes": {
+                "ARM64_V8A": 263571000
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Stories audio autoplay",
       "description": null,
       "default": true,
@@ -4354,6 +4523,36 @@
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Unlock WhatsApp Plus (Nova)",
+      "description": "Unlocks official Meta Nova / WhatsApp Plus features including Custom App Themes, Custom App Icons, Pinned Chats Limit increase, and exclusive stickers.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.whatsapp",
+          "name": "WhatsApp",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#25D366",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "2.26.35.71",
+              "versionCodes": {
+                "ARM64_V8A": 263571000
               },
               "isExperimental": false,
               "minSdk": null,
