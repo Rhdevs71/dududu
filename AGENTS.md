@@ -100,7 +100,19 @@
      1. Menetralkan field static enum `LX/0GuK;->A06` di method `<clinit>` tepat sebelum `return-void` dengan menyetel `const/4 v0, 0` lalu `sput-object v0, LX/0GuK;->A06`. Karena seluruh objek ikon berstatus enum non-null, maka perbandingan `icon.status == LX/0GuK.A06` di SEMUA tempat otomatis bernilai **FALSE**!
      2. Menetralkan instruksi perbandingan `sget-object v0, LX/0GuK;->A06` langsung di lambda klik `LX/0RAH;->invoke` menjadi `const/4 v0, 0`. Perbandingan `if-ne` selalu lolos ke pemilihan ikon (`LX/0EKv;->A00`) dan melewatkan seluruh blok popup upsell Case 42.
      3. Membatasi register di `HookReelOverflowMenuButton.kt` ke 4-bit safe registers (`safeRegisterOne`, `safeRegisterTwo`) untuk memusnahkan warning STDIO invalid register `v23`.
-   - *Status Saat Ini*: Rilis **`v1.0.22`** (`patches-1.0.22.mpp`) berhasil dirilis via CI Run #45. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.22_59patches.apk`** telah dipatch dan diaudit (**104 calls checked, 0 warnings / 0 VerifyError**, verifikasi Dalvik menunjukkan `sput-object v0, LX/0GuK;->A06` di `<clinit>`, `const/4 v0, 0` di `LX/0RAH;->invoke`, dan pemanggilan `AddReelButton` bebas dari warning `v23`).
+   - *Status*: Rilis **`v1.0.22`** (`patches-1.0.22.mpp`) berhasil dirilis via CI Run #45. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.22_59patches.apk`** telah dipatch dan diaudit (**104 calls checked, 0 warnings / 0 VerifyError**, verifikasi Dalvik menunjukkan `sput-object v0, LX/0GuK;->A06` di `<clinit>`, `const/4 v0, 0` di `LX/0RAH;->invoke`, dan pemanggilan `AddReelButton` bebas dari warning `v23`).
+
+10. **Tahap 10: Perbaikan Dalvik VerifyError pada Reels Controller `X.09qJ.A09` (Rilis v1.1.1 / v1.0.23 - Terkini)**
+    - *Analisis Masalah Reverse Engineering*:
+      1. Pengguna melaporkan bahwa fitur ganti icon IG Plus telah bekerja dengan sempurna, namun terjadi crash fatal saat membuka Reels:
+         `java.lang.VerifyError: Verifier rejected class X.09qJ: void X.09qJ.A09(...) [0x16F] register v1 has type Reference: androidx.fragment.app.FragmentActivity but expected Reference: X.0CJF`.
+      2. Pada perubahan sebelumnya di `HookReelOverflowMenuButton.kt`, logika fallback register memilih `v1`. Register `v1` memegang objek instansiasi button adder `LX/0F1s;` (`LX/0CJF`).
+      3. Injeksi `iget-object v1, v0, LX/09rS;->A05:Landroidx/fragment/app/FragmentActivity;` menimpa register `v1` dengan `FragmentActivity`. Saat kode asli Instagram membaca `v1` di baris [0x16F] dan mengharapkan `LX/0CJF`, ART Verifier Android 15 menolak class tersebut.
+    - *Solusi & Implementasi*:
+      1. Melindungi register aktif `v0`, `v1`, `v4`, dan `v2` dalam `reservedRegisters`.
+      2. Mengalokasikan `safeRegisterTwo` ke register 4-bit aman yang belum digunakan sebelum titik injeksi (memilih `v5` yang belum diinisialisasi hingga baris [33] di mana ia ditimpa oleh `move-object/from16 v5, v23`).
+      3. Register `v1` tetap utuh memegang `LX/0CJF`.
+    - *Status Saat Ini*: Rilis **`v1.1.1`** (`patches-1.1.1.mpp` / `patches-1.0.23.mpp`) berhasil dirilis via CI Run #46. APK **`C:\Users\Rhdevs\Downloads\instagram_v1.0.23_59patches.apk`** telah dipatch dan diaudit (**104 calls checked, 0 warnings / 0 VerifyError**, verifikasi Dalvik menunjukkan `v1` utuh dan pemanggilan menggunakan `v5, v1, v4, v2`).
 
 ---
 
