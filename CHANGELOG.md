@@ -1,3 +1,9 @@
+## [1.2.0](https://github.com/Rhdevs71/dududu/compare/v1.1.1...v1.2.0) (2026-09-08)
+
+### ✨ New Features
+
+* **instagram:** add Ghost Online Presence, Video Playback Speed, Anti-Edited DM, and Biometric App Lock ([0d3a549](https://github.com/Rhdevs71/dududu/commit/0d3a549c9202ed7507ea61cea8f5bd0860cc3fa7))
+
 ## [1.1.1](https://github.com/Rhdevs71/dududu/compare/v1.1.0...v1.1.1) (2026-09-08)
 
 ### 🐛 Bug Fixes

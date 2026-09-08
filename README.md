@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.1.1](https://github.com/Rhdevs71/dududu/releases/tag/v1.1.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;133 patches total
+> **[v1.2.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.2.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;135 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -159,7 +159,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 </details>
 
 <details>
-<summary>📦 Instagram&nbsp;&nbsp;•&nbsp;&nbsp;59 patches</summary>
+<summary>📦 Instagram&nbsp;&nbsp;•&nbsp;&nbsp;61 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -171,6 +171,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 |----------|----------------|-----------|
 | [Add settings](#add-settings) | Adds settings to control preferences are patching |  |
 | [Allow user network certificate](#allow-user-network-certificate) | Allows user network certificate for whitehat testing |  |
+| [App Lock](#app-lock) | Locks Instagram with Biometric / Device PIN when opening or resuming the app. |  |
 | [Change like animation](#change-like-animation) | Change the animation to one from existing Rings like animations |  |
 | [Change version code](#change-version-code) | Changes the version code of the app. This will turn off app store updates and allows downgrading an existing app install to an older app version. | • Version code |
 | [Clone](#clone) | Changes the package name and the app name. This allows you to install the patched app alongside the original Instagram app.<br>Caution: Do not select the official Morphe's "Change package name" universal patch. | • Package name<br>• App name |
@@ -201,6 +202,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 | [Hide group creation button on sharesheet](#hide-group-creation-button-on-sharesheet) |  |  |
 | [Hide navigation buttons](#hide-navigation-buttons) | Hides navigation bar buttons, such as the Reels and Create button. |  |
 | [Hide notes tray](#hide-notes-tray) | Hides notes tray in DM section |  |
+| [Hide online status](#hide-online-status) | Prevents sending online presence and green dot to Meta while keeping other users' presence visible. |  |
 | [Hide reshare button](#hide-reshare-button) | Hides the reshare button from both posts and reels. |  |
 | [Hide stories tray](#hide-stories-tray) | Hides stories tray from main feed. |  |
 | [Hide suggested content](#hide-suggested-content) | Hides suggested stories, reels, threads (Suggested posts will still be shown). |  |
