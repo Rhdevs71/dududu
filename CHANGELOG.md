@@ -1,3 +1,9 @@
+## [1.3.2](https://github.com/Rhdevs71/dududu/compare/v1.3.1...v1.3.2) (2026-09-08)
+
+### 🐛 Bug Fixes
+
+* **instagram:** remove broken legacy DM media saver injection to fix VerifyError on Android 15 ([3573038](https://github.com/Rhdevs71/dududu/commit/35730385ac661b25b74b6e6a55c0263bdc8d2c92))
+
 ## [1.3.1](https://github.com/Rhdevs71/dududu/compare/v1.3.0...v1.3.1) (2026-09-08)
 
 ### 🐛 Bug Fixes
