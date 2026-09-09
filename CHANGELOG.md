@@ -1,3 +1,14 @@
+## [1.6.0](https://github.com/Rhdevs71/dududu/compare/v1.5.1...v1.6.0) (2026-09-09)
+
+### 🐛 Bug Fixes
+
+* **rhpatch:** fix boolean setting types, instantiate ProfileInfo, and fix audio patch quotes ([23276b1](https://github.com/Rhdevs71/dududu/commit/23276b1b4ad89b45cd66dc3a5832e24bfc98c471))
+* **rhpatch:** fix parameter type check in audio patch and final variable in userprofile button ([51b5dae](https://github.com/Rhdevs71/dududu/commit/51b5daee7c7fadd0e72102c1f84e3d68b240d018))
+
+### ✨ New Features
+
+* **rhpatch:** text color studio, profile-only capsule, video speed lock, 9 profile actions & spotify audio quality/anti-upsell fixes ([6137cb1](https://github.com/Rhdevs71/dududu/commit/6137cb1d71dc5df35949246000f89ff40f030be5))
+
 ## [1.5.1](https://github.com/Rhdevs71/dududu/compare/v1.5.0...v1.5.1) (2026-09-09)
 
 ### 🐛 Bug Fixes
