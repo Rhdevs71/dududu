@@ -46,7 +46,7 @@ val spotifyPlaybackRestrictionsPatch =
                 }
             }
 
-            // 2. Hook AutoValue_Restrictions disallow* methods
+            // 2. Hook AutoValue_Restrictions disallow* methods by directly reading the empty field from Restrictions.EMPTY (no recursion)
             AutoValueRestrictionsFingerprint.classDefOrNull?.methods?.forEach { method ->
                 if (method.name.startsWith("disallow") && method.parameters.isEmpty()) {
                     val returnType = method.returnType
@@ -54,8 +54,8 @@ val spotifyPlaybackRestrictionsPatch =
                         0,
                         """
                         sget-object v0, $RESTRICTIONS_CLASS->EMPTY:$RESTRICTIONS_CLASS
-                        invoke-virtual {v0}, $RESTRICTIONS_CLASS->${method.name}()$returnType
-                        move-result-object v0
+                        check-cast v0, $AUTOVALUE_RESTRICTIONS_CLASS
+                        iget-object v0, v0, $AUTOVALUE_RESTRICTIONS_CLASS->${method.name}:$returnType
                         return-object v0
                         """.trimIndent(),
                     )
