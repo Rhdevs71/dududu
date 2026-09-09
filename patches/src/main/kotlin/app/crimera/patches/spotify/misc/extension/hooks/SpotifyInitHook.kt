@@ -18,7 +18,7 @@ internal val spotifyInitHook =
         fingerprint =
             Fingerprint(
                 definingClass = SPOTIFY_APP_CLASS,
-                name = "onCreate",
+                name = "attachBaseContext",
             ),
         insertIndexResolver = { method ->
             method.instructions.indexOfFirst { instruction ->
