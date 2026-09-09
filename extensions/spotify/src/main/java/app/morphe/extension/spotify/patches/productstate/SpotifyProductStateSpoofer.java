@@ -41,9 +41,12 @@ public class SpotifyProductStateSpoofer {
             case "pause-after-every-track":
             case "shuffle":
             case "nft-disabled":
+            case "tablet-free":
                 return "0";
             case "streaming-rules":
                 return "";
+            case "payment-state":
+                return "paid";
             case "audio-quality":
                 if (SpotifyPref.veryHighAudioQuality()) {
                     return "very_high";
@@ -80,6 +83,7 @@ public class SpotifyProductStateSpoofer {
             case "pause-after-every-track":
             case "shuffle":
             case "nft-disabled":
+            case "tablet-free":
                 return false;
         }
 

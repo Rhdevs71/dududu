@@ -205,18 +205,16 @@ val spotifyAdblockPatch =
                 }
             }
 
-            // 9. Lp/hsp0; -> disable Premium tab (b()Z) and Premium marketing (a()Z)
+            // 9. Lp/hsp0; -> disable Premium tab (b()Z & c()Z) and Premium marketing (a()Z)
             Hsp0Fingerprint.classDefOrNull?.methods?.forEach { method ->
                 if (method.returnType == "Z" && method.parameters.isEmpty()) {
-                    if (method.name == "b" || method.name == "a") {
-                        method.addInstructions(
-                            0,
-                            """
-                            const/4 v0, 0
-                            return v0
-                            """.trimIndent(),
-                        )
-                    }
+                    method.addInstructions(
+                        0,
+                        """
+                        const/4 v0, 0
+                        return v0
+                        """.trimIndent(),
+                    )
                 }
             }
 

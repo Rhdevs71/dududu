@@ -33,14 +33,14 @@ val spotifyClonePatch =
         description =
             "Changes the package name and app name for Spotify. " +
                 "This allows you to install the patched Spotify alongside the original Spotify app.\n" +
-                "Default cloned package: com.spotify.music.pikoo",
+                "Default cloned package: com.spotify.music.rhpatch",
         default = true,
     ) {
         compatibleWith(COMPATIBILITY_SPOTIFY)
 
         val packageName by stringOption(
             key = "packageName",
-            default = "com.spotify.music.pikoo",
+            default = "com.spotify.music.rhpatch",
             title = "Package name",
             description = "A new package name for the patched Spotify app.",
             required = true,
@@ -50,7 +50,7 @@ val spotifyClonePatch =
 
         val appName by stringOption(
             key = "appName",
-            default = "Piko Spotify",
+            default = "RHpatch Spotify",
             title = "App name",
             description = "A new app name (label). Entering \"Spotify\" will skip changing the app name.",
             required = true,

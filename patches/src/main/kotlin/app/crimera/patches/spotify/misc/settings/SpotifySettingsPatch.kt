@@ -23,8 +23,8 @@ internal object SpotifyMainActivityFingerprint : Fingerprint(
 @Suppress("unused")
 val spotifySettingsPatch =
     bytecodePatch(
-        name = "Spotify Piko Settings Menu",
-        description = "Injects an interactive floating Piko settings button on Spotify main screen to customize adblock, playback, lyrics, and quality preferences.",
+        name = "Spotify RHpatch Settings Menu",
+        description = "Injects an interactive floating RHpatch settings button on Spotify main screen to customize adblock, playback, lyrics, and quality preferences.",
     ) {
         dependsOn(spotifyExtensionPatch)
         compatibleWith(COMPATIBILITY_SPOTIFY)

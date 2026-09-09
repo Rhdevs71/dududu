@@ -273,7 +273,7 @@ public class SpotifySettingsDialog {
             doneBtn.setOnClickListener(v -> {
                 dialog.dismiss();
                 try {
-                    Toast.makeText(context, "Pengaturan Piko Spotify berhasil disimpan!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Pengaturan RHpatch Spotify berhasil disimpan!", Toast.LENGTH_SHORT).show();
                 } catch (Throwable ignored) {}
             });
             root.addView(doneBtn);

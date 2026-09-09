@@ -9,7 +9,7 @@ package app.morphe.extension.spotify.utils;
 import app.morphe.extension.crimera.PikoUtils;
 
 public class SpotifyLog {
-    private static final String DEFAULT_TAG = "SpotifyPiko";
+    private static final String DEFAULT_TAG = "SpotifyRHpatch";
 
     public static void d(String tag, Object message) {
         PikoUtils.logger(tag != null ? tag : DEFAULT_TAG, message != null ? message.toString() : "null");
