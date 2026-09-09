@@ -37,20 +37,9 @@ public class UserProfileButton {
     }
 
     public static void addButtons(ViewGroup viewGroup, Object object) {
-        try {
-            ProfileInfo profileInfo = new ProfileInfo(object);
-            Boolean isSelfProfile = profileInfo.isSelfProfile();
-
-            if (!isSettingsInActionBar && isSelfProfile){
-                UI.pikoSettingsButton(viewGroup);
-            }
-            if(!userProfileABPref.contains(Constants.AB_PROFILE_INFO_ICON) && Pref.isMoreOptionsOnProfilePatched()){
-                ProfileMoreOption.addProfileMoreOptionsButton(viewGroup, profileInfo);
-            }
-        } catch (Exception e) {
-            PikoLog.e("UserProfileButton", "Failed to add piko button", e);
-        }
-
+        // Kept clean: No intrusive buttons are injected into the profile header
+        // so that the profile looks 100% authentic and native on screenshots.
+        // All Rhpatch settings and profile utilities are accessed via the floating ● RHpatch capsule!
     }
 }
 

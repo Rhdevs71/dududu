@@ -272,6 +272,41 @@
       - **Android Signer**: Ditandatangani dan diverifikasi dengan Android SDK 35 `apksigner` (**v2 scheme: true, v3 scheme: true, verifies: true**).
       - **Bytecode Audit**: 14 DEX files, 97,689 classes diaudit (**0 VerifyErrors, seluruh hook tervalidasi aktif**).
 
+18. **Tahap 18: Perbaikan Crash Startup Spotify (`StackOverflowError`) & Redesign UI Menu Piko Spotify (Rilis v1.4.2 - Terkini)**
+    - *Analisis Log Crash Pengguna (`logAndroid_Rhpatch.txt`)*:
+      - *Masalah*: Pengguna melaporkan bahwa APK Spotify v1.4.1 crash fatal saat dibuka dan tampilan menu UI Piko dinilai kurang bagus ("jelek bgt jujur").
+      - *Analisis Exception*:
+        `FATAL EXCEPTION: Core Thread`
+        `java.lang.StackOverflowError: stack size 989KB`
+        `at com.spotify.player.model.AutoValue_Restrictions.disallowSettingPlaybackSpeedReasons(SourceFile:2)`
+        `at com.spotify.player.model.AutoValue_Restrictions.disallowSettingPlaybackSpeedReasons(SourceFile:7)`
+        `... (1000+ frame berulang)`
+      - *Penyebab*: Di `SpotifyPlaybackRestrictionsPatch.kt`, method pada `AutoValue_Restrictions` di-hook untuk mengembalikan `Restrictions.EMPTY->${method.name}()`. Karena `Restrictions.EMPTY` adalah instance dari `AutoValue_Restrictions`, maka pemanggilan tersebut memanggil kembali method yang sama yang sedang di-hook, memicu infinite recursive call hingga stack Dalvik (989KB) habis.
+      - *Solusi Bytecode*: Mengganti pemanggilan method dengan pembacaan field langsung pada class `AutoValue_Restrictions`:
+        ```smali
+        sget-object v0, Lapp/spotify/player/model/Restrictions;->EMPTY:Lapp/spotify/player/model/Restrictions;
+        check-cast v0, Lapp/spotify/player/model/AutoValue_Restrictions;
+        iget-object v0, v0, Lapp/spotify/player/model/AutoValue_Restrictions;->${method.name}:$returnType
+        return-object v0
+        ```
+        Instruksi ini membaca field pre-initialized tanpa memicu dispatch method baru, melenyapkan rekursi 100% dan bebas crash.
+    - *Redesign UI Pengaturan Piko Spotify (`extensions/spotify`)*:
+      - *Tombol Floating Trigger (`SpotifySettingsInjector.java`)*:
+        - Mengganti tombol hijau kotak lama dengan **Sleek Floating Capsule Pill** bertema Spotify Dark Glass (`#E6181818`, sudut melengkung 24dp, garis tepi Spotify Green `#1DB954` 1.5dp, teks `● Piko`).
+        - Menambahkan interaktivitas **Vertical Draggable (`OnTouchListener`)**: pengguna dapat menggeser posisi tombol naik atau turun di sepanjang sisi layar agar tidak pernah menutupi tombol atau konten native Spotify.
+      - *Modal Pengaturan Piko (`SpotifySettingsDialog.java`)*:
+        - Mengganti Android stock `AlertDialog` polos dengan **Spotify Dark Modal Sheet** (`#121212`, sudut melengkung 22dp, border `#282828`).
+        - Header modern dengan badge `PIKO` (hijau), judul `Spotify Mod`, dan tombol `✕` penutup cepat.
+        - Setiap pengaturan dikelompokkan ke dalam kartu individual bergaya Spotify (`#181818`, 14dp corner) dengan judul putih tebal dan penjelasan fungsi berwarna abu-abu redup (`#A7A7A7`).
+        - Switch toggle kustom dengan warna aksen Spotify Green (`#1DB954`) saat aktif dan abu-abu (`#666666`) saat mati. Kartu dapat disentuh di area mana saja untuk mengubah status toggle.
+        - Tombol aksi kapsul Spotify Green penuh: `"Tutup & Terapkan"` serta opsi teks halus `"Reset ke Pengaturan Default"`.
+    - *Status Rilis & Hasil Build*:
+      - Rilis **`v1.4.2`** (`patches-1.4.2.mpp`, 6.89 MB) berhasil dipublish melalui GitHub Actions CI Run #34363320063.
+      - Patching Morphe CLI berhasil 100% pada `spt.apkm` (9/9 patches applied, 0 warnings).
+      - Ditandatangani dan diverifikasi dengan Android SDK 35 `apksigner` (**v2: true, v3: true, verifies: true**).
+      - Audit Bytecode: 14 DEX files, 97,692 classes (**0 VerifyErrors, seluruh hook dan UI tervalidasi aktif**).
+      - File APK Siap Pakai: **`C:\Users\Rhdevs\Downloads\spotify_v1.4.2_piko.apk`** (76,047,713 bytes).
+
 ---
 
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)

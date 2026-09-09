@@ -198,15 +198,22 @@ public class PikoUtils {
 
             byte[] logBytes = sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
 
-            // 1. Try public Downloads/Piko/piko_debug.log
+            // 1. Try public Downloads/Rhpatch/rhpatch_debug.log (primary) & Downloads/Piko/piko_debug.log (compatibility)
             try {
                 File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+                File rhpatchDir = new File(downloadsDir, "Rhpatch");
+                if (!rhpatchDir.exists()) {
+                    rhpatchDir.mkdirs();
+                }
+                File rhpatchLogFile = new File(rhpatchDir, "rhpatch_debug.log");
+                writeRawFile(rhpatchLogFile, logBytes, true);
+
                 File pikoDir = new File(downloadsDir, "Piko");
                 if (!pikoDir.exists()) {
                     pikoDir.mkdirs();
                 }
-                File logFile = new File(pikoDir, "piko_debug.log");
-                writeRawFile(logFile, logBytes, true);
+                File pikoLogFile = new File(pikoDir, "piko_debug.log");
+                writeRawFile(pikoLogFile, logBytes, true);
             } catch (Exception ignored) {
             }
 
@@ -217,21 +224,21 @@ public class PikoUtils {
                     File extDir = context.getExternalFilesDir("logs");
                     if (extDir != null) {
                         if (!extDir.exists()) extDir.mkdirs();
-                        File logFile = new File(extDir, "piko_debug.log");
-                        writeRawFile(logFile, logBytes, true);
+                        writeRawFile(new File(extDir, "rhpatch_debug.log"), logBytes, true);
+                        writeRawFile(new File(extDir, "piko_debug.log"), logBytes, true);
                     }
                 } catch (Exception ignored) {
                 }
                 try {
                     File intDir = new File(context.getFilesDir(), "logs");
                     if (!intDir.exists()) intDir.mkdirs();
-                    File logFile = new File(intDir, "piko_debug.log");
-                    writeRawFile(logFile, logBytes, true);
+                    writeRawFile(new File(intDir, "rhpatch_debug.log"), logBytes, true);
+                    writeRawFile(new File(intDir, "piko_debug.log"), logBytes, true);
                 } catch (Exception ignored) {
                 }
             }
         } catch (Exception ex) {
-            Log.e("piko", "Error in logToFile: " + ex);
+            Log.e("rhpatch", "Error in logToFile: " + ex);
         }
     }
 

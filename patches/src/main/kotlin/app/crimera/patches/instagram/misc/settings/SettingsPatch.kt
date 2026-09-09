@@ -70,6 +70,17 @@ val settingsPatch =
                 )
             }
 
+            IgFragmentActivityOnResume.method.apply {
+                val returnVoidIndex = indexOfFirstInstruction(Opcode.RETURN_VOID)
+                addInstruction(
+                    returnVoidIndex,
+                    """
+                    invoke-static {p0}, Lapp/morphe/extension/instagram/ui/RhpatchInstagramInjector;->onActivityResume(Landroid/app/Activity;)V
+                    """.trimIndent(),
+                )
+            }
+
+
             instagramInitHook.fingerprint.method.apply {
 
                 val firstInvokeSuperIndex = indexOfFirstInstruction(Opcode.INVOKE_SUPER)

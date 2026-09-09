@@ -25,15 +25,22 @@ public class SpotifyProductStateSpoofer {
 
         switch (key.toLowerCase()) {
             case "type":
-                return "premium";
+            case "financial-product":
+            case "plan":
+                return "premiumPlatinum";
             case "can_play_on_demand":
             case "interruption-free":
             case "unlimited-skips":
+            case "high-tier":
+            case "offline":
                 return "1";
+            case "catalogue":
+                return "full";
             case "ads":
             case "ad-rules":
             case "pause-after-every-track":
             case "shuffle":
+            case "nft-disabled":
                 return "0";
             case "streaming-rules":
                 return "";
@@ -65,12 +72,14 @@ public class SpotifyProductStateSpoofer {
             case "can_play_on_demand":
             case "interruption-free":
             case "unlimited-skips":
+            case "high-tier":
             case "offline":
                 return true;
             case "ads":
             case "ad-rules":
             case "pause-after-every-track":
             case "shuffle":
+            case "nft-disabled":
                 return false;
         }
 
@@ -87,7 +96,11 @@ public class SpotifyProductStateSpoofer {
         }
 
         try {
-            map.put("type", "premium");
+            map.put("type", "premiumPlatinum");
+            map.put("financial-product", "premiumPlatinum");
+            map.put("catalogue", "full");
+            map.put("high-tier", "1");
+            map.put("offline", "1");
             map.put("can_play_on_demand", "1");
             map.put("interruption-free", "1");
             map.put("ads", "0");
@@ -95,6 +108,7 @@ public class SpotifyProductStateSpoofer {
             map.put("pause-after-every-track", "0");
             map.put("streaming-rules", "");
             map.put("unlimited-skips", "1");
+            map.put("nft-disabled", "0");
             if (SpotifyPref.veryHighAudioQuality()) {
                 map.put("audio-quality", "very_high");
             }
@@ -107,7 +121,7 @@ public class SpotifyProductStateSpoofer {
             }
 
             if (SpotifyPref.pikoDebug()) {
-                SpotifyLog.d(TAG, "Applied Premium attributes onto ProductState map");
+                SpotifyLog.d(TAG, "Applied Platinum attributes onto ProductState map");
             }
         } catch (Throwable t) {
             SpotifyLog.e(TAG, "Failed to apply spoofed attributes: " + t.getMessage(), t);

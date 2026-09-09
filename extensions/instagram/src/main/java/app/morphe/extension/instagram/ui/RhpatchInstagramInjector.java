@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2026 piko <https://github.com/crimera/piko>
+ * Copyright (C) 2026 RHpatch <https://github.com/crimera/piko>
  *
  * See the included NOTICE file for GPLv3 §7(b) terms that apply to this code.
  */
 
-package app.morphe.extension.spotify.settings;
+package app.morphe.extension.instagram.ui;
 
 import android.app.Activity;
 import android.graphics.Color;
@@ -19,11 +19,11 @@ import android.widget.TextView;
 
 import app.morphe.extension.crimera.PikoUtils;
 
-public class SpotifySettingsInjector {
-    private static final String TAG_PIKO_BTN = "rhpatch_spotify_settings_btn";
+public class RhpatchInstagramInjector {
+    private static final String TAG_RHPATCH_BTN = "rhpatch_instagram_settings_btn";
 
     /**
-     * Injects the sleek, draggable floating RHpatch pill onto the Spotify main activity decor view.
+     * Menyematkan tombol kapsul mengambang draggable ● RHpatch pada DecorView activity Instagram.
      */
     public static void onActivityResume(Activity activity) {
         if (activity == null) return;
@@ -32,25 +32,25 @@ public class SpotifySettingsInjector {
             activity.getWindow().getDecorView().post(() -> {
                 try {
                     ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
-                    if (decorView.findViewWithTag(TAG_PIKO_BTN) != null) {
-                        return; // Already present
+                    if (decorView.findViewWithTag(TAG_RHPATCH_BTN) != null) {
+                        return; // Sudah terpasang
                     }
 
                     float density = activity.getResources().getDisplayMetrics().density;
 
                     TextView btn = new TextView(activity);
-                    btn.setTag(TAG_PIKO_BTN);
+                    btn.setTag(TAG_RHPATCH_BTN);
                     btn.setText("● RHpatch");
                     btn.setTextColor(Color.WHITE);
                     btn.setTextSize(12f);
                     btn.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
                     btn.setGravity(Gravity.CENTER);
 
-                    // Premium Dark Capsule: #181818 with Spotify Green accent border
+                    // Premium Dark Capsule: #181818 dengan border Neon Sunset Magenta (#E1306C)
                     GradientDrawable bg = new GradientDrawable();
                     bg.setColor(Color.parseColor("#E6181818")); // Translucent charcoal
                     bg.setCornerRadius(24 * density);
-                    bg.setStroke((int) (1.5f * density), Color.parseColor("#1DB954")); // Spotify Green accent border
+                    bg.setStroke((int) (1.5f * density), Color.parseColor("#E1306C")); // Instagram Sunset Neon Magenta
                     btn.setBackground(bg);
                     btn.setElevation(16f * density);
 
@@ -58,7 +58,7 @@ public class SpotifySettingsInjector {
                     int vPad = (int) (6 * density);
                     btn.setPadding(hPad, vPad, hPad, vPad);
 
-                    int topOffset = (int) (52 * density); // Positioned comfortably below system status bar
+                    int topOffset = (int) (60 * density); // Nyaman di bawah action bar/status bar
                     int rightMargin = (int) (12 * density);
 
                     FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
@@ -70,7 +70,7 @@ public class SpotifySettingsInjector {
                     lp.rightMargin = rightMargin;
                     btn.setLayoutParams(lp);
 
-                    // Touch drag listener: allows user to freely drag the pill vertically along the screen edge
+                    // Touch drag listener: pengguna bebas menggeser kapsul naik/turun di tepi layar
                     btn.setOnTouchListener(new View.OnTouchListener() {
                         private float dY = 0f;
                         private float startY = 0f;
@@ -109,11 +109,11 @@ public class SpotifySettingsInjector {
                         }
                     });
 
-                    btn.setOnClickListener(v -> SpotifySettingsDialog.show(activity));
+                    btn.setOnClickListener(v -> RhpatchInstagramDialog.show(activity));
 
                     decorView.addView(btn);
                 } catch (Throwable t) {
-                    PikoUtils.logger("SpotifySettingsInjector", "Error attaching Piko button: " + t.getMessage(), t);
+                    PikoUtils.logger("RhpatchInstagramInjector", "Error attaching RHpatch button: " + t.getMessage(), t);
                 }
             });
         } catch (Throwable ignored) {}

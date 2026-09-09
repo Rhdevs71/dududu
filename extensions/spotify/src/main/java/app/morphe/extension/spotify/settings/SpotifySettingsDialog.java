@@ -42,8 +42,8 @@ public class SpotifySettingsDialog {
         { "Buka Lirik Berjalan Tanpa Batas", "Bypass pembatasan kuota bulanan lirik lagu (unlimited lyrics)." },
         { "Kualitas Audio 320kbps (Extreme)", "Buka bitrate streaming audio kualitas tertinggi Very High." },
         { "Blokir Pop-up Promosi (Anti-Upsell)", "Hilangkan semua popup tawaran langganan 'Dapatkan Premium'." },
-        { "Simulasi Akun Premium", "Simulasi kapabilitas akun berbayar pada player state internal." },
-        { "Pencatatan Log Debug Piko", "Simpan catatan diagnostik rinci ke /sdcard/Download/Piko/piko_debug.log." }
+        { "Status Akun Platinum (HiFi)", "Simulasi akun Spotify Platinum & kapabilitas tertinggi player." },
+        { "Pencatatan Log Diagnostik RHpatch", "Simpan catatan diagnostik rinci ke /sdcard/Download/Rhpatch/rhpatch_debug.log." }
     };
 
     private static final BooleanSetting[] SETTING_KEYS = new BooleanSetting[] {
@@ -89,9 +89,9 @@ public class SpotifySettingsDialog {
             header.setOrientation(LinearLayout.HORIZONTAL);
             header.setGravity(Gravity.CENTER_VERTICAL);
 
-            // Piko Badge
+            // RHpatch Badge
             TextView badge = new TextView(context);
-            badge.setText(" PIKO ");
+            badge.setText(" RHPATCH ");
             badge.setTextColor(Color.BLACK);
             badge.setTextSize(11f);
             badge.setTypeface(Typeface.DEFAULT_BOLD);
@@ -106,7 +106,7 @@ public class SpotifySettingsDialog {
 
             // Title
             TextView title = new TextView(context);
-            title.setText(" Spotify Mod");
+            title.setText(" Spotify Studio");
             title.setTextColor(Color.WHITE);
             title.setTextSize(17f);
             title.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
