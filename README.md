@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.5.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.5.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;150 patches total
+> **[v1.5.1](https://github.com/Rhdevs71/dududu/releases/tag/v1.5.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;150 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -266,11 +266,11 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 |----------|----------------|-----------|
 | [Spotify Ad-Block](#spotify-ad-block) | Blocks audio, video ads, sponsored content, ad breaks, and removes the Premium tab from navigation. |  |
 | [Spotify Clean UI & Anti-Upsell](#spotify-clean-ui-anti-upsell) | Suppresses in-app subscription pop-ups ("Dapatkan Premium") and forces NO_UPSELL on all upsell evaluation requests. |  |
-| [Spotify Clone](#spotify-clone) | Changes the package name and app name for Spotify. This allows you to install the patched Spotify alongside the original Spotify app.<br>Default cloned package: com.spotify.music.pikoo | • Package name<br>• App name |
+| [Spotify Clone](#spotify-clone) | Changes the package name and app name for Spotify. This allows you to install the patched Spotify alongside the original Spotify app.<br>Default cloned package: com.spotify.music.rhpatch | • Package name<br>• App name |
 | [Spotify On-Demand Playback & Disable Force-Shuffle](#spotify-on-demand-playback-disable-force-shuffle) | Unlocks direct on-demand track selection from any playlist or album and removes forced shuffle mode. |  |
-| [Spotify Piko Settings Menu](#spotify-piko-settings-menu) | Injects an interactive floating Piko settings button on Spotify main screen to customize adblock, playback, lyrics, and quality preferences. |  |
 | [Spotify Playback Restrictions Unlock](#spotify-playback-restrictions-unlock) | Unlocks unlimited track skips, scrubbing/seeking on player bar, repeat track/context, and toggle shuffle without limits. |  |
 | [Spotify ProductState & Capabilities Unlock](#spotify-productstate-capabilities-unlock) | Unlocks native player capabilities (can_play_on_demand, interruption-free) and spoofs Premium product attributes. |  |
+| [Spotify RHpatch Settings Menu](#spotify-rhpatch-settings-menu) | Injects an interactive floating RHpatch settings button on Spotify main screen to customize adblock, playback, lyrics, and quality preferences. |  |
 | [Spotify Unlimited Lyrics](#spotify-unlimited-lyrics) | Bypasses lyrics capping, restrictions, and paywalls so live lyrics are always available. |  |
 | [Spotify Very High Audio Quality Unlock](#spotify-very-high-audio-quality-unlock) | Unlocks and enforces 320kbps "Very High" extreme bitrate audio streaming quality. |  |
 

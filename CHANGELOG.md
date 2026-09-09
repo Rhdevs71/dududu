@@ -1,3 +1,9 @@
+## [1.5.1](https://github.com/Rhdevs71/dududu/compare/v1.5.0...v1.5.1) (2026-09-09)
+
+### 🐛 Bug Fixes
+
+* **spotify:** eliminate premium tab with hsp0.c, hook ProductState spoofing for platinum/offline, and rebrand app name to RHpatch ([73750e6](https://github.com/Rhdevs71/dududu/commit/73750e6dde58f684a3a11dd0fef46fbc3cb18c07))
+
 ## [1.5.0](https://github.com/Rhdevs71/dududu/compare/v1.4.2...v1.5.0) (2026-09-09)
 
 ### 🐛 Bug Fixes
