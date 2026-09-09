@@ -7,6 +7,8 @@
 package app.morphe.extension.instagram.ui;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
@@ -17,21 +19,82 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+
 import app.morphe.extension.crimera.PikoUtils;
+import app.morphe.extension.instagram.theme.RhpatchTextColorManager;
 
 public class RhpatchInstagramInjector {
-    private static final String TAG_RHPATCH_BTN = "rhpatch_instagram_settings_btn";
+    public static final String TAG_RHPATCH_BTN = "rhpatch_instagram_settings_btn";
+    private static boolean lifecycleRegistered = false;
 
     /**
-     * Menyematkan tombol kapsul mengambang draggable ● RHpatch pada DecorView activity Instagram.
+     * Mengatur visibilitas tombol kapsul ● RHpatch secara real-time.
      */
-    public static void onActivityResume(Activity activity) {
+    public static void setCapsuleVisibility(Context context, final int visibility) {
+        if (context == null) return;
+        Activity activity = getActivity(context);
         if (activity == null) return;
 
         try {
+            activity.runOnUiThread(() -> {
+                try {
+                    View decorView = activity.getWindow().getDecorView();
+                    View btn = decorView.findViewWithTag(TAG_RHPATCH_BTN);
+                    if (btn != null) {
+                        btn.setVisibility(visibility);
+                    }
+                } catch (Throwable ignored) {}
+            });
+        } catch (Throwable ignored) {}
+    }
+
+    private static Activity getActivity(Context context) {
+        Context current = context;
+        while (current instanceof ContextWrapper) {
+            if (current instanceof Activity) {
+                return (Activity) current;
+            }
+            current = ((ContextWrapper) current).getBaseContext();
+        }
+        return null;
+    }
+
+    /**
+     * Menyematkan tombol kapsul mengambang draggable ● RHpatch pada DecorView activity Instagram.
+     * Default: GONE (hanya muncul saat berada di halaman/tab Profil).
+     */
+    public static void onActivityResume(final Activity activity) {
+        if (activity == null) return;
+
+        try {
+            // Inisialisasi mesin warna teks kustom jika aktif
+            RhpatchTextColorManager.initActivity(activity);
+
+            // Pasang lifecycle monitor untuk mendeteksi kapan pengguna masuk / keluar dari halaman profil
+            if (activity instanceof FragmentActivity && !lifecycleRegistered) {
+                try {
+                    FragmentManager fm = ((FragmentActivity) activity).getSupportFragmentManager();
+                    fm.registerFragmentLifecycleCallbacks(new FragmentManager.FragmentLifecycleCallbacks() {
+                        @Override
+                        public void onFragmentResumed(FragmentManager fm, Fragment f) {
+                            String name = f.getClass().getName();
+                            if (name.contains("UserDetailFragment") || name.contains("Profile")) {
+                                setCapsuleVisibility(activity, View.VISIBLE);
+                            } else {
+                                setCapsuleVisibility(activity, View.GONE);
+                            }
+                        }
+                    }, true);
+                    lifecycleRegistered = true;
+                } catch (Throwable ignored) {}
+            }
+
             activity.getWindow().getDecorView().post(() -> {
                 try {
-                    ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
+                    final ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
                     if (decorView.findViewWithTag(TAG_RHPATCH_BTN) != null) {
                         return; // Sudah terpasang
                     }
@@ -40,11 +103,14 @@ public class RhpatchInstagramInjector {
 
                     TextView btn = new TextView(activity);
                     btn.setTag(TAG_RHPATCH_BTN);
-                    btn.setText("RHpatch");
+                    btn.setText("● RHpatch");
                     btn.setTextColor(Color.WHITE);
                     btn.setTextSize(12f);
                     btn.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
                     btn.setGravity(Gravity.CENTER);
+
+                    // PENTING: Awal mula GONE agar tab Beranda, Reels, Explore, DM 100% bersih!
+                    btn.setVisibility(View.GONE);
 
                     // Premium Dark Capsule: #181818 dengan border Neon Sunset Magenta (#E1306C)
                     GradientDrawable bg = new GradientDrawable();
@@ -58,7 +124,7 @@ public class RhpatchInstagramInjector {
                     int vPad = (int) (6 * density);
                     btn.setPadding(hPad, vPad, hPad, vPad);
 
-                    int topOffset = (int) (60 * density); // Nyaman di bawah action bar/status bar
+                    int topOffset = (int) (60 * density);
                     int rightMargin = (int) (12 * density);
 
                     FrameLayout.LayoutParams lp = new FrameLayout.LayoutParams(
@@ -70,7 +136,7 @@ public class RhpatchInstagramInjector {
                     lp.rightMargin = rightMargin;
                     btn.setLayoutParams(lp);
 
-                    // Touch drag listener: pengguna bebas menggeser kapsul naik/turun di tepi layar
+                    // Touch drag listener
                     btn.setOnTouchListener(new View.OnTouchListener() {
                         private float dY = 0f;
                         private float startY = 0f;

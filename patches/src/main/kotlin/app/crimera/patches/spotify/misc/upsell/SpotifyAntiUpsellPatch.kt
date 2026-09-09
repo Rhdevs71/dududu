@@ -14,9 +14,14 @@ import app.morphe.patcher.patch.bytecodePatch
 
 private const val SHOULD_UPSELL_RESPONSE_CLASS = "Lcom/spotify/upsells/v1/proto/ShouldUpsellResponse;"
 private const val UPSELL_RESULT_ENUM_CLASS = "Lp/uf91;"
+private const val JNE1_CLASS = "Lp/jne1;"
 
 internal object ShouldUpsellResponseFingerprint : Fingerprint(
     definingClass = SHOULD_UPSELL_RESPONSE_CLASS,
+)
+
+internal object Jne1Fingerprint : Fingerprint(
+    definingClass = JNE1_CLASS,
 )
 
 @Suppress("unused")
@@ -29,6 +34,7 @@ val spotifyAntiUpsellPatch =
         compatibleWith(COMPATIBILITY_SPOTIFY)
 
         execute {
+            // 1. Hook ShouldUpsellResponse getters
             ShouldUpsellResponseFingerprint.classDefOrNull?.methods?.forEach { method ->
                 // Hook getter returning the upsell decision enum
                 if (method.returnType == UPSELL_RESULT_ENUM_CLASS && method.parameters.isEmpty()) {
@@ -48,6 +54,18 @@ val spotifyAntiUpsellPatch =
                         """
                         const/4 v0, 0
                         return v0
+                        """.trimIndent(),
+                    )
+                }
+            }
+
+            // 2. Silence Compose Upsell Dialog (e.g. "Mau mengontrol cara mendengarkan?")
+            Jne1Fingerprint.classDefOrNull?.methods?.forEach { method ->
+                if (method.name == "d" && method.returnType == "V" && method.parameters.size == 7) {
+                    method.addInstructions(
+                        0,
+                        """
+                        return-void
                         """.trimIndent(),
                     )
                 }

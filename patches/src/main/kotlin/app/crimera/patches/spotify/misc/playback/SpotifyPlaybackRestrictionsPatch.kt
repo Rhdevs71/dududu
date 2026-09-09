@@ -46,19 +46,28 @@ val spotifyPlaybackRestrictionsPatch =
                 }
             }
 
-            // 2. Hook AutoValue_Restrictions disallow* methods by directly reading the empty field from Restrictions.EMPTY (no recursion)
+            // 2. Hook AutoValue_Restrictions disallow* methods to always return empty Set / Map
             AutoValueRestrictionsFingerprint.classDefOrNull?.methods?.forEach { method ->
                 if (method.name.startsWith("disallow") && method.parameters.isEmpty()) {
-                    val returnType = method.returnType
-                    method.addInstructions(
-                        0,
-                        """
-                        sget-object v0, $RESTRICTIONS_CLASS->EMPTY:$RESTRICTIONS_CLASS
-                        check-cast v0, $AUTOVALUE_RESTRICTIONS_CLASS
-                        iget-object v0, v0, $AUTOVALUE_RESTRICTIONS_CLASS->${method.name}:$returnType
-                        return-object v0
-                        """.trimIndent(),
-                    )
+                    if (method.returnType == "Ljava/util/Set;") {
+                        method.addInstructions(
+                            0,
+                            """
+                            invoke-static {}, Ljava/util/Collections;->emptySet()Ljava/util/Set;
+                            move-result-object v0
+                            return-object v0
+                            """.trimIndent(),
+                        )
+                    } else if (method.returnType == "Ljava/util/Map;") {
+                        method.addInstructions(
+                            0,
+                            """
+                            invoke-static {}, Ljava/util/Collections;->emptyMap()Ljava/util/Map;
+                            move-result-object v0
+                            return-object v0
+                            """.trimIndent(),
+                        )
+                    }
                 }
             }
         }

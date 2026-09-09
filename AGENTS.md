@@ -336,14 +336,26 @@
       - **Spotify RHpatch APK**:
         - File: **`C:\Users\Rhdevs\Downloads\spotify_v1.5.0_rhpatch.apk`** (76,002,657 bytes).
         - 9 patches applied, 0 warnings.
-        - Ditandatangani dan diverifikasi dengan Android SDK 35 `apksigner` (**v2: true, v3: true, verifies: true**).
+- Ditandatangani dan diverifikasi dengan Android SDK 35 `apksigner` (**v2: true, v3: true, verifies: true**).
       - **Instagram RHpatch APK**:
         - File: **`C:\Users\Rhdevs\Downloads\instagram_v1.5.0_rhpatch.apk`** (152,138,227 bytes).
         - 60 patches applied, 0 warnings.
         - Ditandatangani dan diverifikasi dengan Android SDK 35 `apksigner` (**v2: true, v3: true, verifies: true**).
-      - Audit Bytecode: **0 VerifyErrors pada kedua APK**, seluruh 14 DEX (Spotify) dan 22 DEX (Instagram) tervalidasi aktif sempurna.
 
----
+20. **Tahap 20: RHpatch Instagram Studio (Profile-Only Capsule, Studio Warna Teks Kustom, Kunci Kecepatan Video, & 9 Opsi Profil) serta Spotify Premium Anti-Upsell & Kualitas Audio Maksimal (Rilis v1.6.0 - Terkini)**
+    - *Spotify Premium Anti-Upsell & Kualitas Audio*:
+      - *Anti-Upsell Shuffle (`SpotifyAntiUpsellPatch.kt`)*: Injeksi `return-void` pada `Lp/jne1;->d` (controller Compose dialog shuffle upsell: *"Mau mengontrol cara mendengarkan?"*).
+      - *Kualitas Audio Maksimal (`SpotifyAudioQualityPatch.kt`)*: Hook `PremiumBadgeView->d(Z)V` menyembunyikan badge hijau Premium (`View.GONE`), hook `p17->a` memaksa `p1 = 0` (unlocked). Baris *Very high* dan *Lossless* di pengaturan Kualitas Media terbuka.
+      - *Dexlib2 Type-Safe Inspection (`SpotifyProductStatePatch.kt`)*: Mengganti perbandingan `ins.toString()` dengan type-safe cast `ReferenceInstruction` dan `MethodReference` untuk `nrf1->i` dan `n2z->emit`.
+      - *Playback Restrictions Bypass (`SpotifyPlaybackRestrictionsPatch.kt`)*: Mengembalikan `Collections.emptySet()` / `emptyMap()`.
+      - *Adblock Slot Zeroing (`SpotifyAdblockPatch.kt`)*: Mengembalikan `emptyMap()` pada `GetAdsResponse` dan `Absent` pada `adBreakContext`.
+    - *RHpatch Instagram Studio*:
+      - *Aturan Kapsul Khusus Profil (`RhpatchInstagramInjector.java`)*: Tombol `● RHpatch` disetel default `View.GONE`. Didaftarkan `FragmentManager.FragmentLifecycleCallbacks` yang memastikan kapsul HANYA muncul saat di `UserDetailFragment` / Profil, dan 100% tersembunyi di Beranda, Reels, Explore, dan DM.
+      - *Ikon Mini Profil Estetik (`UserProfileButton.java`)*: Mengganti tombol biru lama dengan ikon melingkar mini estetik (`⋮`, 34dp) di header profil dan menyediakan `currentUserData` statis.
+      - *Studio Warna Teks Kustom (`RhpatchTextColorManager.java`)*: Mesin penelusur View dinamis (`applyToViewTree`) dengan `ViewTreeObserver.OnPreDrawListener` (debounced). 10 Presets (Luxury Gold, Emerald Green, Sunset Magenta, Cyber Cyan, Royal Purple, Vibrant Orange, Rose Gold, Electric Blue, Neon Lime, Pure White) + Custom Hex dialog.
+      - *Kontrol Kecepatan Video & Kunci Kecepatan (`PlaybackSpeedController.java`)*: Pilihan kecepatan 0.5x - 2.0x dan switch Kunci Kecepatan Default (`rhpatch_speed_lock_enabled`).
+      - *Modal Dialog Lengkap (`RhpatchInstagramDialog.java`)*: Menghapus seluruh sebutan nama lama, memuat kartu Aksi Cepat Profil (9 Opsi), Studio Warna Teks Kustom, Kecepatan Video, dan ~50 Pengaturan Terkategori.
+      - *Folder Unduhan (`Constants.java`)*: Folder penyimpanan diperbarui menjadi `RHpatch-Instagram`.
 
 
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)

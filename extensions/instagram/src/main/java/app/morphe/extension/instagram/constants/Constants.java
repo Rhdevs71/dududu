@@ -15,7 +15,7 @@ public class Constants {
     public static final String PIKO = "piko";
     public static final String PIKO_SETTINGS = PIKO + "_settings";
     public static final String SHARED_PREF_NAME = PIKO_SETTINGS;
-    public static final String DEFAULT_PIKO_FOLDER = "Piko-Instagram";
+    public static final String DEFAULT_PIKO_FOLDER = "RHpatch-Instagram";
     public static final String DEFAULT_AUDIO_FOLDER = "Audio";
     public static final String DEFAULT_DM_FOLDER = "DM";
     public static final String DEFAULT_GIF_FOLDER = "Gif";

@@ -161,7 +161,7 @@ val spotifyAdblockPatch =
                 }
             }
 
-            // 6. GetAdsResponse -> neutralize ads returned flag
+            // 6. GetAdsResponse -> neutralize ads returned flag and ads map
             GetAdsFingerprint.classDefOrNull?.methods?.forEach { method ->
                 if (method.returnType == "Z" && method.parameters.isEmpty()) {
                     method.addInstructions(
@@ -171,6 +171,15 @@ val spotifyAdblockPatch =
                         invoke-static {v0}, $AD_MANAGER_CLASS->neutralizeAdFlag(Z)Z
                         move-result v0
                         return v0
+                        """.trimIndent(),
+                    )
+                } else if (method.name == "n" && method.returnType == "Ljava/util/Map;") {
+                    method.addInstructions(
+                        0,
+                        """
+                        invoke-static {}, Ljava/util/Collections;->emptyMap()Ljava/util/Map;
+                        move-result-object v0
+                        return-object v0
                         """.trimIndent(),
                     )
                 }

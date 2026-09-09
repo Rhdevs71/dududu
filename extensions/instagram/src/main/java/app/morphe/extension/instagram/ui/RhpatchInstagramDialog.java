@@ -1,12 +1,16 @@
 /*
- * Copyright (C) 2026 RHpatch <https://github.com/crimera/piko>
+ * Copyright (C) 2026 RHpatch <https://github.com/Rhdevs71/dududu>
  *
  * See the included NOTICE file for GPLv3 §7(b) terms that apply to this code.
  */
 
 package app.morphe.extension.instagram.ui;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -15,69 +19,309 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.RippleDrawable;
 import android.os.Build;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.crimera.settings.BooleanSetting;
 import app.morphe.extension.crimera.sharedPreference.SharedPref;
+import app.morphe.extension.instagram.entity.UserData;
+import app.morphe.extension.instagram.patches.download.DownloadUtils;
+import app.morphe.extension.instagram.patches.userprofile.ProfileMoreOption;
+import app.morphe.extension.instagram.patches.userprofile.ProfilePictureViewer;
+import app.morphe.extension.instagram.patches.userprofile.UserProfileButton;
+import app.morphe.extension.instagram.patches.video.PlaybackSpeedController;
 import app.morphe.extension.instagram.settings.Settings;
 import app.morphe.extension.instagram.settings.preference.fragments.FragmentHook;
+import app.morphe.extension.instagram.theme.RhpatchTextColorManager;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 public class RhpatchInstagramDialog {
 
-    private static final String ACCENT_COLOR = "#E1306C"; // Instagram Sunset Neon Magenta
+    private static final String ACCENT_COLOR = "#E1306C"; // Neon Sunset Magenta
+    private static final String CARD_BG_COLOR = "#181818";
+    private static final String CARD_BORDER_COLOR = "#262626";
 
-    private static final String[][] SETTINGS_METADATA = new String[][] {
-        { "Blokir Iklan Feed & Stories", "Hilangkan semua iklan komersial, postingan sponsor, dan saran." },
-        { "Mode Siluman Lihat Cerita", "Lihat story tanpa memicu tanda terbaca (nama Anda tidak muncul di viewer)." },
-        { "Mode Siluman Baca Direct Message", "Baca pesan obrolan DM tanpa mengirim tanda centang 'Seen' ke pengirim." },
-        { "Anti-Hilang Media Sekali Lihat", "Buka foto dan video sekali lihat (view-once) berkali-kali tanpa batas." },
-        { "Penyelamat Pesan DM yang Ditarik", "Catat dan simpan otomatis pesan yang dihapus lawan bicara ke database lokal." },
-        { "Pengunduh Media Resolusi Tertinggi", "Unduh foto, video, carousel, reels, dan story dalam kualitas asli." },
-        { "Buka Seluruh Fitur IG Plus", "Buka icon aplikasi kustom, font bio khusus, font cerita, dan preview." },
-        { "Blokir Notifikasi Screenshot DM", "Cegah Instagram memberitahu lawan bicara saat Anda screenshot layar obrolan." },
-        { "Lencana Indikator Pertemanan", "Tampilkan lencana status apakah akun mengikuti Anda kembali di halaman profil." },
-        { "Mode Gelap AMOLED Hitam Murni", "Terapkan warna hitam murni #000000 untuk hemat baterai layar OLED." },
-        { "Pencatatan Log Diagnostik RHpatch", "Simpan catatan diagnostik rinci ke /sdcard/Download/Rhpatch/rhpatch_debug.log." }
-    };
+    private static class SettingItem {
+        final String title;
+        final String description;
+        final BooleanSetting setting;
 
-    private static final BooleanSetting[] SETTING_KEYS = new BooleanSetting[] {
-        Settings.DISABLE_ADS,
-        Settings.VIEW_STORIES_ANONYMOUSLY,
-        Settings.VIEW_DM_ANONYMOUSLY,
-        Settings.UNLIMITED_REPLAYS,
-        Settings.SAVE_DELETED_MESSAGES,
-        Settings.ENABLE_DOWNLOAD,
-        Settings.UNLOCK_PLUS_BENEFITS,
-        Settings.DISABLE_SCREENSHOT_DETECTION,
-        Settings.FOLLOW_BACK_INDICATOR,
-        Settings.AMOLED_THEME,
-        Settings.PIKO_DEBUG
+        SettingItem(String title, String description, BooleanSetting setting) {
+            this.title = title;
+            this.description = description;
+            this.setting = setting;
+        }
+    }
+
+    private static class CategoryGroup {
+        final String name;
+        final SettingItem[] items;
+
+        CategoryGroup(String name, SettingItem[] items) {
+            this.name = name;
+            this.items = items;
+        }
+    }
+
+    private static final CategoryGroup[] CATEGORIES = new CategoryGroup[] {
+        new CategoryGroup("PRIVASI & KEAMANAN AKUN", new SettingItem[] {
+            new SettingItem(
+                "Kunci Aplikasi (Biometrik / PIN HP)",
+                "Kunci Instagram dengan autentikasi biometrik sidik jari atau PIN/pola perangkat saat aplikasi dibuka.",
+                Settings.APP_LOCK
+            ),
+            new SettingItem(
+                "Blokir Notifikasi Screenshot DM",
+                "Cegah Instagram memberi tahu lawan bicara saat Anda mengambil tangkapan layar di obrolan DM.",
+                Settings.DISABLE_SCREENSHOT_DETECTION
+            ),
+            new SettingItem(
+                "Anti-Hilang Media Sekali Lihat",
+                "Buka dan lihat foto serta video sekali lihat (view-once) berkali-kali tanpa batasan waktu.",
+                Settings.UNLIMITED_REPLAYS
+            ),
+            new SettingItem(
+                "Penyelamat Pesan DM yang Dihapus",
+                "Catat dan simpan otomatis pesan teks yang ditarik atau dihapus lawan bicara ke database lokal.",
+                Settings.SAVE_DELETED_MESSAGES
+            ),
+            new SettingItem(
+                "Lacak Pesan DM yang Diedit",
+                "Simpan riwayat teks asli pesan sebelum diedit oleh lawan bicara di ruang obrolan.",
+                Settings.SAVE_EDITED_MESSAGES
+            ),
+            new SettingItem(
+                "Mode Siluman Status Online (Ghost Presence)",
+                "Blokir pelaporan status online Anda ke Meta sambil tetap melihat status aktif pengguna lain.",
+                Settings.HIDE_ONLINE_STATUS
+            ),
+            new SettingItem(
+                "Sembunyikan Status Sedang Mengetik",
+                "Lawan bicara tidak akan melihat indikator sedang mengetik saat Anda menulis pesan di DM.",
+                Settings.DISABLE_TYPING_STATUS
+            )
+        }),
+
+        new CategoryGroup("MODE SILUMAN (GHOST MODE)", new SettingItem[] {
+            new SettingItem(
+                "Lihat Cerita Anonim (Ghost Stories)",
+                "Lihat cerita atau story akun lain tanpa nama Anda muncul di daftar pemirsa (viewers).",
+                Settings.VIEW_STORIES_ANONYMOUSLY
+            ),
+            new SettingItem(
+                "Tonton Siaran Langsung Anonim (Ghost Live)",
+                "Tonton siaran langsung (Live) tanpa nama akun Anda masuk ke daftar penonton.",
+                Settings.VIEW_LIVE_ANONYMOUSLY
+            ),
+            new SettingItem(
+                "Baca Pesan DM Anonim (Ghost DM)",
+                "Baca pesan direct message tanpa mengirim tanda centang terbaca (Seen) ke pengirim.",
+                Settings.VIEW_DM_ANONYMOUSLY
+            ),
+            new SettingItem(
+                "Tombol Tandai Pesan Dibaca Manual",
+                "Tampilkan tombol khusus di obrolan untuk menandai pesan terbaca hanya saat Anda inginkan.",
+                Settings.ENABLE_MARK_CHAT_AS_READ
+            )
+        }),
+
+        new CategoryGroup("BLOKIR IKLAN & BERSIHKAN TAMPILAN", new SettingItem[] {
+            new SettingItem(
+                "Blokir Semua Iklan Feed & Cerita",
+                "Hilangkan seluruh iklan komersial, postingan sponsor, dan penawaran belanja di feed dan reels.",
+                Settings.DISABLE_ADS
+            ),
+            new SettingItem(
+                "Sembunyikan Konten yang Disarankan",
+                "Hilangkan postingan rekomendasi pihak ketiga dan akun saran dari beranda Anda.",
+                Settings.HIDE_SUGGESTED_CONTENT
+            ),
+            new SettingItem(
+                "Hilangkan Ruang Bawah Kosong",
+                "Rapikan celah ruang kosong di bilah navigasi bawah untuk tampilan layar yang lebih luas.",
+                Settings.REMOVE_EMPTY_BOTTOM_SPACE
+            ),
+            new SettingItem(
+                "Kunci Gulir Otomatis Reels",
+                "Cegah video reels beralih secara tidak sengaja saat sedang ditonton.",
+                Settings.DISABLE_REELS_SCROLLING
+            ),
+            new SettingItem(
+                "Sembunyikan Bilah Catatan (Notes Tray)",
+                "Hilangkan tray gelembung catatan (notes) di bagian atas halaman direct message.",
+                Settings.HIDE_NOTES_TRAY
+            ),
+            new SettingItem(
+                "Sembunyikan Bilah Cerita di Feed",
+                "Sembunyikan deretan lingkaran cerita (stories tray) di bagian atas beranda utama.",
+                Settings.HIDE_STORIES_TRAY
+            ),
+            new SettingItem(
+                "Nonaktifkan Geser Layar Buat Cerita",
+                "Cegah kamera postingan terbuka tanpa sengaja saat menggeser layar beranda ke kanan.",
+                Settings.DISABLE_SWIPE_TO_CREATE
+            ),
+            new SettingItem(
+                "Matikan Putar Otomatis Video Feed",
+                "Hemat kuota data dengan mematikan putar otomatis video saat menjelajahi feed.",
+                Settings.DISABLE_VIDEO_AUTOPLAY
+            )
+        }),
+
+        new CategoryGroup("PENGUNDUH MEDIA & PROFIL", new SettingItem[] {
+            new SettingItem(
+                "Aktifkan Pengunduh Media Resolusi Penuh",
+                "Unduh foto, video reels, story, dan carousel dalam kualitas asli resolusi maksimal.",
+                Settings.ENABLE_DOWNLOAD
+            ),
+            new SettingItem(
+                "Unduh Cepat Sekali Sentuh (Direct Download)",
+                "Mulai pengunduhan media secara instan tanpa dialog konfirmasi tambahan.",
+                Settings.ENABLE_DIRECT_DOWNLOAD
+            ),
+            new SettingItem(
+                "Kelompokkan ke Folder Username",
+                "Simpan file unduhan ke sub-folder tersendiri berdasarkan nama pengguna pembuat konten.",
+                Settings.DOWNLOAD_USERNAME_FOLDER
+            )
+        }),
+
+        new CategoryGroup("FITUR EKSKLUSIF IG PLUS & PROFIL", new SettingItem[] {
+            new SettingItem(
+                "Buka Seluruh Manfaat IG Plus",
+                "Buka fitur ganti icon aplikasi kustom, font cerita khusus, font bio, dan preview Plus.",
+                Settings.UNLOCK_PLUS_BENEFITS
+            ),
+            new SettingItem(
+                "Lencana Status Pertemanan (Follow-Back)",
+                "Tampilkan lencana visual penanda apakah akun yang Anda kunjungi mengikuti Anda kembali.",
+                Settings.FOLLOW_BACK_INDICATOR
+            ),
+            new SettingItem(
+                "Warna Khusus Indikator Pertemanan",
+                "Warnai tombol ikuti dengan indikator warna sesuai status hubungan pertemanan.",
+                Settings.FOLLOW_BACK_COLOR_INDICATOR
+            ),
+            new SettingItem(
+                "Menu Opsi Tambahan pada Postingan",
+                "Tambahkan tombol cepat kecepatan putar, unduh media, dan salin teks pada setiap postingan.",
+                Settings.ENABLE_MORE_OPTIONS_ON_POST
+            ),
+            new SettingItem(
+                "Tombol Salin Teks Komentar",
+                "Salin teks komentar pengguna lain langsung dengan sekali sentuh.",
+                Settings.COMMENT_COPY_BUTTON
+            ),
+            new SettingItem(
+                "Tombol Unduh Media di Komentar",
+                "Simpan stiker gambar dan media dari kolom komentar ke galeri perangkat Anda.",
+                Settings.COMMENT_SAVE_MEDIA_BUTTON
+            ),
+            new SettingItem(
+                "Tingkatkan Kualitas Penampil Foto",
+                "Buka penampil foto dengan resolusi tinggi tanpa penurunan kualitas kompresi.",
+                Settings.IMPROVE_IMAGE_VIEWING
+            ),
+            new SettingItem(
+                "Lihat Sebutan Tersembunyi di Cerita",
+                "Tampilkan nama pengguna yang dimention di cerita meskipun teksnya disembunyikan.",
+                Settings.VIEW_STORY_MENTIONS
+            ),
+            new SettingItem(
+                "Putar Ulang Cerita Tanpa Henti (Loop Story)",
+                "Ulangi pemutaran story secara otomatis tanpa langsung berpindah ke story berikutnya.",
+                Settings.LOOP_STORY
+            )
+        }),
+
+        new CategoryGroup("ALAT PENGEMBANG & DIAGNOSTIK", new SettingItem[] {
+            new SettingItem(
+                "Aktifkan Opsi Pengembang (Developer Options)",
+                "Buka menu pengaturan internal Meta dengan menekan lama ikon Beranda (Home).",
+                Settings.DEVELOPER_OPTIONS
+            ),
+            new SettingItem(
+                "Langsung Buka Penggantian MetaConfig",
+                "Tekan lama ikon Beranda langsung membuka layar MetaConfig Overrides internal.",
+                Settings.DIRECTLY_OPEN_METACONFIG
+            ),
+            new SettingItem(
+                "Aktifkan Opsi Karyawan Internal Meta",
+                "Buka seluruh fitur pengujian eksperimental internal pengembang Meta.",
+                Settings.ENABLE_EMP_OPTIONS
+            ),
+            new SettingItem(
+                "Izinkan Sertifikat Jaringan Pengguna (Whitehat)",
+                "Dukung penggunaan sertifikat CA kustom untuk inspeksi lalu lintas jaringan.",
+                Settings.ALLOW_USER_NETWORK_CERTIFICATE
+            ),
+            new SettingItem(
+                "Hilangkan Peringatan Kedaluwarsa Build",
+                "Blokir jendela popup peringatan versi lama yang muncul otomatis dari Meta.",
+                Settings.REMOVE_BUILD_EXPIRE_POPUP
+            ),
+            new SettingItem(
+                "Tema AMOLED Hitam Pekat Murni",
+                "Terapkan latar belakang hitam murni #000000 untuk penghematan baterai layar OLED.",
+                Settings.AMOLED_THEME
+            ),
+            new SettingItem(
+                "Buka Tautan di Browser Eksternal",
+                "Gunakan peramban bawaan ponsel (Chrome/Brave) alih-alih webview internal Instagram.",
+                Settings.OPEN_LINKS_EXTERNALLY
+            ),
+            new SettingItem(
+                "Bersihkan Pelacak Parameter URL Berbagi",
+                "Hapus parameter pelacak seperti igsh, utm_source, dan tracking token saat menyalin tautan.",
+                Settings.SANITIZE_SHARE_LINKS
+            ),
+            new SettingItem(
+                "Nonaktifkan Pelaporan Analitik Meta",
+                "Hentikan pengiriman log telemetri dan analitik pemakaian ke server Meta.",
+                Settings.DISABLE_ANALYTICS
+            ),
+            new SettingItem(
+                "Sembunyikan Rekomendasi Teman",
+                "Hilangkan bilah rekomendasi akun pengguna baru yang mungkin Anda kenal di profil.",
+                Settings.DISABLE_DISCOVER_PEOPLE
+            ),
+            new SettingItem(
+                "Pencatatan Log Diagnostik RHpatch",
+                "Simpan catatan diagnostik lengkap ke /sdcard/Download/RHpatch-Instagram/rhpatch_debug.log.",
+                Settings.PIKO_DEBUG
+            )
+        })
     };
 
     /**
-     * Menampilkan dialog pengaturan modern bergaya Instagram Dark Glassmorphic (senada dengan Spotify).
+     * Menampilkan dialog pengaturan lengkap RHpatch Instagram Studio.
      */
-    public static void show(Context context) {
+    public static void show(final Context context) {
         if (context == null) return;
 
         try {
-            Dialog dialog = new Dialog(context);
+            final Dialog dialog = new Dialog(context);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
             DisplayMetrics dm = context.getResources().getDisplayMetrics();
-            float density = dm.density;
+            final float density = dm.density;
 
             // Root Card Container (Deep Dark Black: #121212)
             LinearLayout root = new LinearLayout(context);
@@ -92,12 +336,14 @@ public class RhpatchInstagramDialog {
             int rootPadV = (int) (18 * density);
             root.setPadding(rootPadH, rootPadV, rootPadH, rootPadV);
 
-            // 1. Header Section
+            // ==========================================
+            // 1. HEADER SECTION
+            // ==========================================
             LinearLayout header = new LinearLayout(context);
             header.setOrientation(LinearLayout.HORIZONTAL);
             header.setGravity(Gravity.CENTER_VERTICAL);
 
-            // RHpatch Badge (Neon Sunset Magenta)
+            // RHpatch Badge
             TextView badge = new TextView(context);
             badge.setText(" RHPATCH ");
             badge.setTextColor(Color.WHITE);
@@ -139,8 +385,8 @@ public class RhpatchInstagramDialog {
 
             // Subtitle
             TextView subTitle = new TextView(context);
-            subTitle.setText("Pengaturan Fitur & Kustomisasi Instagram");
-            subTitle.setTextColor(Color.parseColor("#A7A7A7"));
+            subTitle.setText("Pusat Kustomisasi & Fitur Eksklusif Instagram");
+            subTitle.setTextColor(Color.parseColor("#8E8E93"));
             subTitle.setTextSize(12f);
             LinearLayout.LayoutParams subLp = new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -151,7 +397,9 @@ public class RhpatchInstagramDialog {
             subTitle.setLayoutParams(subLp);
             root.addView(subTitle);
 
-            // 2. Scrollable Feature List
+            // ==========================================
+            // 2. SCROLLABLE CONTENT
+            // ==========================================
             ScrollView scrollView = new ScrollView(context);
             scrollView.setVerticalScrollBarEnabled(false);
             LinearLayout.LayoutParams scrollLp = new LinearLayout.LayoutParams(
@@ -161,113 +409,539 @@ public class RhpatchInstagramDialog {
             );
             scrollView.setLayoutParams(scrollLp);
 
-            LinearLayout listContainer = new LinearLayout(context);
-            listContainer.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout contentContainer = new LinearLayout(context);
+            contentContainer.setOrientation(LinearLayout.VERTICAL);
 
-            Switch[] switchArray = new Switch[SETTING_KEYS.length];
+            // ------------------------------------------
+            // A. TARGET PROFILE QUICK ACTION CARD (if viewing a profile)
+            // ------------------------------------------
+            final UserData targetUser = UserProfileButton.getCurrentUserData();
+            if (targetUser != null && targetUser.getUsername() != null && !targetUser.getUsername().isEmpty()) {
+                LinearLayout profileCard = new LinearLayout(context);
+                profileCard.setOrientation(LinearLayout.VERTICAL);
+                GradientDrawable pBg = new GradientDrawable();
+                pBg.setColor(Color.parseColor("#1B1220"));
+                pBg.setCornerRadius(14 * density);
+                pBg.setStroke((int) (1.2f * density), Color.parseColor("#E1306C"));
+                profileCard.setBackground(pBg);
+                int pPad = (int) (14 * density);
+                profileCard.setPadding(pPad, pPad, pPad, pPad);
 
-            for (int i = 0; i < SETTING_KEYS.length; i++) {
-                final int index = i;
-                final BooleanSetting setting = SETTING_KEYS[i];
-                boolean isEnabled = SharedPref.getBooleanPref(setting);
-
-                // Feature Card
-                LinearLayout card = new LinearLayout(context);
-                card.setOrientation(LinearLayout.HORIZONTAL);
-                card.setGravity(Gravity.CENTER_VERTICAL);
-                card.setClickable(true);
-                card.setFocusable(true);
-
-                GradientDrawable cardBg = new GradientDrawable();
-                cardBg.setColor(Color.parseColor("#181818"));
-                cardBg.setCornerRadius(14 * density);
-                cardBg.setStroke((int) (1 * density), Color.parseColor("#242424"));
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    card.setBackground(new RippleDrawable(
-                        ColorStateList.valueOf(Color.parseColor("#33FFFFFF")),
-                        cardBg,
-                        null
-                    ));
-                } else {
-                    card.setBackground(cardBg);
-                }
-
-                int cardPadH = (int) (14 * density);
-                int cardPadV = (int) (12 * density);
-                card.setPadding(cardPadH, cardPadV, cardPadH, cardPadV);
-
-                LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams pLp = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 );
-                cardLp.bottomMargin = (int) (10 * density);
-                card.setLayoutParams(cardLp);
+                pLp.bottomMargin = (int) (14 * density);
+                profileCard.setLayoutParams(pLp);
 
-                // Text Column
-                LinearLayout textCol = new LinearLayout(context);
-                textCol.setOrientation(LinearLayout.VERTICAL);
-                LinearLayout.LayoutParams textLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
-                textCol.setLayoutParams(textLp);
+                TextView pTitle = new TextView(context);
+                pTitle.setText("👤 Aksi Cepat Profil (@" + targetUser.getUsername() + ")");
+                pTitle.setTextColor(Color.WHITE);
+                pTitle.setTextSize(14f);
+                pTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
+                profileCard.addView(pTitle);
 
-                TextView itemTitle = new TextView(context);
-                itemTitle.setText(SETTINGS_METADATA[i][0]);
-                itemTitle.setTextColor(Color.WHITE);
-                itemTitle.setTextSize(13.5f);
-                itemTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
-                textCol.addView(itemTitle);
-
-                TextView itemDesc = new TextView(context);
-                itemDesc.setText(SETTINGS_METADATA[i][1]);
-                itemDesc.setTextColor(Color.parseColor("#A7A7A7"));
-                itemDesc.setTextSize(11f);
-                LinearLayout.LayoutParams descLp = new LinearLayout.LayoutParams(
+                TextView pDesc = new TextView(context);
+                pDesc.setText("Pilihan aksi eksklusif profil yang sedang Anda lihat:");
+                pDesc.setTextColor(Color.parseColor("#B3B3B3"));
+                pDesc.setTextSize(11f);
+                LinearLayout.LayoutParams pDescLp = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 );
-                descLp.topMargin = (int) (2 * density);
-                itemDesc.setLayoutParams(descLp);
-                textCol.addView(itemDesc);
+                pDescLp.topMargin = (int) (2 * density);
+                pDescLp.bottomMargin = (int) (10 * density);
+                pDesc.setLayoutParams(pDescLp);
+                profileCard.addView(pDesc);
 
-                card.addView(textCol);
-
-                // Magenta Switch
-                Switch toggle = new Switch(context);
-                toggle.setChecked(isEnabled);
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    int[][] states = new int[][] {
-                        new int[] { android.R.attr.state_checked },
-                        new int[] { -android.R.attr.state_checked }
-                    };
-                    int[] thumbColors = new int[] {
-                        Color.parseColor(ACCENT_COLOR),
-                        Color.parseColor("#B3B3B3")
-                    };
-                    int[] trackColors = new int[] {
-                        Color.parseColor("#66E1306C"),
-                        Color.parseColor("#3E3E3E")
-                    };
-                    toggle.setThumbTintList(new ColorStateList(states, thumbColors));
-                    toggle.setTrackTintList(new ColorStateList(states, trackColors));
-                }
-
-                switchArray[i] = toggle;
-
-                toggle.setOnCheckedChangeListener((btn, checked) -> {
-                    SharedPref.setBooleanPref(setting.key, checked);
+                // Button: Buka Menu 9 Pilihan Lengkap
+                TextView open9Btn = new TextView(context);
+                open9Btn.setText("Buka Menu Pilihan Profil Lengkap (9 Opsi) →");
+                open9Btn.setTextColor(Color.WHITE);
+                open9Btn.setTextSize(12.5f);
+                open9Btn.setTypeface(Typeface.DEFAULT_BOLD);
+                open9Btn.setGravity(Gravity.CENTER);
+                GradientDrawable open9Bg = new GradientDrawable();
+                open9Bg.setColor(Color.parseColor("#E1306C"));
+                open9Bg.setCornerRadius(18 * density);
+                open9Btn.setBackground(open9Bg);
+                int bPad = (int) (9 * density);
+                open9Btn.setPadding(bPad, bPad, bPad, bPad);
+                open9Btn.setOnClickListener(v -> {
+                    dialog.dismiss();
+                    ProfileMoreOption.moreOptionsDailogueBox(context, targetUser);
                 });
+                profileCard.addView(open9Btn);
 
-                card.setOnClickListener(v -> toggle.setChecked(!toggle.isChecked()));
+                // Quick Row: Lihat Foto Profil & Unduh Foto Profil
+                LinearLayout pRow = new LinearLayout(context);
+                pRow.setOrientation(LinearLayout.HORIZONTAL);
+                LinearLayout.LayoutParams pRowLp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                pRowLp.topMargin = (int) (8 * density);
+                pRow.setLayoutParams(pRowLp);
 
-                card.addView(toggle);
-                listContainer.addView(card);
+                TextView viewDpBtn = new TextView(context);
+                viewDpBtn.setText("Lihat Foto Profil");
+                viewDpBtn.setTextColor(Color.WHITE);
+                viewDpBtn.setTextSize(11.5f);
+                viewDpBtn.setGravity(Gravity.CENTER);
+                GradientDrawable btn1Bg = new GradientDrawable();
+                btn1Bg.setColor(Color.parseColor("#262626"));
+                btn1Bg.setCornerRadius(12 * density);
+                viewDpBtn.setBackground(btn1Bg);
+                viewDpBtn.setPadding(bPad, bPad, bPad, bPad);
+                LinearLayout.LayoutParams b1Lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+                b1Lp.rightMargin = (int) (4 * density);
+                viewDpBtn.setLayoutParams(b1Lp);
+                viewDpBtn.setOnClickListener(v -> {
+                    ProfilePictureViewer.show(context, targetUser);
+                });
+                pRow.addView(viewDpBtn);
+
+                TextView dlDpBtn = new TextView(context);
+                dlDpBtn.setText("Unduh Foto Profil");
+                dlDpBtn.setTextColor(Color.WHITE);
+                dlDpBtn.setTextSize(11.5f);
+                dlDpBtn.setGravity(Gravity.CENTER);
+                GradientDrawable btn2Bg = new GradientDrawable();
+                btn2Bg.setColor(Color.parseColor("#262626"));
+                btn2Bg.setCornerRadius(12 * density);
+                dlDpBtn.setBackground(btn2Bg);
+                dlDpBtn.setPadding(bPad, bPad, bPad, bPad);
+                LinearLayout.LayoutParams b2Lp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+                b2Lp.leftMargin = (int) (4 * density);
+                dlDpBtn.setLayoutParams(b2Lp);
+                dlDpBtn.setOnClickListener(v -> {
+                    try {
+                        String url = targetUser.getProfilePictureUrl();
+                        String username = targetUser.getUsername();
+                        String sub = DownloadUtils.getSubfolderName(username);
+                        DownloadUtils.downloadMediaUrl(context, url, sub, username + "_dp.jpg");
+                        Toast.makeText(context, "Mengunduh foto profil @" + username, Toast.LENGTH_SHORT).show();
+                    } catch (Throwable t) {
+                        Toast.makeText(context, "Gagal mengunduh foto profil", Toast.LENGTH_SHORT).show();
+                    }
+                });
+                pRow.addView(dlDpBtn);
+
+                profileCard.addView(pRow);
+                contentContainer.addView(profileCard);
             }
 
-            scrollView.addView(listContainer);
+            // ------------------------------------------
+            // B. STUDIO WARNA TEKS KUSTOM CARD
+            // ------------------------------------------
+            LinearLayout themeCard = new LinearLayout(context);
+            themeCard.setOrientation(LinearLayout.VERTICAL);
+            GradientDrawable tBg = new GradientDrawable();
+            tBg.setColor(Color.parseColor(CARD_BG_COLOR));
+            tBg.setCornerRadius(14 * density);
+            tBg.setStroke((int) (1 * density), Color.parseColor(CARD_BORDER_COLOR));
+            themeCard.setBackground(tBg);
+            int tPad = (int) (14 * density);
+            themeCard.setPadding(tPad, tPad, tPad, tPad);
+
+            LinearLayout.LayoutParams tLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            tLp.bottomMargin = (int) (14 * density);
+            themeCard.setLayoutParams(tLp);
+
+            // Theme Header + Switch
+            LinearLayout themeHeader = new LinearLayout(context);
+            themeHeader.setOrientation(LinearLayout.HORIZONTAL);
+            themeHeader.setGravity(Gravity.CENTER_VERTICAL);
+
+            TextView themeTitle = new TextView(context);
+            themeTitle.setText("🎨 Studio Warna Teks Kustom");
+            themeTitle.setTextColor(Color.WHITE);
+            themeTitle.setTextSize(14f);
+            themeTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
+            LinearLayout.LayoutParams ttLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+            themeTitle.setLayoutParams(ttLp);
+            themeHeader.addView(themeTitle);
+
+            Switch themeSwitch = createSwitch(context, RhpatchTextColorManager.isEnabled());
+            themeHeader.addView(themeSwitch);
+            themeCard.addView(themeHeader);
+
+            TextView themeDesc = new TextView(context);
+            themeDesc.setText("Ubah semua teks Instagram (feed, profil, direct message, komentar) secara dinamis.");
+            themeDesc.setTextColor(Color.parseColor("#A7A7A7"));
+            themeDesc.setTextSize(11f);
+            LinearLayout.LayoutParams tdLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            tdLp.topMargin = (int) (3 * density);
+            tdLp.bottomMargin = (int) (10 * density);
+            themeDesc.setLayoutParams(tdLp);
+            themeCard.addView(themeDesc);
+
+            // Live Preview Box
+            final TextView previewBox = new TextView(context);
+            previewBox.setText("Contoh Teks: Instagram RHpatch Studio Theme");
+            previewBox.setTextSize(13f);
+            previewBox.setTypeface(Typeface.DEFAULT_BOLD);
+            previewBox.setGravity(Gravity.CENTER);
+            previewBox.setTextColor(RhpatchTextColorManager.getParsedColor());
+            GradientDrawable previewBg = new GradientDrawable();
+            previewBg.setColor(Color.parseColor("#0C0C0C"));
+            previewBg.setCornerRadius(10 * density);
+            previewBg.setStroke((int) (1 * density), Color.parseColor("#2D2D2D"));
+            previewBox.setBackground(previewBg);
+            int prevPad = (int) (10 * density);
+            previewBox.setPadding(prevPad, prevPad, prevPad, prevPad);
+            LinearLayout.LayoutParams prevLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            prevLp.bottomMargin = (int) (10 * density);
+            previewBox.setLayoutParams(prevLp);
+            themeCard.addView(previewBox);
+
+            // Horizontal Color Chips ScrollView
+            HorizontalScrollView colorScrollView = new HorizontalScrollView(context);
+            colorScrollView.setHorizontalScrollBarEnabled(false);
+            LinearLayout colorRow = new LinearLayout(context);
+            colorRow.setOrientation(LinearLayout.HORIZONTAL);
+
+            for (int p = 0; p < RhpatchTextColorManager.PRESET_NAMES.length; p++) {
+                final String pName = RhpatchTextColorManager.PRESET_NAMES[p];
+                final String pHex = RhpatchTextColorManager.PRESET_COLORS[p];
+
+                LinearLayout chip = new LinearLayout(context);
+                chip.setOrientation(LinearLayout.HORIZONTAL);
+                chip.setGravity(Gravity.CENTER_VERTICAL);
+                GradientDrawable chipBg = new GradientDrawable();
+                chipBg.setColor(Color.parseColor("#222222"));
+                chipBg.setCornerRadius(14 * density);
+                chipBg.setStroke((int) (1 * density), Color.parseColor(pHex));
+                chip.setBackground(chipBg);
+                int cPadH = (int) (10 * density);
+                int cPadV = (int) (6 * density);
+                chip.setPadding(cPadH, cPadV, cPadH, cPadV);
+
+                LinearLayout.LayoutParams cLp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                cLp.rightMargin = (int) (6 * density);
+                chip.setLayoutParams(cLp);
+
+                View dot = new View(context);
+                GradientDrawable dotBg = new GradientDrawable();
+                dotBg.setShape(GradientDrawable.OVAL);
+                dotBg.setColor(Color.parseColor(pHex));
+                dot.setBackground(dotBg);
+                int dotSize = (int) (10 * density);
+                LinearLayout.LayoutParams dotLp = new LinearLayout.LayoutParams(dotSize, dotSize);
+                dotLp.rightMargin = (int) (6 * density);
+                dot.setLayoutParams(dotLp);
+                chip.addView(dot);
+
+                TextView chipText = new TextView(context);
+                chipText.setText(pName);
+                chipText.setTextColor(Color.WHITE);
+                chipText.setTextSize(11f);
+                chipText.setTypeface(Typeface.DEFAULT_BOLD);
+                chip.addView(chipText);
+
+                chip.setOnClickListener(v -> {
+                    RhpatchTextColorManager.setColorHex(pHex);
+                    previewBox.setTextColor(Color.parseColor(pHex));
+                    if (context instanceof Activity) {
+                        RhpatchTextColorManager.refreshNow((Activity) context);
+                    }
+                    Toast.makeText(context, "Warna diubah: " + pName, Toast.LENGTH_SHORT).show();
+                });
+
+                colorRow.addView(chip);
+            }
+
+            // Custom Hex Button Chip
+            TextView customHexBtn = new TextView(context);
+            customHexBtn.setText("+ Custom Hex");
+            customHexBtn.setTextColor(Color.parseColor(ACCENT_COLOR));
+            customHexBtn.setTextSize(11f);
+            customHexBtn.setTypeface(Typeface.DEFAULT_BOLD);
+            customHexBtn.setGravity(Gravity.CENTER);
+            GradientDrawable customBg = new GradientDrawable();
+            customBg.setColor(Color.parseColor("#222222"));
+            customBg.setCornerRadius(14 * density);
+            customBg.setStroke((int) (1 * density), Color.parseColor(ACCENT_COLOR));
+            customHexBtn.setBackground(customBg);
+            int custPadH = (int) (12 * density);
+            int custPadV = (int) (6 * density);
+            customHexBtn.setPadding(custPadH, custPadV, custPadH, custPadV);
+            customHexBtn.setOnClickListener(v -> {
+                showCustomHexDialog(context, previewBox);
+            });
+            colorRow.addView(customHexBtn);
+
+            colorScrollView.addView(colorRow);
+            themeCard.addView(colorScrollView);
+
+            themeSwitch.setOnCheckedChangeListener((btn, checked) -> {
+                RhpatchTextColorManager.setEnabled(checked);
+                if (context instanceof Activity) {
+                    RhpatchTextColorManager.refreshNow((Activity) context);
+                }
+                Toast.makeText(context, checked ? "Warna teks kustom diaktifkan" : "Warna teks default dipulihkan", Toast.LENGTH_SHORT).show();
+            });
+
+            contentContainer.addView(themeCard);
+
+            // ------------------------------------------
+            // C. KONTROL KECEPATAN VIDEO & REELS CARD
+            // ------------------------------------------
+            LinearLayout speedCard = new LinearLayout(context);
+            speedCard.setOrientation(LinearLayout.VERTICAL);
+            GradientDrawable sBg = new GradientDrawable();
+            sBg.setColor(Color.parseColor(CARD_BG_COLOR));
+            sBg.setCornerRadius(14 * density);
+            sBg.setStroke((int) (1 * density), Color.parseColor(CARD_BORDER_COLOR));
+            speedCard.setBackground(sBg);
+            speedCard.setPadding(tPad, tPad, tPad, tPad);
+
+            LinearLayout.LayoutParams spLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            spLp.bottomMargin = (int) (14 * density);
+            speedCard.setLayoutParams(spLp);
+
+            TextView spTitle = new TextView(context);
+            spTitle.setText("⚡ Kecepatan Pemutaran Video & Reels");
+            spTitle.setTextColor(Color.WHITE);
+            spTitle.setTextSize(14f);
+            spTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
+            speedCard.addView(spTitle);
+
+            TextView spDesc = new TextView(context);
+            spDesc.setText("Pilih kecepatan pemutaran untuk video reels dan feed:");
+            spDesc.setTextColor(Color.parseColor("#A7A7A7"));
+            spDesc.setTextSize(11f);
+            LinearLayout.LayoutParams spdLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            spdLp.topMargin = (int) (3 * density);
+            spdLp.bottomMargin = (int) (10 * density);
+            spDesc.setLayoutParams(spdLp);
+            speedCard.addView(spDesc);
+
+            // Speed Selector Buttons
+            HorizontalScrollView speedScrollView = new HorizontalScrollView(context);
+            speedScrollView.setHorizontalScrollBarEnabled(false);
+            LinearLayout speedRow = new LinearLayout(context);
+            speedRow.setOrientation(LinearLayout.HORIZONTAL);
+
+            final float[] speeds = new float[] { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f };
+            final String[] speedNames = new String[] { "0.5x", "0.75x", "1.0x (Normal)", "1.25x", "1.5x", "2.0x" };
+            final List<TextView> speedBtnList = new ArrayList<>();
+
+            float activeSpeed = PlaybackSpeedController.isSpeedLockEnabled() ?
+                PlaybackSpeedController.getLockedSpeed() : PlaybackSpeedController.currentPlaybackSpeed;
+
+            for (int s = 0; s < speeds.length; s++) {
+                final float spdVal = speeds[s];
+                final String spdTxt = speedNames[s];
+
+                final TextView speedBtn = new TextView(context);
+                speedBtn.setText(spdTxt);
+                speedBtn.setTextSize(11.5f);
+                speedBtn.setTypeface(Typeface.DEFAULT_BOLD);
+                speedBtn.setGravity(Gravity.CENTER);
+
+                boolean isCurrent = Math.abs(activeSpeed - spdVal) < 0.05f;
+                applySpeedBtnStyle(speedBtn, isCurrent, density);
+
+                int sbPadH = (int) (11 * density);
+                int sbPadV = (int) (7 * density);
+                speedBtn.setPadding(sbPadH, sbPadV, sbPadH, sbPadV);
+
+                LinearLayout.LayoutParams sbLp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                sbLp.rightMargin = (int) (6 * density);
+                speedBtn.setLayoutParams(sbLp);
+
+                speedBtn.setOnClickListener(v -> {
+                    PlaybackSpeedController.applySpeed(spdVal);
+                    if (PlaybackSpeedController.isSpeedLockEnabled()) {
+                        PlaybackSpeedController.setLockedSpeed(spdVal);
+                    }
+                    for (int k = 0; k < speeds.length; k++) {
+                        applySpeedBtnStyle(speedBtnList.get(k), speeds[k] == spdVal, density);
+                    }
+                    Toast.makeText(context, "Kecepatan video: " + spdTxt, Toast.LENGTH_SHORT).show();
+                });
+
+                speedBtnList.add(speedBtn);
+                speedRow.addView(speedBtn);
+            }
+
+            speedScrollView.addView(speedRow);
+            speedCard.addView(speedScrollView);
+
+            // Speed Lock Toggle
+            LinearLayout lockRow = new LinearLayout(context);
+            lockRow.setOrientation(LinearLayout.HORIZONTAL);
+            lockRow.setGravity(Gravity.CENTER_VERTICAL);
+            LinearLayout.LayoutParams lrLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            lrLp.topMargin = (int) (12 * density);
+            lockRow.setLayoutParams(lrLp);
+
+            LinearLayout lockTextCol = new LinearLayout(context);
+            lockTextCol.setOrientation(LinearLayout.VERTICAL);
+            LinearLayout.LayoutParams ltcLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+            lockTextCol.setLayoutParams(ltcLp);
+
+            TextView lockTitle = new TextView(context);
+            lockTitle.setText("Kunci Kecepatan Default (Lock Speed)");
+            lockTitle.setTextColor(Color.WHITE);
+            lockTitle.setTextSize(13f);
+            lockTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
+            lockTextCol.addView(lockTitle);
+
+            TextView lockDesc = new TextView(context);
+            lockDesc.setText("Otomatis putar semua Reels & Video pada kecepatan yang dipilih secara permanen.");
+            lockDesc.setTextColor(Color.parseColor("#A7A7A7"));
+            lockDesc.setTextSize(11f);
+            lockTextCol.addView(lockDesc);
+
+            lockRow.addView(lockTextCol);
+
+            Switch lockSwitch = createSwitch(context, PlaybackSpeedController.isSpeedLockEnabled());
+            lockSwitch.setOnCheckedChangeListener((btn, checked) -> {
+                PlaybackSpeedController.setSpeedLockEnabled(checked);
+                if (checked) {
+                    PlaybackSpeedController.setLockedSpeed(PlaybackSpeedController.currentPlaybackSpeed);
+                }
+                Toast.makeText(context, checked ? "Kecepatan video dikunci permanen" : "Kunci kecepatan dinonaktifkan", Toast.LENGTH_SHORT).show();
+            });
+            lockRow.addView(lockSwitch);
+
+            speedCard.addView(lockRow);
+            contentContainer.addView(speedCard);
+
+            // ------------------------------------------
+            // D. CATEGORIZED SETTING GROUPS
+            // ------------------------------------------
+            final List<Switch> allSwitches = new ArrayList<>();
+            final List<BooleanSetting> allSettingKeys = new ArrayList<>();
+
+            for (CategoryGroup group : CATEGORIES) {
+                // Category Header Title
+                TextView catHeader = new TextView(context);
+                catHeader.setText("● " + group.name);
+                catHeader.setTextColor(Color.parseColor(ACCENT_COLOR));
+                catHeader.setTextSize(12f);
+                catHeader.setTypeface(Typeface.DEFAULT_BOLD);
+                LinearLayout.LayoutParams chLp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                chLp.topMargin = (int) (8 * density);
+                chLp.bottomMargin = (int) (8 * density);
+                catHeader.setLayoutParams(chLp);
+                contentContainer.addView(catHeader);
+
+                for (SettingItem item : group.items) {
+                    final BooleanSetting setting = item.setting;
+                    boolean isEnabled = SharedPref.getBooleanPref(setting);
+
+                    LinearLayout card = new LinearLayout(context);
+                    card.setOrientation(LinearLayout.HORIZONTAL);
+                    card.setGravity(Gravity.CENTER_VERTICAL);
+                    card.setClickable(true);
+                    card.setFocusable(true);
+
+                    GradientDrawable cardBg = new GradientDrawable();
+                    cardBg.setColor(Color.parseColor(CARD_BG_COLOR));
+                    cardBg.setCornerRadius(14 * density);
+                    cardBg.setStroke((int) (1 * density), Color.parseColor(CARD_BORDER_COLOR));
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        card.setBackground(new RippleDrawable(
+                            ColorStateList.valueOf(Color.parseColor("#33FFFFFF")),
+                            cardBg,
+                            null
+                        ));
+                    } else {
+                        card.setBackground(cardBg);
+                    }
+
+                    int cardPadH = (int) (14 * density);
+                    int cardPadV = (int) (12 * density);
+                    card.setPadding(cardPadH, cardPadV, cardPadH, cardPadV);
+
+                    LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                    cardLp.bottomMargin = (int) (8 * density);
+                    card.setLayoutParams(cardLp);
+
+                    // Text Column
+                    LinearLayout textCol = new LinearLayout(context);
+                    textCol.setOrientation(LinearLayout.VERTICAL);
+                    LinearLayout.LayoutParams textLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+                    textCol.setLayoutParams(textLp);
+
+                    TextView itemTitle = new TextView(context);
+                    itemTitle.setText(item.title);
+                    itemTitle.setTextColor(Color.WHITE);
+                    itemTitle.setTextSize(13.5f);
+                    itemTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
+                    textCol.addView(itemTitle);
+
+                    TextView itemDesc = new TextView(context);
+                    itemDesc.setText(item.description);
+                    itemDesc.setTextColor(Color.parseColor("#A7A7A7"));
+                    itemDesc.setTextSize(11f);
+                    LinearLayout.LayoutParams descLp = new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    );
+                    descLp.topMargin = (int) (2 * density);
+                    itemDesc.setLayoutParams(descLp);
+                    textCol.addView(itemDesc);
+
+                    card.addView(textCol);
+
+                    // Switch
+                    final Switch toggle = createSwitch(context, isEnabled);
+                    card.addView(toggle);
+
+                    allSwitches.add(toggle);
+                    allSettingKeys.add(setting);
+
+                    toggle.setOnCheckedChangeListener((btn, checked) -> {
+                        SharedPref.setBooleanPref(setting.key, checked);
+                    });
+
+                    card.setOnClickListener(v -> toggle.setChecked(!toggle.isChecked()));
+
+                    contentContainer.addView(card);
+                }
+            }
+
+            scrollView.addView(contentContainer);
             root.addView(scrollView);
 
-            // 3. Quick Action: Menu Pengaturan Lengkap
+            // ==========================================
+            // 3. QUICK ACTION: MENU PENGATURAN LENGKAP
+            // ==========================================
             TextView advancedBtn = new TextView(context);
             advancedBtn.setText("Buka Pengaturan Lanjutan (Developer & MobileConfig) →");
             advancedBtn.setTextColor(Color.parseColor(ACCENT_COLOR));
@@ -282,7 +956,9 @@ public class RhpatchInstagramDialog {
             });
             root.addView(advancedBtn);
 
-            // 4. Action Button (Full-width Magenta Pill)
+            // ==========================================
+            // 4. ACTION BUTTON: TUTUP & TERAPKAN
+            // ==========================================
             TextView applyBtn = new TextView(context);
             applyBtn.setText("Tutup & Terapkan");
             applyBtn.setTextColor(Color.WHITE);
@@ -308,22 +984,28 @@ public class RhpatchInstagramDialog {
             applyBtn.setOnClickListener(v -> dialog.dismiss());
             root.addView(applyBtn);
 
-            // 5. Reset to default button
+            // ==========================================
+            // 5. RESET KE DEFAULT
+            // ==========================================
             TextView resetBtn = new TextView(context);
-            resetBtn.setText("Reset ke Pengaturan Default");
+            resetBtn.setText("Reset Semua Pengaturan ke Default");
             resetBtn.setTextColor(Color.parseColor("#777777"));
             resetBtn.setTextSize(11f);
             resetBtn.setGravity(Gravity.CENTER);
             int resetPad = (int) (6 * density);
             resetBtn.setPadding(resetPad, resetPad, resetPad, resetPad);
             resetBtn.setOnClickListener(v -> {
-                for (int i = 0; i < SETTING_KEYS.length; i++) {
-                    BooleanSetting s = SETTING_KEYS[i];
+                for (int i = 0; i < allSettingKeys.size(); i++) {
+                    BooleanSetting s = allSettingKeys.get(i);
                     SharedPref.setBooleanPref(s.key, s.defaultValue);
-                    if (switchArray[i] != null) {
-                        switchArray[i].setChecked(s.defaultValue);
+                    if (i < allSwitches.size() && allSwitches.get(i) != null) {
+                        allSwitches.get(i).setChecked(s.defaultValue);
                     }
                 }
+                RhpatchTextColorManager.setEnabled(false);
+                RhpatchTextColorManager.setColorHex(RhpatchTextColorManager.DEFAULT_COLOR_HEX);
+                PlaybackSpeedController.setSpeedLockEnabled(false);
+                PlaybackSpeedController.applySpeed(1.0f);
                 Toast.makeText(context, "Pengaturan RHpatch direset ke default!", Toast.LENGTH_SHORT).show();
             });
             root.addView(resetBtn);
@@ -337,8 +1019,8 @@ public class RhpatchInstagramDialog {
                 int screenW = dm.widthPixels;
                 int screenH = dm.heightPixels;
 
-                int targetW = Math.min((int) (screenW * 0.92f), (int) (420 * density));
-                int targetH = (int) (screenH * 0.82f);
+                int targetW = Math.min((int) (screenW * 0.94f), (int) (480 * density));
+                int targetH = (int) (screenH * 0.88f);
 
                 wlp.width = targetW;
                 wlp.height = targetH;
@@ -349,6 +1031,83 @@ public class RhpatchInstagramDialog {
             dialog.show();
         } catch (Throwable t) {
             PikoUtils.logger("RhpatchInstagramDialog", "Gagal menampilkan dialog pengaturan: " + t.getMessage(), t);
+        }
+    }
+
+    private static Switch createSwitch(Context context, boolean checked) {
+        Switch toggle = new Switch(context);
+        toggle.setChecked(checked);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int[][] states = new int[][] {
+                new int[] { android.R.attr.state_checked },
+                new int[] { -android.R.attr.state_checked }
+            };
+            int[] thumbColors = new int[] {
+                Color.parseColor(ACCENT_COLOR),
+                Color.parseColor("#B3B3B3")
+            };
+            int[] trackColors = new int[] {
+                Color.parseColor("#66E1306C"),
+                Color.parseColor("#3E3E3E")
+            };
+            toggle.setThumbTintList(new ColorStateList(states, thumbColors));
+            toggle.setTrackTintList(new ColorStateList(states, trackColors));
+        }
+
+        return toggle;
+    }
+
+    private static void applySpeedBtnStyle(TextView btn, boolean isSelected, float density) {
+        GradientDrawable bg = new GradientDrawable();
+        if (isSelected) {
+            bg.setColor(Color.parseColor(ACCENT_COLOR));
+            btn.setTextColor(Color.WHITE);
+        } else {
+            bg.setColor(Color.parseColor("#222222"));
+            bg.setStroke((int) (1 * density), Color.parseColor("#333333"));
+            btn.setTextColor(Color.parseColor("#CCCCCC"));
+        }
+        bg.setCornerRadius(14 * density);
+        btn.setBackground(bg);
+    }
+
+    private static void showCustomHexDialog(final Context context, final TextView previewBox) {
+        try {
+            AlertDialog.Builder builder = new AlertDialog.Builder(context, AlertDialog.THEME_DEVICE_DEFAULT_DARK);
+            builder.setTitle("Input Warna Hex Kustom");
+
+            final EditText input = new EditText(context);
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            input.setHint("#FFD700 atau FFD700");
+            input.setText(RhpatchTextColorManager.getColorHex());
+            input.setTextColor(Color.WHITE);
+            builder.setView(input);
+
+            builder.setPositiveButton("Terapkan", (d, which) -> {
+                String hex = input.getText().toString().trim();
+                if (!hex.startsWith("#")) {
+                    hex = "#" + hex;
+                }
+                try {
+                    int parsed = Color.parseColor(hex);
+                    RhpatchTextColorManager.setColorHex(hex);
+                    if (previewBox != null) {
+                        previewBox.setTextColor(parsed);
+                    }
+                    if (context instanceof Activity) {
+                        RhpatchTextColorManager.refreshNow((Activity) context);
+                    }
+                    Toast.makeText(context, "Warna kustom diterapkan: " + hex, Toast.LENGTH_SHORT).show();
+                } catch (Throwable t) {
+                    Toast.makeText(context, "Format hex tidak valid! Contoh: #FFD700", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            builder.setNegativeButton("Batal", (d, which) -> d.cancel());
+            builder.show();
+        } catch (Throwable t) {
+            PikoLog.e("RhpatchInstagramDialog", "Error showing custom hex dialog", t);
         }
     }
 }

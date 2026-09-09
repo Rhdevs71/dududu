@@ -14,6 +14,9 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import com.android.tools.smali.dexlib2.Opcode
 
+import com.android.tools.smali.dexlib2.iface.instruction.ReferenceInstruction
+import com.android.tools.smali.dexlib2.iface.reference.MethodReference
+
 private const val APP_PROTOCOL_CAPABILITIES_CLASS = "Lcom/spotify/interapp/model/AppProtocol\$Capabilities;"
 private const val I6Z_CLASS = "Lp/i6z;"
 private const val D6Z_CLASS = "Lp/d6z;"
@@ -83,7 +86,8 @@ val spotifyProductStatePatch =
             D6zFingerprint.classDefOrNull?.methods?.firstOrNull { it.name == "emit" }?.let { m ->
                 val instructions = m.implementation?.instructions?.toList() ?: return@let
                 for ((index, ins) in instructions.withIndex()) {
-                    if (ins.opcode == Opcode.INVOKE_STATIC && ins.toString().contains("nrf1->i")) {
+                    val ref = (ins as? ReferenceInstruction)?.reference as? MethodReference
+                    if (ins.opcode == Opcode.INVOKE_STATIC && ref?.name == "i" && ref?.definingClass == "Lp/nrf1;") {
                         m.addInstructions(
                             index + 2,
                             """
@@ -101,7 +105,8 @@ val spotifyProductStatePatch =
             NmjFingerprint.classDefOrNull?.methods?.firstOrNull { it.name == "emit" }?.let { m ->
                 val instructions = m.implementation?.instructions?.toList() ?: return@let
                 for ((index, ins) in instructions.withIndex()) {
-                    if (ins.opcode == Opcode.INVOKE_INTERFACE && ins.toString().contains("Lp/n2z;->emit")) {
+                    val ref = (ins as? ReferenceInstruction)?.reference as? MethodReference
+                    if (ins.opcode == Opcode.INVOKE_INTERFACE && ref?.name == "emit" && ref?.definingClass == "Lp/n2z;") {
                         m.addInstructions(
                             index,
                             """
