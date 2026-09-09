@@ -1,3 +1,9 @@
+## [1.4.2](https://github.com/Rhdevs71/dududu/compare/v1.4.1...v1.4.2) (2026-09-09)
+
+### 🐛 Bug Fixes
+
+* **spotify:** eliminate StackOverflowError in Restrictions and redesign Piko UI with Spotify Dark theme ([a1dec88](https://github.com/Rhdevs71/dududu/commit/a1dec88d3702297083d3ffbd0d3fa3a5315930ab))
+
 ## [1.4.1](https://github.com/Rhdevs71/dududu/compare/v1.4.0...v1.4.1) (2026-09-09)
 
 ### 🐛 Bug Fixes
