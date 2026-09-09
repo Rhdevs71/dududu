@@ -260,7 +260,17 @@
       7. `spotifyAntiUpsellPatch`: Eliminasi dialog promo dan upsell langganan.
       8. `spotifySettingsPatch`: Tombol floating dan dialog pengaturan Piko di layar utama.
       9. `spotifyClonePatch`: Kloning dual-install `com.spotify.music.pikoo` (`Piko Spotify`).
-    - *Status Kompilasi*: `:patches:compileKotlin` berhasil dikompilasi dengan **`BUILD SUCCESSFUL` (0 error)**.
+    - *Status Rilis & Verifikasi Morphe CLI*:
+      - Rilis **`v1.4.1`** (`patches-1.4.1.mpp`, 6.89 MB) berhasil dipublish melalui GitHub Actions CI Run #34361251790.
+      - Patching Morphe CLI berhasil 100% pada target `C:\Users\Rhdevs\Downloads\spt.apkm` (Spotify v9.1.82.1596 arm64-v8a):
+        - **Exit Code**: `0`
+        - **Patches Applied (9/9)**: `Spotify Ad-Block`, `Spotify Clean UI & Anti-Upsell`, `Spotify Clone`, `Spotify On-Demand Playback & Disable Force-Shuffle`, `Spotify Piko Settings Menu`, `Spotify Playback Restrictions Unlock`, `Spotify ProductState & Capabilities Unlock`, `Spotify Unlimited Lyrics`, `Spotify Very High Audio Quality Unlock`.
+        - **Failed Patches**: `0` (kosong).
+      - APK Hasil Patching: **`C:\Users\Rhdevs\Downloads\spotify_v1.4.1_piko.apk`** (76.0 MB).
+      - **Package Name**: `com.spotify.music.pikoo` (Dual-install / Cloned).
+      - **Application Label**: `Piko Spotify`.
+      - **Android Signer**: Ditandatangani dan diverifikasi dengan Android SDK 35 `apksigner` (**v2 scheme: true, v3 scheme: true, verifies: true**).
+      - **Bytecode Audit**: 14 DEX files, 97,689 classes diaudit (**0 VerifyErrors, seluruh hook tervalidasi aktif**).
 
 ---
 
