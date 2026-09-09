@@ -16,12 +16,13 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.TextView;
 
+import app.morphe.extension.crimera.settings.BooleanSetting;
 import app.morphe.extension.crimera.sharedPreference.SharedPref;
 import app.morphe.extension.instagram.utils.PikoLog;
 
 public class RhpatchTextColorManager {
     private static final String TAG = "RhpatchTextColorManager";
-    public static final String PREF_ENABLED = "rhpatch_custom_text_color_enabled";
+    public static final BooleanSetting CUSTOM_TEXT_COLOR_ENABLED = new BooleanSetting("rhpatch_custom_text_color_enabled", false);
     public static final String PREF_COLOR_HEX = "rhpatch_custom_text_color_hex";
 
     public static final String DEFAULT_COLOR_HEX = "#FFD700"; // Luxury Gold
@@ -41,11 +42,11 @@ public class RhpatchTextColorManager {
     private static boolean isScheduled = false;
 
     public static boolean isEnabled() {
-        return Boolean.TRUE.equals(SharedPref.getBooleanPref(PREF_ENABLED, false));
+        return Boolean.TRUE.equals(SharedPref.getBooleanPref(CUSTOM_TEXT_COLOR_ENABLED));
     }
 
     public static void setEnabled(boolean enabled) {
-        SharedPref.setBooleanPref(PREF_ENABLED, enabled);
+        SharedPref.setBooleanPref(CUSTOM_TEXT_COLOR_ENABLED.key, enabled);
     }
 
     public static String getColorHex() {

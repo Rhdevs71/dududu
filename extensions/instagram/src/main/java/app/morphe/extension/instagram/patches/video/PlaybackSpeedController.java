@@ -15,28 +15,30 @@ import android.content.DialogInterface;
 import java.util.ArrayList;
 
 import app.morphe.extension.crimera.PikoUtils;
+import app.morphe.extension.crimera.settings.BooleanSetting;
+import app.morphe.extension.crimera.settings.StringSetting;
 import app.morphe.extension.crimera.sharedPreference.SharedPref;
 import app.morphe.extension.instagram.entity.InstagramDialogBox;
 import app.morphe.extension.instagram.utils.PikoLog;
 
 public class PlaybackSpeedController {
     private static final String TAG = "PlaybackSpeedController";
-    public static final String PREF_SPEED_LOCK_ENABLED = "rhpatch_speed_lock_enabled";
-    public static final String PREF_LOCKED_SPEED = "rhpatch_locked_playback_speed";
+    public static final BooleanSetting SPEED_LOCK_ENABLED = new BooleanSetting("rhpatch_speed_lock_enabled", false);
+    public static final StringSetting LOCKED_SPEED = new StringSetting("rhpatch_locked_playback_speed", "2.0");
 
     public static volatile float currentPlaybackSpeed = 1.0f;
 
     public static boolean isSpeedLockEnabled() {
-        return Boolean.TRUE.equals(SharedPref.getBooleanPref(PREF_SPEED_LOCK_ENABLED, false));
+        return Boolean.TRUE.equals(SharedPref.getBooleanPref(SPEED_LOCK_ENABLED));
     }
 
     public static void setSpeedLockEnabled(boolean enabled) {
-        SharedPref.setBooleanPref(PREF_SPEED_LOCK_ENABLED, enabled);
+        SharedPref.setBooleanPref(SPEED_LOCK_ENABLED.key, enabled);
     }
 
     public static float getLockedSpeed() {
         try {
-            String val = SharedPref.getStringPref(PREF_LOCKED_SPEED, "2.0");
+            String val = SharedPref.getStringPref(LOCKED_SPEED);
             return Float.parseFloat(val);
         } catch (Throwable t) {
             return 2.0f;
@@ -44,7 +46,7 @@ public class PlaybackSpeedController {
     }
 
     public static void setLockedSpeed(float speed) {
-        SharedPref.setStringPref(PREF_LOCKED_SPEED, String.valueOf(speed));
+        SharedPref.setStringPref(LOCKED_SPEED.key, String.valueOf(speed));
         currentPlaybackSpeed = speed;
     }
 

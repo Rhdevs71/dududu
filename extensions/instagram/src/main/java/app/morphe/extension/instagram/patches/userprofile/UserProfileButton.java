@@ -42,7 +42,10 @@ public class UserProfileButton {
 
         try {
             final Context context = viewGroup.getContext();
-            final UserData userData = ProfileInfo.getUserData(object);
+            UserData userData = null;
+            try {
+                userData = new ProfileInfo(object).getUserData();
+            } catch (Throwable ignored) {}
             currentUserData = userData;
 
             // Pastikan kapsul RHpatch aktif di halaman profil

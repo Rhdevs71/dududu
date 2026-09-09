@@ -51,7 +51,7 @@ val spotifyAudioQualityPatch =
                                 """
                                 sget-object v0, $BITRATE_LEVEL_CLASS->VERY_HIGH:$BITRATE_LEVEL_CLASS
                                 return-object v0
-                                "".trimIndent(),
+                                """.trimIndent(),
                             )
                         }
                     }
