@@ -1,3 +1,13 @@
+## [1.5.0](https://github.com/Rhdevs71/dududu/compare/v1.4.2...v1.5.0) (2026-09-09)
+
+### 🐛 Bug Fixes
+
+* **spotify:** import TRIGGER_SLOT_CLASS in SpotifyAdblockPatch ([6992bbc](https://github.com/Rhdevs71/dududu/commit/6992bbcba636f934a089686e515fb6a0f17553cb))
+
+### ✨ New Features
+
+* **rhpatch:** rebrand to RHpatch, dual-app UI theming, eliminate Spotify Premium tab, Platinum tier, and fix ad-block ([26ca1cb](https://github.com/Rhdevs71/dududu/commit/26ca1cbe5cf22350160a619512eccae17338827f))
+
 ## [1.4.2](https://github.com/Rhdevs71/dududu/compare/v1.4.1...v1.4.2) (2026-09-09)
 
 ### 🐛 Bug Fixes

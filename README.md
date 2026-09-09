@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.4.2](https://github.com/Rhdevs71/dududu/releases/tag/v1.4.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;150 patches total
+> **[v1.5.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.5.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;150 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -264,7 +264,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Spotify Ad-Block](#spotify-ad-block) | Blocks audio, video ads, sponsored content, and ad breaks across Spotify playback and playlists. |  |
+| [Spotify Ad-Block](#spotify-ad-block) | Blocks audio, video ads, sponsored content, ad breaks, and removes the Premium tab from navigation. |  |
 | [Spotify Clean UI & Anti-Upsell](#spotify-clean-ui-anti-upsell) | Suppresses in-app subscription pop-ups ("Dapatkan Premium") and forces NO_UPSELL on all upsell evaluation requests. |  |
 | [Spotify Clone](#spotify-clone) | Changes the package name and app name for Spotify. This allows you to install the patched Spotify alongside the original Spotify app.<br>Default cloned package: com.spotify.music.pikoo | • Package name<br>• App name |
 | [Spotify On-Demand Playback & Disable Force-Shuffle](#spotify-on-demand-playback-disable-force-shuffle) | Unlocks direct on-demand track selection from any playlist or album and removes forced shuffle mode. |  |

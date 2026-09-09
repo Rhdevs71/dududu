@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-09T14:25:03",
-  "description": "## [1.4.2](https://github.com/Rhdevs71/dududu/compare/v1.4.1...v1.4.2) (2026-09-09)\n\n### 🐛 Bug Fixes\n\n* **spotify:** eliminate StackOverflowError in Restrictions and redesign Piko UI with Spotify Dark theme ([a1dec88](https://github.com/Rhdevs71/dududu/commit/a1dec88d3702297083d3ffbd0d3fa3a5315930ab))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.4.2/patches-1.4.2.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.4.2/patches-1.4.2.mpp.asc",
-  "version": "1.4.2"
+  "created_at": "2026-09-09T15:52:57",
+  "description": "## [1.5.0](https://github.com/Rhdevs71/dududu/compare/v1.4.2...v1.5.0) (2026-09-09)\n\n### 🐛 Bug Fixes\n\n* **spotify:** import TRIGGER_SLOT_CLASS in SpotifyAdblockPatch ([6992bbc](https://github.com/Rhdevs71/dududu/commit/6992bbcba636f934a089686e515fb6a0f17553cb))\n\n### ✨ New Features\n\n* **rhpatch:** rebrand to RHpatch, dual-app UI theming, eliminate Spotify Premium tab, Platinum tier, and fix ad-block ([26ca1cb](https://github.com/Rhdevs71/dududu/commit/26ca1cbe5cf22350160a619512eccae17338827f))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.5.0/patches-1.5.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.5.0/patches-1.5.0.mpp.asc",
+  "version": "1.5.0"
 }
