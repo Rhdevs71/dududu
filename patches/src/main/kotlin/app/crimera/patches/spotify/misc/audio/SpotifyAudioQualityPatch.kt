@@ -60,7 +60,7 @@ val spotifyAudioQualityPatch =
 
             // 2. Hide green Premium badge in settings and app-wide
             PremiumBadgeViewFingerprint.classDefOrNull?.methods?.forEach { method ->
-                if (method.name == "d" && method.returnType == "V" && method.parameters.size == 1 && method.parameters[0] == "Z") {
+                if (method.name == "d" && method.returnType == "V" && method.parameters.size == 1 && method.parameters[0].type == "Z") {
                     method.addInstructions(
                         0,
                         """
@@ -74,7 +74,7 @@ val spotifyAudioQualityPatch =
 
             // 3. Unlock Very High & Lossless rows in Media Quality settings (p17->a)
             P17Fingerprint.classDefOrNull?.methods?.forEach { method ->
-                if (method.name == "a" && method.returnType == "Lp/lmh0;" && method.parameters.size == 3 && method.parameters[0] == "Z") {
+                if (method.name == "a" && method.returnType == "Lp/lmh0;" && method.parameters.size == 3 && method.parameters[0].type == "Z") {
                     method.addInstructions(
                         0,
                         """

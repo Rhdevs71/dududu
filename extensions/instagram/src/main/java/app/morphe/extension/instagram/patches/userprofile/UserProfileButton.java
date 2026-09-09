@@ -87,9 +87,10 @@ public class UserProfileButton {
                 lp.setMargins((int) (6 * density), (int) (4 * density), (int) (6 * density), (int) (4 * density));
                 miniBtn.setLayoutParams(lp);
 
+                final UserData targetData = userData;
                 miniBtn.setOnClickListener(v -> {
                     try {
-                        ProfileMoreOption.moreOptionsDailogueBox(context, userData);
+                        ProfileMoreOption.moreOptionsDailogueBox(context, targetData);
                     } catch (Throwable t) {
                         PikoLog.e("UserProfileButton", "Error opening profile more options", t);
                     }
