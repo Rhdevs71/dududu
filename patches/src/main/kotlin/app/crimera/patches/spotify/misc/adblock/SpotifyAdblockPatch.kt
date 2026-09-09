@@ -18,6 +18,7 @@ import app.crimera.patches.spotify.utils.Constants.GET_SLOT_CLASS
 import app.crimera.patches.spotify.utils.Constants.HSP0_CLASS
 import app.crimera.patches.spotify.utils.Constants.SUB_IN_STREAM_CLASS
 import app.crimera.patches.spotify.utils.Constants.SUB_SLOT_CLASS
+import app.crimera.patches.spotify.utils.Constants.TRIGGER_SLOT_CLASS
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
