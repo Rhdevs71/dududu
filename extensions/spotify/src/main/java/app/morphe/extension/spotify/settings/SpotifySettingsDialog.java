@@ -58,11 +58,11 @@ public class SpotifySettingsDialog {
             builder.setMultiChoiceItems(SETTING_LABELS, checkedStates, (dialog, which, isChecked) -> {
                 if (which >= 0 && which < SETTING_KEYS.length) {
                     BooleanSetting setting = SETTING_KEYS[which];
-                    SharedPref.setBooleanPref(setting, isChecked);
+                    SharedPref.setBooleanPref(setting.key, isChecked);
 
                     // Sync related settings
                     if (setting == SpotifySettings.UNLIMITED_SKIPS) {
-                        SharedPref.setBooleanPref(SpotifySettings.ENABLE_SEEK, isChecked);
+                        SharedPref.setBooleanPref(SpotifySettings.ENABLE_SEEK.key, isChecked);
                     }
                 }
             });
@@ -76,7 +76,7 @@ public class SpotifySettingsDialog {
 
             builder.setNeutralButton("Reset Default", (dialog, which) -> {
                 for (BooleanSetting setting : SETTING_KEYS) {
-                    SharedPref.setBooleanPref(setting, (Boolean) setting.getDefaultValue());
+                    SharedPref.setBooleanPref(setting.key, setting.defaultValue);
                 }
                 Toast.makeText(context, "Pengaturan direset ke default!", Toast.LENGTH_SHORT).show();
             });
