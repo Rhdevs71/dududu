@@ -1,3 +1,13 @@
+## [1.4.0](https://github.com/Rhdevs71/dududu/compare/v1.3.3...v1.4.0) (2026-09-09)
+
+### 🐛 Bug Fixes
+
+* **spotify:** correct SharedPref.setBooleanPref argument types in SpotifySettingsDialog ([445e6a7](https://github.com/Rhdevs71/dududu/commit/445e6a7169b8bee5cce9190c4094597b6bc2eb91))
+
+### ✨ New Features
+
+* **spotify:** add full suite Piko Spotify mod for Morphe CLI ([c43bade](https://github.com/Rhdevs71/dududu/commit/c43badec1ebbed0c58819a85a0f3128fef2e9b7a))
+
 ## [1.3.3](https://github.com/Rhdevs71/dududu/compare/v1.3.2...v1.3.3) (2026-09-08)
 
 ### 🐛 Bug Fixes

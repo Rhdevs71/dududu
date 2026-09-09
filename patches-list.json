@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.3.3",
+  "version": "1.4.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -4333,6 +4333,295 @@
             {
               "version": "12.19.1-release.0",
               "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Spotify Ad-Block",
+      "description": "Blocks audio, video ads, sponsored content, and ad breaks across Spotify playback and playlists.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.spotify.music",
+          "name": "Spotify",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#1DB954",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.1.82.1596",
+              "versionCodes": {
+                "ARM64_V8A": 146025380
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Spotify Clean UI & Anti-Upsell",
+      "description": "Suppresses in-app subscription pop-ups (\"Dapatkan Premium\") and forces NO_UPSELL on all upsell evaluation requests.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.spotify.music",
+          "name": "Spotify",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#1DB954",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.1.82.1596",
+              "versionCodes": {
+                "ARM64_V8A": 146025380
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Spotify Clone",
+      "description": "Changes the package name and app name for Spotify. This allows you to install the patched Spotify alongside the original Spotify app.\nDefault cloned package: com.spotify.music.pikoo",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.spotify.music",
+          "name": "Spotify",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#1DB954",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.1.82.1596",
+              "versionCodes": {
+                "ARM64_V8A": 146025380
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": [
+        {
+          "key": "packageName",
+          "title": "Package name",
+          "description": "A new package name for the patched Spotify app.",
+          "required": true,
+          "type": "kotlin.String",
+          "default": "com.spotify.music.pikoo",
+          "values": null
+        },
+        {
+          "key": "appName",
+          "title": "App name",
+          "description": "A new app name (label). Entering \"Spotify\" will skip changing the app name.",
+          "required": true,
+          "type": "kotlin.String",
+          "default": "Piko Spotify",
+          "values": null
+        }
+      ]
+    },
+    {
+      "name": "Spotify On-Demand Playback & Disable Force-Shuffle",
+      "description": "Unlocks direct on-demand track selection from any playlist or album and removes forced shuffle mode.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.spotify.music",
+          "name": "Spotify",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#1DB954",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.1.82.1596",
+              "versionCodes": {
+                "ARM64_V8A": 146025380
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Spotify Piko Settings Menu",
+      "description": "Injects an interactive floating Piko settings button on Spotify main screen to customize adblock, playback, lyrics, and quality preferences.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.spotify.music",
+          "name": "Spotify",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#1DB954",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.1.82.1596",
+              "versionCodes": {
+                "ARM64_V8A": 146025380
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Spotify Playback Restrictions Unlock",
+      "description": "Unlocks unlimited track skips, scrubbing/seeking on player bar, repeat track/context, and toggle shuffle without limits.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.spotify.music",
+          "name": "Spotify",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#1DB954",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.1.82.1596",
+              "versionCodes": {
+                "ARM64_V8A": 146025380
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Spotify ProductState & Capabilities Unlock",
+      "description": "Unlocks native player capabilities (can_play_on_demand, interruption-free) and spoofs Premium product attributes.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.spotify.music",
+          "name": "Spotify",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#1DB954",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.1.82.1596",
+              "versionCodes": {
+                "ARM64_V8A": 146025380
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Spotify Unlimited Lyrics",
+      "description": "Bypasses lyrics capping, restrictions, and paywalls so live lyrics are always available.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.spotify.music",
+          "name": "Spotify",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#1DB954",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.1.82.1596",
+              "versionCodes": {
+                "ARM64_V8A": 146025380
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Spotify Very High Audio Quality Unlock",
+      "description": "Unlocks and enforces 320kbps \"Very High\" extreme bitrate audio streaming quality.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.spotify.music",
+          "name": "Spotify",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#1DB954",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "9.1.82.1596",
+              "versionCodes": {
+                "ARM64_V8A": 146025380
+              },
               "isExperimental": false,
               "minSdk": null,
               "description": null
