@@ -1,3 +1,9 @@
+## [1.4.1](https://github.com/Rhdevs71/dududu/compare/v1.4.0...v1.4.1) (2026-09-09)
+
+### 🐛 Bug Fixes
+
+* **spotify:** target attachBaseContext in SpotifyInitHook ([cc8da4a](https://github.com/Rhdevs71/dududu/commit/cc8da4a76c0fccb1bc2a76dd87ad9191bca8f79b))
+
 ## [1.4.0](https://github.com/Rhdevs71/dududu/compare/v1.3.3...v1.4.0) (2026-09-09)
 
 ### 🐛 Bug Fixes

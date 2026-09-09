@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-09T13:58:25",
-  "description": "## [1.4.0](https://github.com/Rhdevs71/dududu/compare/v1.3.3...v1.4.0) (2026-09-09)\n\n### 🐛 Bug Fixes\n\n* **spotify:** correct SharedPref.setBooleanPref argument types in SpotifySettingsDialog ([445e6a7](https://github.com/Rhdevs71/dududu/commit/445e6a7169b8bee5cce9190c4094597b6bc2eb91))\n\n### ✨ New Features\n\n* **spotify:** add full suite Piko Spotify mod for Morphe CLI ([c43bade](https://github.com/Rhdevs71/dududu/commit/c43badec1ebbed0c58819a85a0f3128fef2e9b7a))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.4.0/patches-1.4.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.4.0/patches-1.4.0.mpp.asc",
-  "version": "1.4.0"
+  "created_at": "2026-09-09T14:06:20",
+  "description": "## [1.4.1](https://github.com/Rhdevs71/dududu/compare/v1.4.0...v1.4.1) (2026-09-09)\n\n### 🐛 Bug Fixes\n\n* **spotify:** target attachBaseContext in SpotifyInitHook ([cc8da4a](https://github.com/Rhdevs71/dududu/commit/cc8da4a76c0fccb1bc2a76dd87ad9191bca8f79b))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.4.1/patches-1.4.1.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.4.1/patches-1.4.1.mpp.asc",
+  "version": "1.4.1"
 }
