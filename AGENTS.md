@@ -187,6 +187,81 @@
       - *Solusi*: Mengubah default `pref_wa_premium` menjadi `true` out-of-the-box di XML dan kode Kotlin. Menambahkan hook pada `LX.30G` model methods, `PromoEligibilityManager`, dan dynamic discovery string `wa_plus_custom_app_theme` & `wa_plus_custom_app_icon`.
     - *Hasil Build*: APK `C:\Users\Rhdevs\Downloads\RHpatch_v1.5.6_Plus_Fixed.apk` (52 MB) berhasil di-assemble dengan 0 error.
 
+14. **Tahap 14: Pemisahan Independen Reels & Feed/Story Downloader, Dukungan Kloning Pikoo, & Perbaikan Crash Fatal Spotify (Rilis v1.5.8 - Terkini)**
+    - *Pemisahan Independen Reels Downloader & Feed/Story Downloader (`ReelsDownloaderPatch.kt` & `MediaDownloaderPatch.kt`)*:
+      - *Masalah*: Fitur downloader di Instagram tidak muncul di UI karena `currentOverflowHelper` bernilai `null`, serta penggabungan tidak resmi antara downloader Reels dan Feed/Stories yang memiliki penanganan dan tipe media berbeda.
+      - *Penyebab*: `MetaUnobfuscator.init(appContext)` tidak pernah dipanggil di `MediaDownloaderPatch.kt`, menyebabkan `findMethodUsingStrings("MediaOptionsOverflowHelper")` mengembalikan daftar kosong. Selain itu, guard `BottomSheetFragment` terlalu agresif sehingga menolak dialog overflow modern yang menggunakan penamaan container share sheet (`fName.contains("share")`).
+      - *Solusi*: Memisahkan total `ReelsDownloaderPatch.kt` (khusus Reels dengan fallback `ClipsViewerFragment` & `ClipsMoreOptionsBottomsheetFragment`) dan `MediaDownloaderPatch.kt` (khusus Feed, Carousel, dan Stories). Menambahkan inisialisasi `MetaUnobfuscator.init(appContext)` di kedua patch, melonggarkan guard bottom sheet, menambahkan fallback ekstraksi view media, serta membersihkan seluruh string Toast menjadi pure ASCII Bahasa Indonesia (tanpa emoji atau karakter byte rusak).
+    - *Dukungan Kloning Package Name `com.instagram.android.pikoo` & `com.whatsapp.pikoo`*:
+      - *Masalah*: Xposed module tidak mengait (hook) aplikasi Instagram dan WhatsApp kloningan pengguna.
+      - *Solusi*: Mendaftarkan `com.instagram.android.pikoo` pada `AppPatchInfo.kt` (ke `MetaPatches`), memperbarui `MainHook.kt` (`shouldHook` mengembalikan `true`), serta menambahkan kedua package name ke `arrays.xml` (`xposedscope`).
+    - *Perbaikan Crash Fatal Spotify pada Startup (`SpotifyPatches.kt`)*:
+      - *Masalah*: Aplikasi Spotify langsung mengalami crash fatal saat dibuka berdasarkan catatan log `logAndroid_Rhpatch.txt`.
+      - *Penyebab*: Penggunaan `Proxy.newProxyInstance` pada antarmuka Kotlin Flow `p.f2z` di `CoroutineClientBase.callStream` melanggar kontrak internal runtime Kotlin Coroutine (`Continuation` dispatch), serta pemulihan stream kosong `Observable.empty()` di RxJava `ClientBase.callStream` memicu `NoSuchElementException` saat Spotify mengeksekusi `.firstOrError()`. Selain itu, mutasi Protobuf pada `p.dtb0` merusak deserialisasi data sesi Spotify.
+      - *Solusi*: Menghapus hook transport Esperanto dan mutasi Protobuf yang destruktif tersebut. Mempertahankan pencegat iklan murni pada level model respons (`SubInStreamResponse`, `SubSlotResponse`, `GetSlotResponse`, `Ad.isAd() -> false`, `AutoValue_PlayerState.restrictions() -> EMPTY`, dan pembungkus aman `ProductStateMap` untuk atribut Premium).
+    - *Hasil Build & Distribusi*: APK release berhasil di-build (`BUILD SUCCESSFUL in 6m 37s`), diverifikasi dengan Android SDK 35 `apksigner` (v2 scheme valid: true), dan didistribusikan ke:
+      📁 **`C:\Users\Rhdevs\Downloads\RHpatch-v1.5.8_Spotify_Instagram_Fixed.apk`** (23,564,968 bytes).
+
+15. **Tahap 15: Implementasi Modul Ekstensi & Bytecode Patches Spotify untuk Morphe (Piko Spotify) (Terkini)**
+    - *Latar Belakang & Permintaan Pengguna*: Pengguna meminta pembuatan fitur Morphe untuk Spotify (Piko Spotify) agar pemakai Morphe CLI dapat memodifikasi APK Spotify secara mandiri (non-root / APK standalone).
+    - *Komponen Ekstensi (`extensions/spotify`)*:
+      1. `SpotifySettings.java` & `SpotifyPref.java`: Pengaturan fitur (Ad-block, Unlimited Skips, Seek, On-demand, Audio Quality, Unlimited Lyrics, Piko Debug).
+      2. `SpotifyLog.java`: Integrasi log sentral ke `/sdcard/Download/Piko/piko_debug.log`.
+      3. `SpotifyAdManager.java`: Netralisasi status iklan respon Spotify.
+      4. `SpotifyPlaybackManager.java`: Penghapusan batasan pemutaran dan bypass kuota lirik.
+      5. `SpotifyPackageSpoofer.java`: Pemalsuan package name kembali ke `com.spotify.music` untuk menjaga fungsionalitas native library C++.
+    - *Komponen Bytecode Patches (`patches/.../spotify`)*:
+      1. `SpotifyExtensionPatch.kt` & `SpotifyInitHook.kt`: Hook inisialisasi pada `SpotifyApplication->onCreate()`.
+      2. `SpotifyAdblockPatch.kt`: Blokir iklan audio/video dan peniadaan ad-break (`adBreakContext -> Absent`).
+      3. `SpotifyPlaybackRestrictionsPatch.kt`: Penghapusan pembatasan playback (`restrictions -> Restrictions.EMPTY` & `disallow*Reasons -> EMPTY`).
+      4. `SpotifyOnDemandPlaybackPatch.kt`: Pemilihan lagu langsung on-demand dan penonaktifan paksaan shuffle.
+      5. `SpotifyAudioQualityPatch.kt`: Pembukaan kualitas streaming 320kbps Extreme/Very High (`BitrateLevel.VERY_HIGH`).
+      6. `SpotifyLyricsPatch.kt`: Bypass kuota lirik bulanan (unlimited lyrics).
+      7. `SpotifyClonePatch.kt`: Kloning aplikasi ke `com.spotify.music.pikoo` dengan pembaruan authorities dan permissions manifest.
+    - *Status Kompilasi*: `:patches:compileKotlin` berhasil dikompilasi dengan **`BUILD SUCCESSFUL` (0 error)**.
+
+16. **Tahap 16: Perbaikan Tombol Downloader Instagram & Pemisahan Menu Injeksi Profil RHpatch (Rilis v1.5.9 - Terkini)**
+    - *Pemisahan Opsi Menu Profil (`RhpatchSettingsDialog.kt`)*:
+      - *Masalah*: Di menu inject profil Rhpatch, opsi Reels Downloader tidak ada, dan pengaturan hanya berupa satu toggle Media Downloader yang menyatukan Feed, Story, dan Reels.
+      - *Solusi*: Memisahkan menjadi dua toggle independen: `Media Downloader (Feed & Story)` (`pref_downloader`, default `true`) dan `Reels Downloader (HD)` (`pref_reels_downloader`, default `true`). Membersihkan karakter string non-ASCII menjadi ASCII bersih.
+    - *Perbaikan Injeksi Tombol Reels Downloader (`ReelsDownloaderPatch.kt`)*:
+      - *Masalah*: Tombol unduh video Reels HD tidak muncul di tampilan Instagram.
+      - *Penyebab*: Adanya guard kaku `if (currentClipsHelper == null && latestPlayingReelUrl == null) return` yang membatalkan injeksi saat helper belum terdeteksi.
+      - *Solusi*: Menghapus guard kaku tersebut, memeriksa `isReelsActiveContext`, menginjeksi tombol `"Unduh Video Reels (HD)"` (tag: `"rhp_reels_download_btn"`), dan mengekstrak video MP4 HD dari pemutar aktif atau root view decorator.
+    - *Perbaikan Injeksi Tombol Feed & Story Downloader (`MediaDownloaderPatch.kt`)*:
+      - *Masalah*: Tombol unduh pada postingan feed dan story tidak muncul di bottom sheet.
+      - *Penyebab*: Adanya guard kaku yang memblokir penambahan tombol jika `currentOverflowHelper` bernilai null.
+      - *Solusi*: Menghapus guard kaku, menginjeksi tombol `"Pilihan Unduhan (Rhpatch)"` (tag: `"rhp_bs_download"`), dan mengembalikan sistem menu native Piko-Style (`showPikoStyleMainMenu`, `showPikoStyleDownloadMenu`, `showPikoStyleMoreMenu`) dari backup stabil: unduh gambar HD, video MP4, audio M4A, unduh semua media carousel, dan salin caption/Media ID.
+    - *Penguatan Injeksi Tombol Profil (`ProfileSettingsPatch.kt`)*:
+      - Menggunakan `view.post` dan lifecycle hook `onResume` agar tombol floating pengaturan profil terpasang handal di seluruh jenis layout profil (`CoordinatorLayout`, `FrameLayout`, `RelativeLayout`).
+    - *Hasil Build*: APK `C:\Users\Rhdevs\Downloads\RHpatch-v1.5.9_Downloader_Fixed.apk` (23.5 MB) berhasil di-build (`BUILD SUCCESSFUL in 10m 8s`), diverifikasi dengan Android SDK 35 `apksigner` (v2 scheme valid: true), dan seluruh string/bytecode terverifikasi di `classes.dex`.
+
+17. **Tahap 17: Penyempurnaan Modul Ekstensi Spotify Piko (Full Suite Ultimate Mod) untuk Morphe CLI (Terkini)**
+    - *Latar Belakang*: Pengguna menyetujui implementasi penuh seluruh fitur modifikasi Spotify pada Morphe CLI (Pendekatan A: Full Suite Ultimate Mod) agar aplikasi Spotify bebas iklan, bebas batasan pemutar, dan memiliki antarmuka pengaturan mandiri.
+    - *Komponen Ekstensi Baru (`extensions/spotify`)*:
+      1. `SpotifyProductStateSpoofer.java`: Menginjeksi dan menyuplai atribut akun Premium (`type=premium`, `can_play_on_demand=1`, `interruption-free=1`, `ads=0`, `streaming-rules=""`, `unlimited-skips=1`, `audio-quality=very_high`).
+      2. `SpotifyAntiUpsell.java`: Mencegat evaluasi kelayakan promo dan membungkam popup upsell tawaran Premium.
+      3. `SpotifySettingsDialog.java`: Dialog multi-choice native Android untuk mengontrol seluruh switch fitur Spotify Piko secara dinamis.
+      4. `SpotifySettingsInjector.java`: Menyematkan tombol floating capsule hijau ("Piko") di kanan atas `SpotifyMainActivity` (DecorView) untuk membuka dialog pengaturan dengan 1-tap.
+      5. `SpotifySettings.java` & `SpotifyPref.java`: Ditambahkan setting `ANTI_UPSELL` dan `PRODUCT_STATE_SPOOF` dengan default `true`.
+      6. `SpotifyPlaybackManager.java`: Integrasi delegasi atribut dan penonaktifan disallow reasons.
+    - *Komponen Bytecode Patches Baru & Ditingkatkan (`patches/.../spotify`)*:
+      1. `SpotifyProductStatePatch.kt`: Membuka kapabilitas native player on-demand pada `AppProtocol$Capabilities->getCanPlayOnDemand()Ljava/lang/Boolean;` (return `Boolean.TRUE`).
+      2. `SpotifyAntiUpsellPatch.kt`: Menginjeksi `ShouldUpsellResponse` agar selalu mengembalikan enum keputusan `Lp/uf91;->d` (`UPSELL_RESULT_NO_UPSELL`), meniadakan dialog tawaran langganan.
+      3. `SpotifySettingsPatch.kt`: Menginjeksi hook `SpotifySettingsInjector->onActivityResume(Activity)` di awal method `SpotifyMainActivity->onResume()V`.
+      4. `Constants.kt`: Ditambahkan pemetaan class name untuk seluruh komponen ProductState, Upsell, Settings, dan Main Activity.
+    - *Katalog Lengkap 9 Patch Spotify Piko*:
+      1. `spotifyAdblockPatch`: Zero-ad blocker (audio, video, ad break context).
+      2. `spotifyPlaybackRestrictionsPatch`: Unlimited skips (bypass 6x/jam), seekbar/scrubbing bebas.
+      3. `spotifyOnDemandPlaybackPatch`: Pemutaran lagu langsung dari album/playlist tanpa paksaan acak.
+      4. `spotifyLyricsPatch`: Bypass limit kuota lirik bulanan (unlimited live lyrics).
+      5. `spotifyAudioQualityPatch`: Bitrate streaming tertinggi 320kbps Extreme (`VERY_HIGH`).
+      6. `spotifyProductStatePatch`: Simulasi status Premium dan kapabilitas on-demand.
+      7. `spotifyAntiUpsellPatch`: Eliminasi dialog promo dan upsell langganan.
+      8. `spotifySettingsPatch`: Tombol floating dan dialog pengaturan Piko di layar utama.
+      9. `spotifyClonePatch`: Kloning dual-install `com.spotify.music.pikoo` (`Piko Spotify`).
+    - *Status Kompilasi*: `:patches:compileKotlin` berhasil dikompilasi dengan **`BUILD SUCCESSFUL` (0 error)**.
+
 ---
 
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)

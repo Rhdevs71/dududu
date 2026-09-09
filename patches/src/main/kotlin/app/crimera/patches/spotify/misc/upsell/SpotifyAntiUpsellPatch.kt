@@ -1,0 +1,56 @@
+/*
+ * Copyright (C) 2026 piko <https://github.com/crimera/piko>
+ *
+ * See the included NOTICE file for GPLv3 §7(b) terms that apply to this code.
+ */
+
+package app.crimera.patches.spotify.misc.upsell
+
+import app.crimera.patches.spotify.misc.extension.spotifyExtensionPatch
+import app.crimera.patches.spotify.utils.Constants.COMPATIBILITY_SPOTIFY
+import app.morphe.patcher.Fingerprint
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
+import app.morphe.patcher.patch.bytecodePatch
+
+private const val SHOULD_UPSELL_RESPONSE_CLASS = "Lcom/spotify/upsells/v1/proto/ShouldUpsellResponse;"
+private const val UPSELL_RESULT_ENUM_CLASS = "Lp/uf91;"
+
+internal object ShouldUpsellResponseFingerprint : Fingerprint(
+    definingClass = SHOULD_UPSELL_RESPONSE_CLASS,
+)
+
+@Suppress("unused")
+val spotifyAntiUpsellPatch =
+    bytecodePatch(
+        name = "Spotify Clean UI & Anti-Upsell",
+        description = "Suppresses in-app subscription pop-ups (\"Dapatkan Premium\") and forces NO_UPSELL on all upsell evaluation requests.",
+    ) {
+        dependsOn(spotifyExtensionPatch)
+        compatibleWith(COMPATIBILITY_SPOTIFY)
+
+        execute {
+            ShouldUpsellResponseFingerprint.classDefOrNull?.methods?.forEach { method ->
+                // Hook getter returning the upsell decision enum
+                if (method.returnType == UPSELL_RESULT_ENUM_CLASS && method.parameters.isEmpty()) {
+                    method.addInstructions(
+                        0,
+                        """
+                        sget-object v0, $UPSELL_RESULT_ENUM_CLASS->d:$UPSELL_RESULT_ENUM_CLASS
+                        return-object v0
+                        """.trimIndent(),
+                    )
+                }
+
+                // Hook boolean checks if any
+                if (method.returnType == "Z" && method.parameters.isEmpty()) {
+                    method.addInstructions(
+                        0,
+                        """
+                        const/4 v0, 0
+                        return v0
+                        """.trimIndent(),
+                    )
+                }
+            }
+        }
+    }
