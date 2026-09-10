@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-10T15:14:51",
-  "description": "## [1.7.0](https://github.com/Rhdevs71/dududu/compare/v1.6.1...v1.7.0) (2026-09-10)\n\n### ✨ New Features\n\n* **instagram:** support bio and caption text recoloring via RCTextView and IgTextLayoutView, enforce pure ASCII ([b567100](https://github.com/Rhdevs71/dududu/commit/b56710051016c8ebf0e3cc99d4927a26b63e8e35))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.7.0/patches-1.7.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.7.0/patches-1.7.0.mpp.asc",
-  "version": "1.7.0"
+  "created_at": "2026-09-10T21:24:41",
+  "description": "## [1.7.1](https://github.com/Rhdevs71/dududu/compare/v1.7.0...v1.7.1) (2026-09-10)\n\n### 🔧 Improvements\n\n* **instagram:** optimize text color manager for 120fps zero-lag, remove brackets from menu titles, and remove video speed card ([7d8c7f1](https://github.com/Rhdevs71/dududu/commit/7d8c7f118267120dd0194cec44f63d7dae8e09da))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.7.1/patches-1.7.1.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.7.1/patches-1.7.1.mpp.asc",
+  "version": "1.7.1"
 }

@@ -1,3 +1,9 @@
+## [1.7.1](https://github.com/Rhdevs71/dududu/compare/v1.7.0...v1.7.1) (2026-09-10)
+
+### 🔧 Improvements
+
+* **instagram:** optimize text color manager for 120fps zero-lag, remove brackets from menu titles, and remove video speed card ([7d8c7f1](https://github.com/Rhdevs71/dududu/commit/7d8c7f118267120dd0194cec44f63d7dae8e09da))
+
 ## [1.7.0](https://github.com/Rhdevs71/dududu/compare/v1.6.1...v1.7.0) (2026-09-10)
 
 ### ✨ New Features
