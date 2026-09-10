@@ -85,12 +85,22 @@ public class ProfileMoreOption {
             contentLayout.addView(subView);
 
             // Action Items
+            interface ActionRunnable {
+                void run() throws Exception;
+            }
+
             class ActionItem {
                 final String label;
                 final Runnable action;
-                ActionItem(String label, Runnable action) {
+                ActionItem(String label, ActionRunnable act) {
                     this.label = label;
-                    this.action = action;
+                    this.action = () -> {
+                        try {
+                            act.run();
+                        } catch (Throwable t) {
+                            PikoLog.e("ProfileMoreOption", "Action failed: " + label, t);
+                        }
+                    };
                 }
             }
 

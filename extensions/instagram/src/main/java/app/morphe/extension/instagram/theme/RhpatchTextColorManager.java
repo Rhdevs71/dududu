@@ -11,6 +11,10 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -81,12 +85,12 @@ public class RhpatchTextColorManager {
                 public boolean onPreDraw() {
                     if (isEnabled() && !isScheduled) {
                         isScheduled = true;
-                        mainHandler.postDelayed(() -> {
+                        mainHandler.post(() -> {
                             isScheduled = false;
                             try {
                                 applyToViewTree(decorView, isEnabled(), getParsedColor());
                             } catch (Throwable ignored) {}
-                        }, 60);
+                        });
                     }
                     return true;
                 }
@@ -110,7 +114,7 @@ public class RhpatchTextColorManager {
     public static void applyToViewTree(View view, boolean enabled, int targetColor) {
         if (view == null) return;
 
-        // Skip our own floating capsule and dialog so they stay readable with their native themes
+        // Lewatkan komponen internal RHpatch (kapsul mengambang, dialog studio, dll.) agar tetap terbaca
         Object tag = view.getTag();
         if (tag != null && tag.toString().startsWith("rhpatch_")) {
             return;
@@ -123,13 +127,47 @@ public class RhpatchTextColorManager {
                     tv.setTag(TAG_ORIG_COLOR, tv.getTextColors());
                 }
                 tv.setTextColor(targetColor);
+                try {
+                    tv.setLinkTextColor(targetColor);
+                } catch (Throwable ignored) {}
+                try {
+                    tv.setHighlightColor(Color.argb(70, Color.red(targetColor), Color.green(targetColor), Color.blue(targetColor)));
+                } catch (Throwable ignored) {}
+
+                // Menangani teks berformat Spanned (username di komentar, caption, mention @, dan hashtag #)
+                try {
+                    CharSequence text = tv.getText();
+                    if (text instanceof Spanned && text.length() > 0) {
+                        Spanned spanned = (Spanned) text;
+                        ForegroundColorSpan[] fgSpans = spanned.getSpans(0, spanned.length(), ForegroundColorSpan.class);
+                        if (fgSpans != null && fgSpans.length > 0) {
+                            Spannable spannable = (text instanceof Spannable) ? (Spannable) text : new SpannableString(text);
+                            boolean changed = false;
+                            for (ForegroundColorSpan span : fgSpans) {
+                                if (span.getForegroundColor() != targetColor) {
+                                    int start = spannable.getSpanStart(span);
+                                    int end = spannable.getSpanEnd(span);
+                                    int flags = spannable.getSpanFlags(span);
+                                    spannable.removeSpan(span);
+                                    spannable.setSpan(new ForegroundColorSpan(targetColor), start, end, flags);
+                                    changed = true;
+                                }
+                            }
+                            if (changed && !(text instanceof Spannable)) {
+                                tv.setText(spannable);
+                            }
+                        }
+                    }
+                } catch (Throwable ignored) {}
             } else {
                 Object orig = tv.getTag(TAG_ORIG_COLOR);
                 if (orig instanceof ColorStateList) {
                     tv.setTextColor((ColorStateList) orig);
                 }
             }
-        } else if (view instanceof ViewGroup) {
+        }
+
+        if (view instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) view;
             int count = vg.getChildCount();
             for (int i = 0; i < count; i++) {
