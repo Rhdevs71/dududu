@@ -65,7 +65,7 @@ public class ProfileMoreOption {
             // Header Title
             android.widget.TextView titleView = new android.widget.TextView(context);
             String uName = userData.getUsername() != null ? "@" + userData.getUsername() : "";
-            titleView.setText("[AKSI PROFIL] " + uName);
+            titleView.setText("Aksi Profil " + uName);
             titleView.setTextColor(android.graphics.Color.WHITE);
             titleView.setTextSize(17f);
             titleView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);

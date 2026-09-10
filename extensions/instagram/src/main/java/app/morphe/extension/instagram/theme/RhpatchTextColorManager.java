@@ -16,7 +16,6 @@ import android.os.SystemClock;
 import android.text.Layout;
 import android.text.Spanned;
 import android.text.TextPaint;
-import android.text.style.ClickableSpan;
 import android.text.style.ForegroundColorSpan;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +37,7 @@ public class RhpatchTextColorManager {
     public static final String DEFAULT_COLOR_HEX = "#FFD700"; // Luxury Gold
     private static final int TAG_ORIG_COLOR = 0x7e090001;
     private static final int TAG_LISTENER_ATTACHED = 0x7e090002;
+    private static final int TAG_APPLIED_COLOR = 0x7e090003;
 
     public static final String[] PRESET_NAMES = new String[] {
         "Luxury Gold", "Emerald Green", "Sunset Magenta", "Cyber Cyan", "Royal Purple",
@@ -49,9 +49,24 @@ public class RhpatchTextColorManager {
         "#FF7A00", "#F48FB1", "#2979FF", "#EEFF41", "#FFFFFF"
     };
 
-    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
+    // Cache refleksi statis untuk performa instan tanpa melempar exception di UI Thread
     private static Field fgColorField = null;
     private static boolean fgColorFieldInit = false;
+
+    private static Method mGetTextLayout = null;
+    private static boolean mGetTextLayoutInit = false;
+
+    private static Method mGetLayout = null;
+    private static boolean mGetLayoutInit = false;
+
+    private static Field fLayoutA02 = null;
+    private static boolean fLayoutA02Init = false;
+
+    private static Field fLayoutA0B = null;
+    private static boolean fLayoutA0BInit = false;
+
+    private static Field fRcA0Q = null;
+    private static boolean fRcA0QInit = false;
 
     public static boolean isEnabled() {
         return Boolean.TRUE.equals(SharedPref.getBooleanPref(CUSTOM_TEXT_COLOR_ENABLED));
@@ -92,13 +107,15 @@ public class RhpatchTextColorManager {
                 decorView.setTag(TAG_LISTENER_ATTACHED, Boolean.TRUE);
 
                 ViewTreeObserver vto = decorView.getViewTreeObserver();
+                // Gunakan OnPreDrawListener terukur (200ms debounce) tanpa OnGlobalLayoutListener
+                // untuk menjamin kestabilan 120 FPS tanpa drop frame / lag saat scroll
                 vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                     private long lastRun = 0;
                     @Override
                     public boolean onPreDraw() {
                         if (isEnabled()) {
                             long now = SystemClock.uptimeMillis();
-                            if (now - lastRun > 100) {
+                            if (now - lastRun > 200) {
                                 lastRun = now;
                                 try {
                                     applyToViewTree(decorView, true, getParsedColor());
@@ -106,17 +123,6 @@ public class RhpatchTextColorManager {
                             }
                         }
                         return true;
-                    }
-                });
-
-                vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        if (isEnabled()) {
-                            try {
-                                applyToViewTree(decorView, true, getParsedColor());
-                            } catch (Throwable ignored) {}
-                        }
                     }
                 });
             }
@@ -146,28 +152,40 @@ public class RhpatchTextColorManager {
             return;
         }
 
-        // 1. Tangani TextView standar (dan subclass-nya: IgTextView, EditText, dll.)
+        // 1. Tangani TextView standar (IgTextView, EditText, ActionTextView, dll.)
         if (view instanceof TextView) {
             processTextView((TextView) view, enabled, targetColor);
-        } else {
-            // 2. Tangani RCTextView (RenderCore/Litho bio), IgTextLayoutView (caption feed/komentar),
-            //    dan view kustom lainnya yang menggambar Layout / TextPaint secara mandiri
-            processLayoutOrCustomView(view, enabled, targetColor);
+            return;
         }
 
-        // 3. Telusuri anak-anak jika merupakan ViewGroup
+        // 2. Strict Type Guard untuk ViewGroup:
+        // Kontainer tata letak (FrameLayout, LinearLayout, RecyclerView, dll.) HANYA menelusuri anaknya.
+        // SAMA SEKALI TIDAK menjalankan refleksi pada ViewGroup!
         if (view instanceof ViewGroup) {
             ViewGroup vg = (ViewGroup) view;
             int count = vg.getChildCount();
             for (int i = 0; i < count; i++) {
                 applyToViewTree(vg.getChildAt(i), enabled, targetColor);
             }
+            return;
+        }
+
+        // 3. View Daun Non-TextView (hanya proses jika merupakan IgTextLayoutView atau RCTextView)
+        String className = view.getClass().getName();
+        if (className.contains("IgTextLayoutView") || className.contains("RCTextView")) {
+            processCustomTextView(view, enabled, targetColor, className);
         }
     }
 
     private static void processTextView(TextView tv, boolean enabled, int targetColor) {
         try {
             if (enabled) {
+                // Periksa apakah view ini sudah terwarnai dengan warna yang sama (skip instan 0ms)
+                Object applied = tv.getTag(TAG_APPLIED_COLOR);
+                if (applied instanceof Integer && (Integer) applied == targetColor && tv.getCurrentTextColor() == targetColor) {
+                    return;
+                }
+
                 if (tv.getTag(TAG_ORIG_COLOR) == null) {
                     tv.setTag(TAG_ORIG_COLOR, tv.getTextColors());
                 }
@@ -190,7 +208,10 @@ public class RhpatchTextColorManager {
                 if (text instanceof Spanned && text.length() > 0) {
                     recolorSpanned((Spanned) text, targetColor);
                 }
+
+                tv.setTag(TAG_APPLIED_COLOR, targetColor);
             } else {
+                tv.setTag(TAG_APPLIED_COLOR, null);
                 Object orig = tv.getTag(TAG_ORIG_COLOR);
                 if (orig instanceof ColorStateList) {
                     tv.setTextColor((ColorStateList) orig);
@@ -200,15 +221,19 @@ public class RhpatchTextColorManager {
         } catch (Throwable ignored) {}
     }
 
-    private static void processLayoutOrCustomView(View view, boolean enabled, int targetColor) {
+    private static void processCustomTextView(View view, boolean enabled, int targetColor, String className) {
         try {
-            String className = view.getClass().getName();
+            if (enabled) {
+                // Periksa apakah view ini sudah terwarnai dengan warna yang sama (skip instan 0ms)
+                Object applied = view.getTag(TAG_APPLIED_COLOR);
+                if (applied instanceof Integer && (Integer) applied == targetColor) {
+                    return;
+                }
 
-            Layout layout = extractLayout(view);
-            if (layout != null) {
-                TextPaint paint = layout.getPaint();
-                if (paint != null) {
-                    if (enabled) {
+                Layout layout = extractLayoutCached(view, className);
+                if (layout != null) {
+                    TextPaint paint = layout.getPaint();
+                    if (paint != null) {
                         boolean modified = false;
                         if (paint.getColor() != targetColor) {
                             if (view.getTag(TAG_ORIG_COLOR) == null) {
@@ -230,98 +255,95 @@ public class RhpatchTextColorManager {
                         if (modified) {
                             view.invalidate();
                         }
-                    } else {
-                        Object orig = view.getTag(TAG_ORIG_COLOR);
-                        if (orig instanceof Integer) {
-                            paint.setColor((Integer) orig);
-                            view.setTag(TAG_ORIG_COLOR, null);
-                            view.invalidate();
-                        }
                     }
                 }
-            }
 
-            // Tangani Paint kustom atau getPaint() pada view jika ada
-            try {
-                Method getPaintMethod = view.getClass().getMethod("getPaint");
-                Object p = getPaintMethod.invoke(view);
-                if (p instanceof Paint) {
-                    Paint paint = (Paint) p;
-                    if (enabled) {
-                        if (paint.getColor() != targetColor) {
-                            paint.setColor(targetColor);
-                            if (paint instanceof TextPaint) {
-                                ((TextPaint) paint).linkColor = targetColor;
-                            }
-                            view.invalidate();
+                // Tangani field ColorStateList A0Q pada RCTextView
+                if (className.contains("RCTextView")) {
+                    try {
+                        if (!fRcA0QInit) {
+                            fRcA0QInit = true;
+                            fRcA0Q = view.getClass().getDeclaredField("A0Q");
+                            fRcA0Q.setAccessible(true);
                         }
+                        if (fRcA0Q != null) {
+                            fRcA0Q.set(view, ColorStateList.valueOf(targetColor));
+                        }
+                    } catch (Throwable ignored) {}
+                }
+
+                view.setTag(TAG_APPLIED_COLOR, targetColor);
+            } else {
+                view.setTag(TAG_APPLIED_COLOR, null);
+                Object orig = view.getTag(TAG_ORIG_COLOR);
+                if (orig instanceof Integer) {
+                    Layout layout = extractLayoutCached(view, className);
+                    if (layout != null && layout.getPaint() != null) {
+                        layout.getPaint().setColor((Integer) orig);
+                        view.setTag(TAG_ORIG_COLOR, null);
+                        view.invalidate();
                     }
                 }
-            } catch (Throwable ignored) {}
-
-            // Tangani field ColorStateList A0Q pada RCTextView
-            if (className.contains("RCTextView")) {
-                try {
-                    Field f = view.getClass().getDeclaredField("A0Q");
-                    f.setAccessible(true);
-                    f.set(view, ColorStateList.valueOf(targetColor));
-                } catch (Throwable ignored) {}
             }
         } catch (Throwable ignored) {}
     }
 
-    private static Layout extractLayout(View view) {
+    private static Layout extractLayoutCached(View view, String className) {
         if (view == null) return null;
 
-        // 1. Coba panggil method publik / declared
-        try {
-            Method m = view.getClass().getMethod("getTextLayout");
-            Object res = m.invoke(view);
-            if (res instanceof Layout) return (Layout) res;
-        } catch (Throwable ignored) {}
+        Class<?> cls = view.getClass();
 
-        try {
-            Method m = view.getClass().getMethod("getLayout");
-            Object res = m.invoke(view);
-            if (res instanceof Layout) return (Layout) res;
-        } catch (Throwable ignored) {}
-
-        // 2. Coba field yang sering digunakan Instagram (A02 di IgTextLayoutView, A0B di RCTextView, mLayout)
-        try {
-            Field f = view.getClass().getDeclaredField("A02");
-            f.setAccessible(true);
-            Object res = f.get(view);
-            if (res instanceof Layout) return (Layout) res;
-        } catch (Throwable ignored) {}
-
-        try {
-            Field f = view.getClass().getDeclaredField("A0B");
-            f.setAccessible(true);
-            Object res = f.get(view);
-            if (res instanceof Layout) return (Layout) res;
-        } catch (Throwable ignored) {}
-
-        try {
-            Field f = view.getClass().getDeclaredField("mLayout");
-            f.setAccessible(true);
-            Object res = f.get(view);
-            if (res instanceof Layout) return (Layout) res;
-        } catch (Throwable ignored) {}
-
-        // 3. Fallback: telusuri field yang bertipe Layout
-        try {
-            Class<?> curr = view.getClass();
-            while (curr != null && curr != View.class && curr != Object.class) {
-                for (Field f : curr.getDeclaredFields()) {
-                    if (Layout.class.isAssignableFrom(f.getType())) {
-                        f.setAccessible(true);
-                        Object res = f.get(view);
-                        if (res instanceof Layout) return (Layout) res;
-                    }
+        // 1. IgTextLayoutView: coba getTextLayout() atau field A02
+        if (className.contains("IgTextLayoutView")) {
+            try {
+                if (!mGetTextLayoutInit) {
+                    mGetTextLayoutInit = true;
+                    mGetTextLayout = cls.getMethod("getTextLayout");
                 }
-                curr = curr.getSuperclass();
-            }
-        } catch (Throwable ignored) {}
+                if (mGetTextLayout != null) {
+                    Object res = mGetTextLayout.invoke(view);
+                    if (res instanceof Layout) return (Layout) res;
+                }
+            } catch (Throwable ignored) {}
+
+            try {
+                if (!fLayoutA02Init) {
+                    fLayoutA02Init = true;
+                    fLayoutA02 = cls.getDeclaredField("A02");
+                    fLayoutA02.setAccessible(true);
+                }
+                if (fLayoutA02 != null) {
+                    Object res = fLayoutA02.get(view);
+                    if (res instanceof Layout) return (Layout) res;
+                }
+            } catch (Throwable ignored) {}
+        }
+
+        // 2. RCTextView: coba getLayout() atau field A0B
+        if (className.contains("RCTextView")) {
+            try {
+                if (!mGetLayoutInit) {
+                    mGetLayoutInit = true;
+                    mGetLayout = cls.getMethod("getLayout");
+                }
+                if (mGetLayout != null) {
+                    Object res = mGetLayout.invoke(view);
+                    if (res instanceof Layout) return (Layout) res;
+                }
+            } catch (Throwable ignored) {}
+
+            try {
+                if (!fLayoutA0BInit) {
+                    fLayoutA0BInit = true;
+                    fLayoutA0B = cls.getDeclaredField("A0B");
+                    fLayoutA0B.setAccessible(true);
+                }
+                if (fLayoutA0B != null) {
+                    Object res = fLayoutA0B.get(view);
+                    if (res instanceof Layout) return (Layout) res;
+                }
+            } catch (Throwable ignored) {}
+        }
 
         return null;
     }
@@ -329,46 +351,22 @@ public class RhpatchTextColorManager {
     private static void recolorSpanned(Spanned spanned, int targetColor) {
         if (spanned == null || spanned.length() == 0) return;
         try {
-            Object[] spans = spanned.getSpans(0, spanned.length(), Object.class);
+            // Hanya ambil ForegroundColorSpan secara terarah tanpa Object.class generik
+            ForegroundColorSpan[] spans = spanned.getSpans(0, spanned.length(), ForegroundColorSpan.class);
             if (spans != null && spans.length > 0) {
-                for (Object span : spans) {
-                    recolorSpan(span, targetColor);
+                if (!fgColorFieldInit) {
+                    fgColorFieldInit = true;
+                    try {
+                        fgColorField = ForegroundColorSpan.class.getDeclaredField("mColor");
+                        fgColorField.setAccessible(true);
+                    } catch (Throwable ignored) {}
                 }
-            }
-        } catch (Throwable ignored) {}
-    }
 
-    private static void recolorSpan(Object span, int targetColor) {
-        if (span == null) return;
-
-        // Inisialisasi cache field mColor pada ForegroundColorSpan
-        if (!fgColorFieldInit) {
-            fgColorFieldInit = true;
-            try {
-                fgColorField = ForegroundColorSpan.class.getDeclaredField("mColor");
-                fgColorField.setAccessible(true);
-            } catch (Throwable ignored) {}
-        }
-
-        // 1. Jika merupakan ForegroundColorSpan atau turunannya
-        if (span instanceof ForegroundColorSpan && fgColorField != null) {
-            try {
-                fgColorField.setInt(span, targetColor);
-            } catch (Throwable ignored) {}
-        }
-
-        // 2. Periksa field int warna kustom pada span obfuscated Instagram
-        try {
-            Class<?> cls = span.getClass();
-            if (cls != ForegroundColorSpan.class) {
-                for (Field f : cls.getDeclaredFields()) {
-                    if (f.getType() == int.class) {
-                        f.setAccessible(true);
-                        int val = f.getInt(span);
-                        // Nilai warna ARGB memiliki alpha 0xFF (val < -1 atau val > 0x00FFFFFF)
-                        if ((val & 0xFF000000) != 0 && (val < -1 || val > 0x00FFFFFF)) {
-                            f.setInt(span, targetColor);
-                        }
+                if (fgColorField != null) {
+                    for (ForegroundColorSpan span : spans) {
+                        try {
+                            fgColorField.setInt(span, targetColor);
+                        } catch (Throwable ignored) {}
                     }
                 }
             }

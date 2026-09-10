@@ -81,7 +81,7 @@ public class RhpatchInstagramDialog {
 
     private static final CategoryGroup[] CATEGORIES = new CategoryGroup[] {
         new CategoryGroup(
-            "[1] Privasi & Keamanan Akun",
+            "1. Privasi & Keamanan Akun",
             "Kunci App, Anti-Revoke DM, Anti-Screenshot, Stealth Mode",
             new SettingItem[] {
                 new SettingItem(
@@ -123,7 +123,7 @@ public class RhpatchInstagramDialog {
         ),
 
         new CategoryGroup(
-            "[2] Mode Siluman (Ghost Mode)",
+            "2. Mode Siluman (Ghost Mode)",
             "Lihat Cerita & Live Anonim, Tanda Dibaca Manual",
             new SettingItem[] {
                 new SettingItem(
@@ -150,7 +150,7 @@ public class RhpatchInstagramDialog {
         ),
 
         new CategoryGroup(
-            "[3] Iklan & Bebas Gangguan",
+            "3. Iklan & Bebas Gangguan",
             "Blokir Iklan Feed, Hilangkan Konten Saran & Tray",
             new SettingItem[] {
                 new SettingItem(
@@ -197,7 +197,7 @@ public class RhpatchInstagramDialog {
         ),
 
         new CategoryGroup(
-            "[4] Pusat Unduhan (Downloader)",
+            "4. Pusat Unduhan (Downloader)",
             "Unduh Media Resolusi Asli & Folder Username",
             new SettingItem[] {
                 new SettingItem(
@@ -219,7 +219,7 @@ public class RhpatchInstagramDialog {
         ),
 
         new CategoryGroup(
-            "[5] Fitur Eksklusif IG Plus & Profil",
+            "5. Fitur Eksklusif IG Plus & Profil",
             "Follow-Back Badge, Opsi Postingan, Salin Komentar, Loop Story",
             new SettingItem[] {
                 new SettingItem(
@@ -271,7 +271,7 @@ public class RhpatchInstagramDialog {
         ),
 
         new CategoryGroup(
-            "[6] Pengaturan Lanjutan & Developer",
+            "6. Pengaturan Lanjutan & Developer",
             "MetaConfig, Employee Options, AMOLED Murni, Clean URL",
             new SettingItem[] {
                 new SettingItem(
@@ -459,7 +459,7 @@ public class RhpatchInstagramDialog {
                 profileCard.setLayoutParams(pLp);
 
                 TextView pTitle = new TextView(context);
-                pTitle.setText("[AKSI PROFIL] @" + targetUser.getUsername());
+                pTitle.setText("Aksi Profil @" + targetUser.getUsername());
                 pTitle.setTextColor(Color.WHITE);
                 pTitle.setTextSize(14f);
                 pTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
@@ -581,7 +581,7 @@ public class RhpatchInstagramDialog {
             themeHeader.setGravity(Gravity.CENTER_VERTICAL);
 
             TextView themeTitle = new TextView(context);
-            themeTitle.setText("[WARNA TEKS] Studio Warna Teks Kustom");
+            themeTitle.setText("Studio Warna Teks Kustom");
             themeTitle.setTextColor(Color.WHITE);
             themeTitle.setTextSize(13.5f);
             themeTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
@@ -719,144 +719,6 @@ public class RhpatchInstagramDialog {
             });
 
             contentContainer.addView(themeCard);
-
-            // ------------------------------------------
-            // C. KONTROL KECEPATAN VIDEO & REELS CARD
-            // ------------------------------------------
-            LinearLayout speedCard = new LinearLayout(context);
-            speedCard.setOrientation(LinearLayout.VERTICAL);
-            GradientDrawable sBg = new GradientDrawable();
-            sBg.setColor(Color.parseColor(CARD_BG_COLOR));
-            sBg.setCornerRadius(14 * density);
-            sBg.setStroke((int) (1 * density), Color.parseColor(CARD_BORDER_COLOR));
-            speedCard.setBackground(sBg);
-            speedCard.setPadding(tPad, tPad, tPad, tPad);
-
-            LinearLayout.LayoutParams spLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            spLp.bottomMargin = (int) (14 * density);
-            speedCard.setLayoutParams(spLp);
-
-            TextView spTitle = new TextView(context);
-            spTitle.setText("[KECEPATAN VIDEO] Kontrol Kecepatan Reels & Video");
-            spTitle.setTextColor(Color.WHITE);
-            spTitle.setTextSize(13.5f);
-            spTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
-            speedCard.addView(spTitle);
-
-            TextView spDesc = new TextView(context);
-            spDesc.setText("Pilih kecepatan pemutaran untuk video reels dan feed:");
-            spDesc.setTextColor(Color.parseColor("#A7A7A7"));
-            spDesc.setTextSize(11f);
-            LinearLayout.LayoutParams spdLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            spdLp.topMargin = (int) (3 * density);
-            spdLp.bottomMargin = (int) (10 * density);
-            spDesc.setLayoutParams(spdLp);
-            speedCard.addView(spDesc);
-
-            // Speed Selector Buttons
-            HorizontalScrollView speedScrollView = new HorizontalScrollView(context);
-            speedScrollView.setHorizontalScrollBarEnabled(false);
-            LinearLayout speedRow = new LinearLayout(context);
-            speedRow.setOrientation(LinearLayout.HORIZONTAL);
-
-            final float[] speeds = new float[] { 0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f };
-            final String[] speedNames = new String[] { "0.5x", "0.75x", "1.0x (Normal)", "1.25x", "1.5x", "2.0x" };
-            final List<TextView> speedBtnList = new ArrayList<>();
-
-            float activeSpeed = PlaybackSpeedController.isSpeedLockEnabled() ?
-                PlaybackSpeedController.getLockedSpeed() : PlaybackSpeedController.currentPlaybackSpeed;
-
-            for (int s = 0; s < speeds.length; s++) {
-                final float spdVal = speeds[s];
-                final String spdTxt = speedNames[s];
-
-                final TextView speedBtn = new TextView(context);
-                speedBtn.setText(spdTxt);
-                speedBtn.setTextSize(11.5f);
-                speedBtn.setTypeface(Typeface.DEFAULT_BOLD);
-                speedBtn.setGravity(Gravity.CENTER);
-
-                boolean isCurrent = Math.abs(activeSpeed - spdVal) < 0.05f;
-                applySpeedBtnStyle(speedBtn, isCurrent, density);
-
-                int sbPadH = (int) (11 * density);
-                int sbPadV = (int) (7 * density);
-                speedBtn.setPadding(sbPadH, sbPadV, sbPadH, sbPadV);
-
-                LinearLayout.LayoutParams sbLp = new LinearLayout.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                );
-                sbLp.rightMargin = (int) (6 * density);
-                speedBtn.setLayoutParams(sbLp);
-
-                speedBtn.setOnClickListener(v -> {
-                    PlaybackSpeedController.applySpeed(spdVal);
-                    if (PlaybackSpeedController.isSpeedLockEnabled()) {
-                        PlaybackSpeedController.setLockedSpeed(spdVal);
-                    }
-                    for (int k = 0; k < speeds.length; k++) {
-                        applySpeedBtnStyle(speedBtnList.get(k), speeds[k] == spdVal, density);
-                    }
-                    Toast.makeText(context, "Kecepatan video: " + spdTxt, Toast.LENGTH_SHORT).show();
-                });
-
-                speedBtnList.add(speedBtn);
-                speedRow.addView(speedBtn);
-            }
-
-            speedScrollView.addView(speedRow);
-            speedCard.addView(speedScrollView);
-
-            // Speed Lock Toggle
-            LinearLayout lockRow = new LinearLayout(context);
-            lockRow.setOrientation(LinearLayout.HORIZONTAL);
-            lockRow.setGravity(Gravity.CENTER_VERTICAL);
-            LinearLayout.LayoutParams lrLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            lrLp.topMargin = (int) (12 * density);
-            lockRow.setLayoutParams(lrLp);
-
-            LinearLayout lockTextCol = new LinearLayout(context);
-            lockTextCol.setOrientation(LinearLayout.VERTICAL);
-            LinearLayout.LayoutParams ltcLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
-            lockTextCol.setLayoutParams(ltcLp);
-
-            TextView lockTitle = new TextView(context);
-            lockTitle.setText("Kunci Kecepatan Default (Lock Speed)");
-            lockTitle.setTextColor(Color.WHITE);
-            lockTitle.setTextSize(13f);
-            lockTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
-            lockTextCol.addView(lockTitle);
-
-            TextView lockDesc = new TextView(context);
-            lockDesc.setText("Otomatis putar semua Reels & Video pada kecepatan yang dipilih secara permanen.");
-            lockDesc.setTextColor(Color.parseColor("#A7A7A7"));
-            lockDesc.setTextSize(11f);
-            lockTextCol.addView(lockDesc);
-
-            lockRow.addView(lockTextCol);
-
-            Switch lockSwitch = createSwitch(context, PlaybackSpeedController.isSpeedLockEnabled());
-            lockSwitch.setOnCheckedChangeListener((btn, checked) -> {
-                PlaybackSpeedController.setSpeedLockEnabled(checked);
-                if (checked) {
-                    PlaybackSpeedController.setLockedSpeed(PlaybackSpeedController.currentPlaybackSpeed);
-                }
-                Toast.makeText(context, checked ? "Kecepatan video dikunci permanen" : "Kunci kecepatan dinonaktifkan", Toast.LENGTH_SHORT).show();
-            });
-            lockRow.addView(lockSwitch);
-
-            speedCard.addView(lockRow);
-            contentContainer.addView(speedCard);
 
             // ------------------------------------------
             // D. MENU KATEGORI PENGATURAN (Clean Categorized Navigation)
@@ -1285,19 +1147,6 @@ public class RhpatchInstagramDialog {
         return toggle;
     }
 
-    private static void applySpeedBtnStyle(TextView btn, boolean isSelected, float density) {
-        GradientDrawable bg = new GradientDrawable();
-        if (isSelected) {
-            bg.setColor(Color.parseColor(ACCENT_COLOR));
-            btn.setTextColor(Color.WHITE);
-        } else {
-            bg.setColor(Color.parseColor("#222222"));
-            bg.setStroke((int) (1 * density), Color.parseColor("#333333"));
-            btn.setTextColor(Color.parseColor("#CCCCCC"));
-        }
-        bg.setCornerRadius(14 * density);
-        btn.setBackground(bg);
-    }
 
     private static void showCustomHexDialog(final Context context, final TextView previewBox) {
         try {
