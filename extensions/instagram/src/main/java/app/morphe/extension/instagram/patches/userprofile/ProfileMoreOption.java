@@ -46,7 +46,7 @@ public class ProfileMoreOption {
         try {
             float density = context.getResources().getDisplayMetrics().density;
             android.app.Dialog dialog = new android.app.Dialog(context);
-            dialog.requestWindowFeature(android.view.WindowFeature.NO_TITLE);
+            dialog.requestWindowFeature(android.view.Window.FEATURE_NO_TITLE);
 
             android.widget.ScrollView scrollView = new android.widget.ScrollView(context);
             scrollView.setVerticalScrollBarEnabled(false);
