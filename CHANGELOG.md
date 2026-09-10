@@ -1,3 +1,9 @@
+## [1.7.0](https://github.com/Rhdevs71/dududu/compare/v1.6.1...v1.7.0) (2026-09-10)
+
+### ✨ New Features
+
+* **instagram:** support bio and caption text recoloring via RCTextView and IgTextLayoutView, enforce pure ASCII ([b567100](https://github.com/Rhdevs71/dududu/commit/b56710051016c8ebf0e3cc99d4927a26b63e8e35))
+
 ## [1.6.1](https://github.com/Rhdevs71/dududu/compare/v1.6.0...v1.6.1) (2026-09-10)
 
 ### 🐛 Bug Fixes

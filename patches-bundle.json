@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-10T13:44:10",
-  "description": "## [1.6.1](https://github.com/Rhdevs71/dududu/compare/v1.6.0...v1.6.1) (2026-09-10)\n\n### 🐛 Bug Fixes\n\n* **instagram:** correct Window.FEATURE_NO_TITLE reference in ProfileMoreOption ([84f3d86](https://github.com/Rhdevs71/dududu/commit/84f3d861065aeceda3428cf0e9dc440c509f096f))\n* **instagram:** support username and comment spans in custom text color, and resolve ActionRunnable checked exceptions in ProfileMoreOption ([14fcc05](https://github.com/Rhdevs71/dududu/commit/14fcc05fa934d826bc051dbf32e8c4f156d1e207))\n* **rhpatch:** fix spotify nmj verifyerror, categorize instagram studio menu without emojis, remove profile 3-dots button, and rebrand settings to rhpatch ([a29a812](https://github.com/Rhdevs71/dududu/commit/a29a81205beca8229ff74cd033ecd7ced905701a))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.6.1/patches-1.6.1.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.6.1/patches-1.6.1.mpp.asc",
-  "version": "1.6.1"
+  "created_at": "2026-09-10T15:14:51",
+  "description": "## [1.7.0](https://github.com/Rhdevs71/dududu/compare/v1.6.1...v1.7.0) (2026-09-10)\n\n### ✨ New Features\n\n* **instagram:** support bio and caption text recoloring via RCTextView and IgTextLayoutView, enforce pure ASCII ([b567100](https://github.com/Rhdevs71/dududu/commit/b56710051016c8ebf0e3cc99d4927a26b63e8e35))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.7.0/patches-1.7.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.7.0/patches-1.7.0.mpp.asc",
+  "version": "1.7.0"
 }
