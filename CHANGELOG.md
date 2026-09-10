@@ -1,3 +1,11 @@
+## [1.6.1](https://github.com/Rhdevs71/dududu/compare/v1.6.0...v1.6.1) (2026-09-10)
+
+### 🐛 Bug Fixes
+
+* **instagram:** correct Window.FEATURE_NO_TITLE reference in ProfileMoreOption ([84f3d86](https://github.com/Rhdevs71/dududu/commit/84f3d861065aeceda3428cf0e9dc440c509f096f))
+* **instagram:** support username and comment spans in custom text color, and resolve ActionRunnable checked exceptions in ProfileMoreOption ([14fcc05](https://github.com/Rhdevs71/dududu/commit/14fcc05fa934d826bc051dbf32e8c4f156d1e207))
+* **rhpatch:** fix spotify nmj verifyerror, categorize instagram studio menu without emojis, remove profile 3-dots button, and rebrand settings to rhpatch ([a29a812](https://github.com/Rhdevs71/dududu/commit/a29a81205beca8229ff74cd033ecd7ced905701a))
+
 ## [1.6.0](https://github.com/Rhdevs71/dududu/compare/v1.5.1...v1.6.0) (2026-09-09)
 
 ### 🐛 Bug Fixes
