@@ -172,12 +172,12 @@
     <string name="piko_hide_navigation_create">Sembunyikan tombol Buat</string>
     <!-- Information Section -->
     <string name="piko_category_about">Tentang</string>
-    <string name="piko_export_pref">Ekspor preferensi Piko</string>
-    <string name="piko_import_pref">Impor preferensi Piko</string>
-    <string name="piko_reset_pref">Atur ulang pengaturan Piko</string>
-    <string name="piko_reset_pref_confirm">Atur ulang pengaturan Piko?</string>
-    <string name="piko_reset_pref_success">Pengaturan Piko diatur ulang</string>
-    <string name="piko_reset_pref_failed">Gagal mengatur ulang pengaturan Piko</string>
+    <string name="piko_export_pref">Ekspor preferensi RHpatch</string>
+    <string name="piko_import_pref">Impor preferensi RHpatch</string>
+    <string name="piko_reset_pref">Atur ulang pengaturan RHpatch</string>
+    <string name="piko_reset_pref_confirm">Atur ulang pengaturan RHpatch?</string>
+    <string name="piko_reset_pref_success">Pengaturan RHpatch diatur ulang</string>
+    <string name="piko_reset_pref_failed">Gagal mengatur ulang pengaturan RHpatch</string>
     <string name="piko_app_version">Versi aplikasi: %s</string>
     <string name="piko_patch_version">Versi tambalan: %s</string>
     <string name="piko_patch_info_title">Informasi tambalan</string>
@@ -194,7 +194,7 @@
     <string name="piko_ok">OKE</string>
     <string name="piko_cancel">Batalkan</string>
     <string name="piko_deleted">Dihapus</string>
-    <string name="piko_debug">Debug Piko</string>
+    <string name="piko_debug">Debug RHpatch</string>
     <string name="piko_debug_desc">Menambahkan pilihan debug pada beberapa komponen untuk pengujian</string>
     <string name="piko_export_experiment_list">Ekspor daftar eksperimen</string>
     <string name="piko_export_experiment_mappings">Ekspor pemetaan eksperimen</string>
@@ -215,9 +215,9 @@
     <string name="piko_array_recmd_flag_state_enable">Aktifkan</string>
     <string name="piko_array_recmd_flag_state_disable">Nonaktifkan</string>
     <!-- Welcome Message -->
-    <string name="piko_welcome_title">Selamat datang di Piko</string>
-    <string name="piko_welcome_message">Untuk meningkatkan pengalaman Anda menggunakan Piko, silakan buka pengaturan Piko dan sesuaikan preferensi Anda</string>
-    <string name="piko_goto_piko_settings">Ke pengaturan Piko</string>
+    <string name="piko_welcome_title">Selamat datang di RHpatch</string>
+    <string name="piko_welcome_message">Untuk meningkatkan pengalaman Anda menggunakan RHpatch, silakan buka pengaturan RHpatch dan sesuaikan preferensi Anda</string>
+    <string name="piko_goto_piko_settings">Ke pengaturan RHpatch</string>
     <string name="piko_no_internet">Silakan sambungkan ke internet</string>
     <string name="piko_tap_here">Ketuk di sini !!</string>
     <!-- Action Bar Section -->
@@ -230,8 +230,8 @@
     <string name="piko_action_bar_button_settings_icon">Ikon pengaturan</string>
     <string name="piko_action_bar_button_ghost_mode_icon">Ikon mode hantu</string>
     <string name="piko_action_bar_button_profile_info_icon">Ikon info profil</string>
-    <string name="piko_settings_on_action_bar">Pengaturan Piko di bilah tindakan</string>
-    <string name="piko_settings_on_action_bar_desc">Pindahkan titik masuk pengaturan Piko ke bilah tindakan feed utama</string>
+    <string name="piko_settings_on_action_bar">Pengaturan RHpatch di bilah tindakan</string>
+    <string name="piko_settings_on_action_bar_desc">Pindahkan titik masuk pengaturan RHpatch ke bilah tindakan feed utama</string>
     <!-- Developer Options Section -->
     <string name="piko_category_rec_flags">Tanda yang direkomendasikan</string>
     <string name="piko_category_rec_flags_desc">Tanda pengembang yang disarankan oleh komunitas</string>

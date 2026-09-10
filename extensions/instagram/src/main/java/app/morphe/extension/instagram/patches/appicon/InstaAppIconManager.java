@@ -37,6 +37,56 @@ public class InstaAppIconManager {
         "com.instagram.android.activity.MainTabActivity.throwback"
     };
 
+    private static final String PREF_NAME = "rhpatch_app_icon_pref";
+    private static final String KEY_SAVED_ALIAS = "saved_icon_alias";
+    private static final String KEY_SAVED_NAME = "saved_icon_name";
+    private static boolean sRestored = false;
+
+    /**
+     * Memulihkan icon launcher kustom pengguna yang tersimpan setelah aplikasi diperbarui/di-reinstall.
+     */
+    public static void restoreSavedIcon(Context context) {
+        if (sRestored) return;
+        sRestored = true;
+        if (context == null) {
+            context = PikoUtils.getContext();
+        }
+        if (context == null) return;
+
+        try {
+            String savedAlias = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                    .getString(KEY_SAVED_ALIAS, null);
+            if (savedAlias == null || savedAlias.isEmpty()) return;
+
+            PackageManager pm = context.getPackageManager();
+            String pkgName = context.getPackageName();
+            ComponentName targetComponent = new ComponentName(pkgName, savedAlias);
+            int state = pm.getComponentEnabledSetting(targetComponent);
+            if (state != PackageManager.COMPONENT_ENABLED_STATE_ENABLED) {
+                PikoLog.e(TAG, "Restoring custom launcher icon across update: " + savedAlias, null);
+                pm.setComponentEnabledSetting(
+                    targetComponent,
+                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                    PackageManager.DONT_KILL_APP
+                );
+                for (String alias : ALL_ICON_ALIASES) {
+                    if (!alias.equals(savedAlias)) {
+                        try {
+                            ComponentName otherComp = new ComponentName(pkgName, alias);
+                            pm.setComponentEnabledSetting(
+                                otherComp,
+                                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                                PackageManager.DONT_KILL_APP
+                            );
+                        } catch (Throwable ignored) {}
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            PikoLog.e(TAG, "Failed to restore custom app icon on startup", t);
+        }
+    }
+
     /**
      * Directly and immediately applies the selected app icon.
      *
@@ -162,7 +212,16 @@ public class InstaAppIconManager {
                 }
             } catch (Throwable ignored) {}
 
-            // Step 4: Show immediate confirmation toast to the user
+            // Step 4: Persist the selected icon alias so it survives APK updates
+            try {
+                context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                    .edit()
+                    .putString(KEY_SAVED_ALIAS, targetComponentClass)
+                    .putString(KEY_SAVED_NAME, iconDisplayName)
+                    .apply();
+            } catch (Throwable ignored) {}
+
+            // Step 5: Show immediate confirmation toast to the user
             PikoUtils.toast("Icon aplikasi berhasil diubah ke: " + iconDisplayName + "!\n(Jika belum berubah di beranda, muat ulang launcher Anda)");
 
         } catch (Throwable t) {

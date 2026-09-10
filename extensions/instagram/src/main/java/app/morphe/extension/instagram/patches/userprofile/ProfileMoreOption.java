@@ -42,99 +42,165 @@ public class ProfileMoreOption {
     }
 
     public static void moreOptionsDailogueBox(Context context, UserData userData) {
+        if (context == null || userData == null) return;
         try {
-            InstagramDialogBox dialog = new InstagramDialogBox(context);
+            float density = context.getResources().getDisplayMetrics().density;
+            android.app.Dialog dialog = new android.app.Dialog(context);
+            dialog.requestWindowFeature(android.view.WindowFeature.NO_TITLE);
 
-            ArrayList<String> options = new ArrayList<>();
-            options.add(str("piko_view_profile_picture"));
-            options.add(str("piko_download_profile_picture"));
-            options.add(str("piko_copy_username"));
-            options.add(str("piko_copy_full_name"));
-            options.add(str("piko_copy_user_id"));
-            options.add(str("piko_copy_profile_link"));
-            options.add(str("piko_share_this_profile"));
-            options.add(str("piko_copy_bio"));
-            options.add(str("piko_copy_links_from_bio"));
-            if (DEBUG) options.add(str("piko_debug"));
+            android.widget.ScrollView scrollView = new android.widget.ScrollView(context);
+            scrollView.setVerticalScrollBarEnabled(false);
 
-            CharSequence[] items = options.toArray(new CharSequence[0]);
+            android.widget.LinearLayout contentLayout = new android.widget.LinearLayout(context);
+            contentLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+            int pad = (int) (18 * density);
+            contentLayout.setPadding(pad, pad, pad, pad);
 
-            dialog.addDialogMenuItems(items, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface d, int which) {
-                    try {
-                        // Doing like this because options are dynamic.
-                        String selectedOption = options.get(which);
-                        boolean toCopy = false;
-                        String text = null;
+            android.graphics.drawable.GradientDrawable bg = new android.graphics.drawable.GradientDrawable();
+            bg.setColor(android.graphics.Color.parseColor("#141414"));
+            bg.setCornerRadius(20 * density);
+            bg.setStroke((int) (1 * density), android.graphics.Color.parseColor("#26FFFFFF"));
+            contentLayout.setBackground(bg);
 
-                        if (selectedOption.equals(str("piko_copy_username"))) {
-                            text = userData.getUsername();
-                            toCopy = true;
+            // Header Title
+            android.widget.TextView titleView = new android.widget.TextView(context);
+            String uName = userData.getUsername() != null ? "@" + userData.getUsername() : "";
+            titleView.setText("[AKSI PROFIL] " + uName);
+            titleView.setTextColor(android.graphics.Color.WHITE);
+            titleView.setTextSize(17f);
+            titleView.setTypeface(android.graphics.Typeface.DEFAULT_BOLD);
+            contentLayout.addView(titleView);
 
-                        } else if (selectedOption.equals(str("piko_copy_full_name"))) {
-                            text = userData.getFullName();
-                            toCopy = true;
+            // Subtitle
+            android.widget.TextView subView = new android.widget.TextView(context);
+            subView.setText("Pusat Aksi & Ekstraksi Data Akun");
+            subView.setTextColor(android.graphics.Color.parseColor("#9E9E9E"));
+            subView.setTextSize(12f);
+            android.widget.LinearLayout.LayoutParams subLp = new android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT,
+                    android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+            subLp.topMargin = (int) (2 * density);
+            subLp.bottomMargin = (int) (14 * density);
+            subView.setLayoutParams(subLp);
+            contentLayout.addView(subView);
 
-                        } else if (selectedOption.equals(str("piko_copy_user_id"))) {
-                            text = userData.getUserId();
-                            toCopy = true;
-
-                        } else if (selectedOption.equals(str("piko_copy_bio"))) {
-                            text = userData.getBio();
-                            toCopy = true;
-
-                        } else if (selectedOption.equals(str("piko_copy_profile_link"))) {
-                            text = userData.getProfileLink();
-                            toCopy = true;
-
-                        } else if (selectedOption.equals(str("piko_share_this_profile"))) {
-                            PikoUtils.shareText(userData.getProfileLink());
-
-                        } else if (selectedOption.equals(str("piko_copy_links_from_bio"))) {
-                            // Links live in the bio as plain text; the profile object
-                            // carries no separate list of them.
-                            String links = linksFrom(userData.getBio());
-                            if (links == null) {
-                                Utils.showToastShort(str("piko_no_links_in_bio"));
-                            } else {
-                                text = links;
-                                toCopy = true;
-                            }
-
-                        } else if (selectedOption.equals(str("piko_view_profile_picture"))) {
-                            ProfilePictureViewer.show(context, userData);
-
-                        } else if (selectedOption.equals(str("piko_download_profile_picture"))) {
-                            String url = userData.getProfilePictureUrl();
-                            String username = userData.getUsername();
-                            String downloadFilename = username+"_dp.jpg";
-                            String subFolder = DownloadUtils.getSubfolderName(username);
-                            DownloadUtils.downloadMediaUrl(context, url, subFolder, downloadFilename);
-                            toCopy = false;
-
-                        } else if (selectedOption.equals(str("piko_debug"))) {
-                            // Using userData as it will be easier to debug known functions.
-                            ObjectBrowser.browseObject(context, userData);
-
-                        }
-
-                        if (toCopy && text != null && text.length() > 0) {
-                            Utils.setClipboard(text);
-                            Utils.showToastShort(str("piko_copied"));
-                        }
-                    } catch (Exception e) {
-                        PikoLog.e("ProfileMoreOption", "Error at moreOptionsDailogueBox onclick", e);
-                        Utils.showToastShort(e.getMessage());
-                    }
+            // Action Items
+            class ActionItem {
+                final String label;
+                final Runnable action;
+                ActionItem(String label, Runnable action) {
+                    this.label = label;
+                    this.action = action;
                 }
-            });
-            dialog.setTitle(str("piko_more_profile_options"));
-            dialog.setCancelable(true);
-            dialog.setCanceledOnTouchOutside(true);
+            }
 
-            Dialog dlg = dialog.getDialog();
-            dlg.show();
+            java.util.List<ActionItem> actions = new java.util.ArrayList<>();
+            actions.add(new ActionItem("Lihat Foto Profil (Ukuran Penuh)", () -> {
+                ProfilePictureViewer.show(context, userData);
+            }));
+            actions.add(new ActionItem("Unduh Foto Profil (Kualitas HD Asli)", () -> {
+                String url = userData.getProfilePictureUrl();
+                String username = userData.getUsername();
+                String downloadFilename = username + "_dp.jpg";
+                String subFolder = DownloadUtils.getSubfolderName(username);
+                DownloadUtils.downloadMediaUrl(context, url, subFolder, downloadFilename);
+            }));
+            actions.add(new ActionItem("Salin Nama Pengguna (" + uName + ")", () -> {
+                Utils.setClipboard(userData.getUsername());
+                Utils.showToastShort("Nama pengguna disalin");
+            }));
+            actions.add(new ActionItem("Salin Nama Lengkap Akun", () -> {
+                Utils.setClipboard(userData.getFullName());
+                Utils.showToastShort("Nama lengkap disalin");
+            }));
+            actions.add(new ActionItem("Salin ID Pengguna (User ID)", () -> {
+                Utils.setClipboard(userData.getUserId());
+                Utils.showToastShort("User ID disalin");
+            }));
+            actions.add(new ActionItem("Salin Tautan Profil Akun", () -> {
+                Utils.setClipboard(userData.getProfileLink());
+                Utils.showToastShort("Tautan profil disalin");
+            }));
+            actions.add(new ActionItem("Bagikan Profil ke Aplikasi Lain", () -> {
+                PikoUtils.shareText(userData.getProfileLink());
+            }));
+            actions.add(new ActionItem("Salin Teks Bio", () -> {
+                Utils.setClipboard(userData.getBio());
+                Utils.showToastShort("Bio disalin");
+            }));
+            actions.add(new ActionItem("Salin Tautan dalam Bio", () -> {
+                String links = linksFrom(userData.getBio());
+                if (links == null) {
+                    Utils.showToastShort("Tidak ada tautan di bio");
+                } else {
+                    Utils.setClipboard(links);
+                    Utils.showToastShort("Tautan bio disalin");
+                }
+            }));
+            if (DEBUG) {
+                actions.add(new ActionItem("Debug RHpatch", () -> {
+                    ObjectBrowser.browseObject(context, userData);
+                }));
+            }
+
+            for (ActionItem act : actions) {
+                android.widget.TextView itemBtn = new android.widget.TextView(context);
+                itemBtn.setText(act.label);
+                itemBtn.setTextColor(android.graphics.Color.WHITE);
+                itemBtn.setTextSize(14f);
+                int pV = (int) (12 * density);
+                int pH = (int) (14 * density);
+                itemBtn.setPadding(pH, pV, pH, pV);
+
+                android.graphics.drawable.GradientDrawable itemBg = new android.graphics.drawable.GradientDrawable();
+                itemBg.setColor(android.graphics.Color.parseColor("#1F1F1F"));
+                itemBg.setCornerRadius(10 * density);
+                itemBg.setStroke((int) (1 * density), android.graphics.Color.parseColor("#1FFFFFFF"));
+                itemBtn.setBackground(itemBg);
+
+                android.widget.LinearLayout.LayoutParams itemLp = new android.widget.LinearLayout.LayoutParams(
+                        android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                        android.widget.LinearLayout.LayoutParams.WRAP_CONTENT);
+                itemLp.bottomMargin = (int) (8 * density);
+                itemBtn.setLayoutParams(itemLp);
+
+                itemBtn.setOnClickListener(v -> {
+                    try {
+                        dialog.dismiss();
+                        act.action.run();
+                    } catch (Throwable t) {
+                        PikoLog.e("ProfileMoreOption", "Error executing action: " + act.label, t);
+                    }
+                });
+                contentLayout.addView(itemBtn);
+            }
+
+            // Close button
+            android.widget.Button closeBtn = new android.widget.Button(context);
+            closeBtn.setText("Tutup");
+            closeBtn.setTextColor(android.graphics.Color.WHITE);
+            closeBtn.setTextSize(14f);
+            android.graphics.drawable.GradientDrawable closeBg = new android.graphics.drawable.GradientDrawable();
+            closeBg.setColor(android.graphics.Color.parseColor("#333333"));
+            closeBg.setCornerRadius(10 * density);
+            closeBtn.setBackground(closeBg);
+            android.widget.LinearLayout.LayoutParams closeLp = new android.widget.LinearLayout.LayoutParams(
+                    android.widget.LinearLayout.LayoutParams.MATCH_PARENT,
+                    (int) (42 * density));
+            closeLp.topMargin = (int) (6 * density);
+            closeBtn.setLayoutParams(closeLp);
+            closeBtn.setOnClickListener(v -> dialog.dismiss());
+            contentLayout.addView(closeBtn);
+
+            scrollView.addView(contentLayout);
+            dialog.setContentView(scrollView);
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(new android.graphics.drawable.ColorDrawable(android.graphics.Color.TRANSPARENT));
+                int width = (int) (context.getResources().getDisplayMetrics().widthPixels * 0.90);
+                dialog.getWindow().setLayout(width, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+            }
+            dialog.show();
         } catch (Exception e) {
             PikoLog.e("ProfileMoreOption", "Error at moreOptionsDailogueBox", e);
             Utils.showToastShort(e.getMessage());

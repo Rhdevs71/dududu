@@ -63,7 +63,11 @@ public class SettingsActivity extends Activity {
 
         // Fallback to default localized string if no custom title was provided in the intent
         if (displayTitle == null || displayTitle.isEmpty()) {
-            displayTitle = str("piko_title_settings");
+            displayTitle = "Pengaturan RHpatch";
+        } else if (displayTitle.equalsIgnoreCase("Pengaturan Piko") || displayTitle.equalsIgnoreCase("Piko settings")) {
+            displayTitle = "Pengaturan RHpatch";
+        } else {
+            displayTitle = displayTitle.replace("Piko", "RHpatch").replace("piko", "rhpatch");
         }
 
         boolean isRootSettings = fragmentName == null || Constants.PIKO_FRAGMENT_SETTINGS.equals(fragmentName);

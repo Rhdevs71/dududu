@@ -9,8 +9,6 @@ package app.morphe.extension.instagram.ui;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -27,7 +25,6 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -72,246 +69,273 @@ public class RhpatchInstagramDialog {
 
     private static class CategoryGroup {
         final String name;
+        final String summary;
         final SettingItem[] items;
 
-        CategoryGroup(String name, SettingItem[] items) {
+        CategoryGroup(String name, String summary, SettingItem[] items) {
             this.name = name;
+            this.summary = summary;
             this.items = items;
         }
     }
 
     private static final CategoryGroup[] CATEGORIES = new CategoryGroup[] {
-        new CategoryGroup("PRIVASI & KEAMANAN AKUN", new SettingItem[] {
-            new SettingItem(
-                "Kunci Aplikasi (Biometrik / PIN HP)",
-                "Kunci Instagram dengan autentikasi biometrik sidik jari atau PIN/pola perangkat saat aplikasi dibuka.",
-                Settings.APP_LOCK
-            ),
-            new SettingItem(
-                "Blokir Notifikasi Screenshot DM",
-                "Cegah Instagram memberi tahu lawan bicara saat Anda mengambil tangkapan layar di obrolan DM.",
-                Settings.DISABLE_SCREENSHOT_DETECTION
-            ),
-            new SettingItem(
-                "Anti-Hilang Media Sekali Lihat",
-                "Buka dan lihat foto serta video sekali lihat (view-once) berkali-kali tanpa batasan waktu.",
-                Settings.UNLIMITED_REPLAYS
-            ),
-            new SettingItem(
-                "Penyelamat Pesan DM yang Dihapus",
-                "Catat dan simpan otomatis pesan teks yang ditarik atau dihapus lawan bicara ke database lokal.",
-                Settings.SAVE_DELETED_MESSAGES
-            ),
-            new SettingItem(
-                "Lacak Pesan DM yang Diedit",
-                "Simpan riwayat teks asli pesan sebelum diedit oleh lawan bicara di ruang obrolan.",
-                Settings.SAVE_EDITED_MESSAGES
-            ),
-            new SettingItem(
-                "Mode Siluman Status Online (Ghost Presence)",
-                "Blokir pelaporan status online Anda ke Meta sambil tetap melihat status aktif pengguna lain.",
-                Settings.HIDE_ONLINE_STATUS
-            ),
-            new SettingItem(
-                "Sembunyikan Status Sedang Mengetik",
-                "Lawan bicara tidak akan melihat indikator sedang mengetik saat Anda menulis pesan di DM.",
-                Settings.DISABLE_TYPING_STATUS
-            )
-        }),
+        new CategoryGroup(
+            "[1] Privasi & Keamanan Akun",
+            "Kunci App, Anti-Revoke DM, Anti-Screenshot, Stealth Mode",
+            new SettingItem[] {
+                new SettingItem(
+                    "Kunci Aplikasi (Biometrik / PIN HP)",
+                    "Kunci Instagram dengan autentikasi biometrik sidik jari atau PIN/pola perangkat saat aplikasi dibuka.",
+                    Settings.APP_LOCK
+                ),
+                new SettingItem(
+                    "Blokir Notifikasi Screenshot DM",
+                    "Cegah Instagram memberi tahu lawan bicara saat Anda mengambil tangkapan layar di obrolan DM.",
+                    Settings.DISABLE_SCREENSHOT_DETECTION
+                ),
+                new SettingItem(
+                    "Anti-Hilang Media Sekali Lihat",
+                    "Buka dan lihat foto serta video sekali lihat (view-once) berkali-kali tanpa batasan waktu.",
+                    Settings.UNLIMITED_REPLAYS
+                ),
+                new SettingItem(
+                    "Penyelamat Pesan DM yang Dihapus",
+                    "Catat dan simpan otomatis pesan teks yang ditarik atau dihapus lawan bicara ke database lokal.",
+                    Settings.SAVE_DELETED_MESSAGES
+                ),
+                new SettingItem(
+                    "Lacak Pesan DM yang Diedit",
+                    "Simpan riwayat teks asli pesan sebelum diedit oleh lawan bicara di ruang obrolan.",
+                    Settings.SAVE_EDITED_MESSAGES
+                ),
+                new SettingItem(
+                    "Mode Siluman Status Online (Ghost Presence)",
+                    "Blokir pelaporan status online Anda ke Meta sambil tetap melihat status aktif pengguna lain.",
+                    Settings.HIDE_ONLINE_STATUS
+                ),
+                new SettingItem(
+                    "Sembunyikan Status Sedang Mengetik",
+                    "Lawan bicara tidak akan melihat indikator sedang mengetik saat Anda menulis pesan di DM.",
+                    Settings.DISABLE_TYPING_STATUS
+                )
+            }
+        ),
 
-        new CategoryGroup("MODE SILUMAN (GHOST MODE)", new SettingItem[] {
-            new SettingItem(
-                "Lihat Cerita Anonim (Ghost Stories)",
-                "Lihat cerita atau story akun lain tanpa nama Anda muncul di daftar pemirsa (viewers).",
-                Settings.VIEW_STORIES_ANONYMOUSLY
-            ),
-            new SettingItem(
-                "Tonton Siaran Langsung Anonim (Ghost Live)",
-                "Tonton siaran langsung (Live) tanpa nama akun Anda masuk ke daftar penonton.",
-                Settings.VIEW_LIVE_ANONYMOUSLY
-            ),
-            new SettingItem(
-                "Baca Pesan DM Anonim (Ghost DM)",
-                "Baca pesan direct message tanpa mengirim tanda centang terbaca (Seen) ke pengirim.",
-                Settings.VIEW_DM_ANONYMOUSLY
-            ),
-            new SettingItem(
-                "Tombol Tandai Pesan Dibaca Manual",
-                "Tampilkan tombol khusus di obrolan untuk menandai pesan terbaca hanya saat Anda inginkan.",
-                Settings.ENABLE_MARK_CHAT_AS_READ
-            )
-        }),
+        new CategoryGroup(
+            "[2] Mode Siluman (Ghost Mode)",
+            "Lihat Cerita & Live Anonim, Tanda Dibaca Manual",
+            new SettingItem[] {
+                new SettingItem(
+                    "Lihat Cerita Anonim (Ghost Stories)",
+                    "Lihat cerita atau story akun lain tanpa nama Anda muncul di daftar pemirsa (viewers).",
+                    Settings.VIEW_STORIES_ANONYMOUSLY
+                ),
+                new SettingItem(
+                    "Tonton Siaran Langsung Anonim (Ghost Live)",
+                    "Tonton siaran langsung (Live) tanpa nama akun Anda masuk ke daftar penonton.",
+                    Settings.VIEW_LIVE_ANONYMOUSLY
+                ),
+                new SettingItem(
+                    "Baca Pesan DM Anonim (Ghost DM)",
+                    "Baca pesan direct message tanpa mengirim tanda centang terbaca (Seen) ke pengirim.",
+                    Settings.VIEW_DM_ANONYMOUSLY
+                ),
+                new SettingItem(
+                    "Tombol Tandai Pesan Dibaca Manual",
+                    "Tampilkan tombol khusus di obrolan untuk menandai pesan terbaca hanya saat Anda inginkan.",
+                    Settings.ENABLE_MARK_CHAT_AS_READ
+                )
+            }
+        ),
 
-        new CategoryGroup("BLOKIR IKLAN & BERSIHKAN TAMPILAN", new SettingItem[] {
-            new SettingItem(
-                "Blokir Semua Iklan Feed & Cerita",
-                "Hilangkan seluruh iklan komersial, postingan sponsor, dan penawaran belanja di feed dan reels.",
-                Settings.DISABLE_ADS
-            ),
-            new SettingItem(
-                "Sembunyikan Konten yang Disarankan",
-                "Hilangkan postingan rekomendasi pihak ketiga dan akun saran dari beranda Anda.",
-                Settings.HIDE_SUGGESTED_CONTENT
-            ),
-            new SettingItem(
-                "Hilangkan Ruang Bawah Kosong",
-                "Rapikan celah ruang kosong di bilah navigasi bawah untuk tampilan layar yang lebih luas.",
-                Settings.REMOVE_EMPTY_BOTTOM_SPACE
-            ),
-            new SettingItem(
-                "Kunci Gulir Otomatis Reels",
-                "Cegah video reels beralih secara tidak sengaja saat sedang ditonton.",
-                Settings.DISABLE_REELS_SCROLLING
-            ),
-            new SettingItem(
-                "Sembunyikan Bilah Catatan (Notes Tray)",
-                "Hilangkan tray gelembung catatan (notes) di bagian atas halaman direct message.",
-                Settings.HIDE_NOTES_TRAY
-            ),
-            new SettingItem(
-                "Sembunyikan Bilah Cerita di Feed",
-                "Sembunyikan deretan lingkaran cerita (stories tray) di bagian atas beranda utama.",
-                Settings.HIDE_STORIES_TRAY
-            ),
-            new SettingItem(
-                "Nonaktifkan Geser Layar Buat Cerita",
-                "Cegah kamera postingan terbuka tanpa sengaja saat menggeser layar beranda ke kanan.",
-                Settings.DISABLE_SWIPE_TO_CREATE
-            ),
-            new SettingItem(
-                "Matikan Putar Otomatis Video Feed",
-                "Hemat kuota data dengan mematikan putar otomatis video saat menjelajahi feed.",
-                Settings.DISABLE_VIDEO_AUTOPLAY
-            )
-        }),
+        new CategoryGroup(
+            "[3] Iklan & Bebas Gangguan",
+            "Blokir Iklan Feed, Hilangkan Konten Saran & Tray",
+            new SettingItem[] {
+                new SettingItem(
+                    "Blokir Semua Iklan Feed & Cerita",
+                    "Hilangkan seluruh iklan komersial, postingan sponsor, dan penawaran belanja di feed dan reels.",
+                    Settings.DISABLE_ADS
+                ),
+                new SettingItem(
+                    "Sembunyikan Konten yang Disarankan",
+                    "Hilangkan postingan rekomendasi pihak ketiga dan akun saran dari beranda Anda.",
+                    Settings.HIDE_SUGGESTED_CONTENT
+                ),
+                new SettingItem(
+                    "Hilangkan Ruang Bawah Kosong",
+                    "Rapikan celah ruang kosong di bilah navigasi bawah untuk tampilan layar yang lebih luas.",
+                    Settings.REMOVE_EMPTY_BOTTOM_SPACE
+                ),
+                new SettingItem(
+                    "Kunci Gulir Otomatis Reels",
+                    "Cegah video reels beralih secara tidak sengaja saat sedang ditonton.",
+                    Settings.DISABLE_REELS_SCROLLING
+                ),
+                new SettingItem(
+                    "Sembunyikan Bilah Catatan (Notes Tray)",
+                    "Hilangkan tray gelembung catatan (notes) di bagian atas halaman direct message.",
+                    Settings.HIDE_NOTES_TRAY
+                ),
+                new SettingItem(
+                    "Sembunyikan Bilah Cerita di Feed",
+                    "Sembunyikan deretan lingkaran cerita (stories tray) di bagian atas beranda utama.",
+                    Settings.HIDE_STORIES_TRAY
+                ),
+                new SettingItem(
+                    "Nonaktifkan Geser Layar Buat Cerita",
+                    "Cegah kamera postingan terbuka tanpa sengaja saat menggeser layar beranda ke kanan.",
+                    Settings.DISABLE_SWIPE_TO_CREATE
+                ),
+                new SettingItem(
+                    "Matikan Putar Otomatis Video Feed",
+                    "Hemat kuota data dengan mematikan putar otomatis video saat menjelajahi feed.",
+                    Settings.DISABLE_VIDEO_AUTOPLAY
+                )
+            }
+        ),
 
-        new CategoryGroup("PENGUNDUH MEDIA & PROFIL", new SettingItem[] {
-            new SettingItem(
-                "Aktifkan Pengunduh Media Resolusi Penuh",
-                "Unduh foto, video reels, story, dan carousel dalam kualitas asli resolusi maksimal.",
-                Settings.ENABLE_DOWNLOAD
-            ),
-            new SettingItem(
-                "Unduh Cepat Sekali Sentuh (Direct Download)",
-                "Mulai pengunduhan media secara instan tanpa dialog konfirmasi tambahan.",
-                Settings.ENABLE_DIRECT_DOWNLOAD
-            ),
-            new SettingItem(
-                "Kelompokkan ke Folder Username",
-                "Simpan file unduhan ke sub-folder tersendiri berdasarkan nama pengguna pembuat konten.",
-                Settings.DOWNLOAD_USERNAME_FOLDER
-            )
-        }),
+        new CategoryGroup(
+            "[4] Pusat Unduhan (Downloader)",
+            "Unduh Media Resolusi Asli & Folder Username",
+            new SettingItem[] {
+                new SettingItem(
+                    "Aktifkan Pengunduh Media Resolusi Penuh",
+                    "Unduh foto, video reels, story, dan carousel dalam kualitas asli resolusi maksimal.",
+                    Settings.ENABLE_DOWNLOAD
+                ),
+                new SettingItem(
+                    "Unduh Cepat Sekali Sentuh (Direct Download)",
+                    "Mulai pengunduhan media secara instan tanpa dialog konfirmasi tambahan.",
+                    Settings.ENABLE_DIRECT_DOWNLOAD
+                ),
+                new SettingItem(
+                    "Kelompokkan ke Folder Username",
+                    "Simpan file unduhan ke sub-folder tersendiri berdasarkan nama pengguna pembuat konten.",
+                    Settings.DOWNLOAD_USERNAME_FOLDER
+                )
+            }
+        ),
 
-        new CategoryGroup("FITUR EKSKLUSIF IG PLUS & PROFIL", new SettingItem[] {
-            new SettingItem(
-                "Buka Seluruh Manfaat IG Plus",
-                "Buka fitur ganti icon aplikasi kustom, font cerita khusus, font bio, dan preview Plus.",
-                Settings.UNLOCK_PLUS_BENEFITS
-            ),
-            new SettingItem(
-                "Lencana Status Pertemanan (Follow-Back)",
-                "Tampilkan lencana visual penanda apakah akun yang Anda kunjungi mengikuti Anda kembali.",
-                Settings.FOLLOW_BACK_INDICATOR
-            ),
-            new SettingItem(
-                "Warna Khusus Indikator Pertemanan",
-                "Warnai tombol ikuti dengan indikator warna sesuai status hubungan pertemanan.",
-                Settings.FOLLOW_BACK_COLOR_INDICATOR
-            ),
-            new SettingItem(
-                "Menu Opsi Tambahan pada Postingan",
-                "Tambahkan tombol cepat kecepatan putar, unduh media, dan salin teks pada setiap postingan.",
-                Settings.ENABLE_MORE_OPTIONS_ON_POST
-            ),
-            new SettingItem(
-                "Tombol Salin Teks Komentar",
-                "Salin teks komentar pengguna lain langsung dengan sekali sentuh.",
-                Settings.COMMENT_COPY_BUTTON
-            ),
-            new SettingItem(
-                "Tombol Unduh Media di Komentar",
-                "Simpan stiker gambar dan media dari kolom komentar ke galeri perangkat Anda.",
-                Settings.COMMENT_SAVE_MEDIA_BUTTON
-            ),
-            new SettingItem(
-                "Tingkatkan Kualitas Penampil Foto",
-                "Buka penampil foto dengan resolusi tinggi tanpa penurunan kualitas kompresi.",
-                Settings.IMPROVE_IMAGE_VIEWING
-            ),
-            new SettingItem(
-                "Lihat Sebutan Tersembunyi di Cerita",
-                "Tampilkan nama pengguna yang dimention di cerita meskipun teksnya disembunyikan.",
-                Settings.VIEW_STORY_MENTIONS
-            ),
-            new SettingItem(
-                "Putar Ulang Cerita Tanpa Henti (Loop Story)",
-                "Ulangi pemutaran story secara otomatis tanpa langsung berpindah ke story berikutnya.",
-                Settings.LOOP_STORY
-            )
-        }),
+        new CategoryGroup(
+            "[5] Fitur Eksklusif IG Plus & Profil",
+            "Follow-Back Badge, Opsi Postingan, Salin Komentar, Loop Story",
+            new SettingItem[] {
+                new SettingItem(
+                    "Buka Seluruh Manfaat IG Plus",
+                    "Buka fitur ganti icon aplikasi kustom, font cerita khusus, font bio, dan preview Plus.",
+                    Settings.UNLOCK_PLUS_BENEFITS
+                ),
+                new SettingItem(
+                    "Lencana Status Pertemanan (Follow-Back)",
+                    "Tampilkan lencana visual penanda apakah akun yang Anda kunjungi mengikuti Anda kembali.",
+                    Settings.FOLLOW_BACK_INDICATOR
+                ),
+                new SettingItem(
+                    "Warna Khusus Indikator Pertemanan",
+                    "Warnai tombol ikuti dengan indikator warna sesuai status hubungan pertemanan.",
+                    Settings.FOLLOW_BACK_COLOR_INDICATOR
+                ),
+                new SettingItem(
+                    "Menu Opsi Tambahan pada Postingan",
+                    "Tambahkan tombol cepat kecepatan putar, unduh media, dan salin teks pada setiap postingan.",
+                    Settings.ENABLE_MORE_OPTIONS_ON_POST
+                ),
+                new SettingItem(
+                    "Tombol Salin Teks Komentar",
+                    "Salin teks komentar pengguna lain langsung dengan sekali sentuh.",
+                    Settings.COMMENT_COPY_BUTTON
+                ),
+                new SettingItem(
+                    "Tombol Unduh Media di Komentar",
+                    "Simpan stiker gambar dan media dari kolom komentar ke galeri perangkat Anda.",
+                    Settings.COMMENT_SAVE_MEDIA_BUTTON
+                ),
+                new SettingItem(
+                    "Tingkatkan Kualitas Penampil Foto",
+                    "Buka penampil foto dengan resolusi tinggi tanpa penurunan kualitas kompresi.",
+                    Settings.IMPROVE_IMAGE_VIEWING
+                ),
+                new SettingItem(
+                    "Lihat Sebutan Tersembunyi di Cerita",
+                    "Tampilkan nama pengguna yang dimention di cerita meskipun teksnya disembunyikan.",
+                    Settings.VIEW_STORY_MENTIONS
+                ),
+                new SettingItem(
+                    "Putar Ulang Cerita Tanpa Henti (Loop Story)",
+                    "Ulangi pemutaran story secara otomatis tanpa langsung berpindah ke story berikutnya.",
+                    Settings.LOOP_STORY
+                )
+            }
+        ),
 
-        new CategoryGroup("ALAT PENGEMBANG & DIAGNOSTIK", new SettingItem[] {
-            new SettingItem(
-                "Aktifkan Opsi Pengembang (Developer Options)",
-                "Buka menu pengaturan internal Meta dengan menekan lama ikon Beranda (Home).",
-                Settings.DEVELOPER_OPTIONS
-            ),
-            new SettingItem(
-                "Langsung Buka Penggantian MetaConfig",
-                "Tekan lama ikon Beranda langsung membuka layar MetaConfig Overrides internal.",
-                Settings.DIRECTLY_OPEN_METACONFIG
-            ),
-            new SettingItem(
-                "Aktifkan Opsi Karyawan Internal Meta",
-                "Buka seluruh fitur pengujian eksperimental internal pengembang Meta.",
-                Settings.ENABLE_EMP_OPTIONS
-            ),
-            new SettingItem(
-                "Izinkan Sertifikat Jaringan Pengguna (Whitehat)",
-                "Dukung penggunaan sertifikat CA kustom untuk inspeksi lalu lintas jaringan.",
-                Settings.ALLOW_USER_NETWORK_CERTIFICATE
-            ),
-            new SettingItem(
-                "Hilangkan Peringatan Kedaluwarsa Build",
-                "Blokir jendela popup peringatan versi lama yang muncul otomatis dari Meta.",
-                Settings.REMOVE_BUILD_EXPIRE_POPUP
-            ),
-            new SettingItem(
-                "Tema AMOLED Hitam Pekat Murni",
-                "Terapkan latar belakang hitam murni #000000 untuk penghematan baterai layar OLED.",
-                Settings.AMOLED_THEME
-            ),
-            new SettingItem(
-                "Buka Tautan di Browser Eksternal",
-                "Gunakan peramban bawaan ponsel (Chrome/Brave) alih-alih webview internal Instagram.",
-                Settings.OPEN_LINKS_EXTERNALLY
-            ),
-            new SettingItem(
-                "Bersihkan Pelacak Parameter URL Berbagi",
-                "Hapus parameter pelacak seperti igsh, utm_source, dan tracking token saat menyalin tautan.",
-                Settings.SANITIZE_SHARE_LINKS
-            ),
-            new SettingItem(
-                "Nonaktifkan Pelaporan Analitik Meta",
-                "Hentikan pengiriman log telemetri dan analitik pemakaian ke server Meta.",
-                Settings.DISABLE_ANALYTICS
-            ),
-            new SettingItem(
-                "Sembunyikan Rekomendasi Teman",
-                "Hilangkan bilah rekomendasi akun pengguna baru yang mungkin Anda kenal di profil.",
-                Settings.DISABLE_DISCOVER_PEOPLE
-            ),
-            new SettingItem(
-                "Pencatatan Log Diagnostik RHpatch",
-                "Simpan catatan diagnostik lengkap ke /sdcard/Download/RHpatch-Instagram/rhpatch_debug.log.",
-                Settings.PIKO_DEBUG
-            )
-        })
+        new CategoryGroup(
+            "[6] Pengaturan Lanjutan & Developer",
+            "MetaConfig, Employee Options, AMOLED Murni, Clean URL",
+            new SettingItem[] {
+                new SettingItem(
+                    "Aktifkan Opsi Pengembang (Developer Options)",
+                    "Buka menu pengaturan internal Meta dengan menekan lama ikon Beranda (Home).",
+                    Settings.DEVELOPER_OPTIONS
+                ),
+                new SettingItem(
+                    "Langsung Buka Penggantian MetaConfig",
+                    "Tekan lama ikon Beranda langsung membuka layar MetaConfig Overrides internal.",
+                    Settings.DIRECTLY_OPEN_METACONFIG
+                ),
+                new SettingItem(
+                    "Aktifkan Opsi Karyawan Internal Meta",
+                    "Buka seluruh fitur pengujian eksperimental internal pengembang Meta.",
+                    Settings.ENABLE_EMP_OPTIONS
+                ),
+                new SettingItem(
+                    "Izinkan Sertifikat Jaringan Pengguna (Whitehat)",
+                    "Dukung penggunaan sertifikat CA kustom untuk inspeksi lalu lintas jaringan.",
+                    Settings.ALLOW_USER_NETWORK_CERTIFICATE
+                ),
+                new SettingItem(
+                    "Hilangkan Peringatan Kedaluwarsa Build",
+                    "Blokir jendela popup peringatan versi lama yang muncul otomatis dari Meta.",
+                    Settings.REMOVE_BUILD_EXPIRE_POPUP
+                ),
+                new SettingItem(
+                    "Tema AMOLED Hitam Pekat Murni",
+                    "Terapkan latar belakang hitam murni #000000 untuk penghematan baterai layar OLED.",
+                    Settings.AMOLED_THEME
+                ),
+                new SettingItem(
+                    "Buka Tautan di Browser Eksternal",
+                    "Gunakan peramban bawaan ponsel (Chrome/Brave) alih-alih webview internal Instagram.",
+                    Settings.OPEN_LINKS_EXTERNALLY
+                ),
+                new SettingItem(
+                    "Bersihkan Pelacak Parameter URL Berbagi",
+                    "Hapus parameter pelacak seperti igsh, utm_source, dan tracking token saat menyalin tautan.",
+                    Settings.SANITIZE_SHARE_LINKS
+                ),
+                new SettingItem(
+                    "Nonaktifkan Pelaporan Analitik Meta",
+                    "Hentikan pengiriman log telemetri dan analitik pemakaian ke server Meta.",
+                    Settings.DISABLE_ANALYTICS
+                ),
+                new SettingItem(
+                    "Sembunyikan Rekomendasi Teman",
+                    "Hilangkan bilah rekomendasi akun pengguna baru yang mungkin Anda kenal di profil.",
+                    Settings.DISABLE_DISCOVER_PEOPLE
+                ),
+                new SettingItem(
+                    "Pencatatan Log Diagnostik RHpatch",
+                    "Simpan catatan diagnostik lengkap ke /sdcard/Download/Piko/piko_debug.log.",
+                    Settings.PIKO_DEBUG
+                )
+            }
+        )
     };
 
     /**
-     * Menampilkan dialog pengaturan lengkap RHpatch Instagram Studio.
+     * Menampilkan dialog utama RHpatch Instagram Studio yang rapi, terstruktur per kategori,
+     * dan bersih tanpa emoji.
      */
     public static void show(final Context context) {
         if (context == null) return;
@@ -371,9 +395,9 @@ public class RhpatchInstagramDialog {
 
             // Close button (X)
             TextView closeBtn = new TextView(context);
-            closeBtn.setText("✕");
+            closeBtn.setText("X");
             closeBtn.setTextColor(Color.parseColor("#A7A7A7"));
-            closeBtn.setTextSize(17f);
+            closeBtn.setTextSize(16f);
             closeBtn.setTypeface(Typeface.DEFAULT_BOLD);
             closeBtn.setGravity(Gravity.CENTER);
             int xPad = (int) (6 * density);
@@ -435,7 +459,7 @@ public class RhpatchInstagramDialog {
                 profileCard.setLayoutParams(pLp);
 
                 TextView pTitle = new TextView(context);
-                pTitle.setText("👤 Aksi Cepat Profil (@" + targetUser.getUsername() + ")");
+                pTitle.setText("[AKSI PROFIL] @" + targetUser.getUsername());
                 pTitle.setTextColor(Color.WHITE);
                 pTitle.setTextSize(14f);
                 pTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
@@ -456,7 +480,7 @@ public class RhpatchInstagramDialog {
 
                 // Button: Buka Menu 9 Pilihan Lengkap
                 TextView open9Btn = new TextView(context);
-                open9Btn.setText("Buka Menu Pilihan Profil Lengkap (9 Opsi) →");
+                open9Btn.setText("Buka Menu Pilihan Profil Lengkap (9 Opsi) ->");
                 open9Btn.setTextColor(Color.WHITE);
                 open9Btn.setTextSize(12.5f);
                 open9Btn.setTypeface(Typeface.DEFAULT_BOLD);
@@ -534,6 +558,7 @@ public class RhpatchInstagramDialog {
             // ------------------------------------------
             // B. STUDIO WARNA TEKS KUSTOM CARD
             // ------------------------------------------
+            int tPad = (int) (14 * density);
             LinearLayout themeCard = new LinearLayout(context);
             themeCard.setOrientation(LinearLayout.VERTICAL);
             GradientDrawable tBg = new GradientDrawable();
@@ -541,7 +566,6 @@ public class RhpatchInstagramDialog {
             tBg.setCornerRadius(14 * density);
             tBg.setStroke((int) (1 * density), Color.parseColor(CARD_BORDER_COLOR));
             themeCard.setBackground(tBg);
-            int tPad = (int) (14 * density);
             themeCard.setPadding(tPad, tPad, tPad, tPad);
 
             LinearLayout.LayoutParams tLp = new LinearLayout.LayoutParams(
@@ -557,9 +581,9 @@ public class RhpatchInstagramDialog {
             themeHeader.setGravity(Gravity.CENTER_VERTICAL);
 
             TextView themeTitle = new TextView(context);
-            themeTitle.setText("🎨 Studio Warna Teks Kustom");
+            themeTitle.setText("[WARNA TEKS] Studio Warna Teks Kustom");
             themeTitle.setTextColor(Color.WHITE);
-            themeTitle.setTextSize(14f);
+            themeTitle.setTextSize(13.5f);
             themeTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
             LinearLayout.LayoutParams ttLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
             themeTitle.setLayoutParams(ttLp);
@@ -570,7 +594,7 @@ public class RhpatchInstagramDialog {
             themeCard.addView(themeHeader);
 
             TextView themeDesc = new TextView(context);
-            themeDesc.setText("Ubah semua teks Instagram (feed, profil, direct message, komentar) secara dinamis.");
+            themeDesc.setText("Ubah semua teks Instagram (feed, profil, pesan, komentar) secara dinamis.");
             themeDesc.setTextColor(Color.parseColor("#A7A7A7"));
             themeDesc.setTextSize(11f);
             LinearLayout.LayoutParams tdLp = new LinearLayout.LayoutParams(
@@ -716,9 +740,9 @@ public class RhpatchInstagramDialog {
             speedCard.setLayoutParams(spLp);
 
             TextView spTitle = new TextView(context);
-            spTitle.setText("⚡ Kecepatan Pemutaran Video & Reels");
+            spTitle.setText("[KECEPATAN VIDEO] Kontrol Kecepatan Reels & Video");
             spTitle.setTextColor(Color.WHITE);
-            spTitle.setTextSize(14f);
+            spTitle.setTextSize(13.5f);
             spTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
             speedCard.addView(spTitle);
 
@@ -835,105 +859,96 @@ public class RhpatchInstagramDialog {
             contentContainer.addView(speedCard);
 
             // ------------------------------------------
-            // D. CATEGORIZED SETTING GROUPS
+            // D. MENU KATEGORI PENGATURAN (Clean Categorized Navigation)
             // ------------------------------------------
-            final List<Switch> allSwitches = new ArrayList<>();
-            final List<BooleanSetting> allSettingKeys = new ArrayList<>();
+            TextView catSectionHeader = new TextView(context);
+            catSectionHeader.setText("KATEGORI PENGATURAN");
+            catSectionHeader.setTextColor(Color.parseColor(ACCENT_COLOR));
+            catSectionHeader.setTextSize(12f);
+            catSectionHeader.setTypeface(Typeface.DEFAULT_BOLD);
+            LinearLayout.LayoutParams cshLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            cshLp.topMargin = (int) (6 * density);
+            cshLp.bottomMargin = (int) (10 * density);
+            catSectionHeader.setLayoutParams(cshLp);
+            contentContainer.addView(catSectionHeader);
 
-            for (CategoryGroup group : CATEGORIES) {
-                // Category Header Title
-                TextView catHeader = new TextView(context);
-                catHeader.setText("● " + group.name);
-                catHeader.setTextColor(Color.parseColor(ACCENT_COLOR));
-                catHeader.setTextSize(12f);
-                catHeader.setTypeface(Typeface.DEFAULT_BOLD);
-                LinearLayout.LayoutParams chLp = new LinearLayout.LayoutParams(
+            // 6 Clean Category Navigation Cards
+            for (final CategoryGroup group : CATEGORIES) {
+                LinearLayout catCard = new LinearLayout(context);
+                catCard.setOrientation(LinearLayout.HORIZONTAL);
+                catCard.setGravity(Gravity.CENTER_VERTICAL);
+                catCard.setClickable(true);
+                catCard.setFocusable(true);
+
+                GradientDrawable catCardBg = new GradientDrawable();
+                catCardBg.setColor(Color.parseColor(CARD_BG_COLOR));
+                catCardBg.setCornerRadius(14 * density);
+                catCardBg.setStroke((int) (1 * density), Color.parseColor(CARD_BORDER_COLOR));
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    catCard.setBackground(new RippleDrawable(
+                        ColorStateList.valueOf(Color.parseColor("#33FFFFFF")),
+                        catCardBg,
+                        null
+                    ));
+                } else {
+                    catCard.setBackground(catCardBg);
+                }
+
+                int cPadH = (int) (15 * density);
+                int cPadV = (int) (14 * density);
+                catCard.setPadding(cPadH, cPadV, cPadH, cPadV);
+
+                LinearLayout.LayoutParams cLp = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 );
-                chLp.topMargin = (int) (8 * density);
-                chLp.bottomMargin = (int) (8 * density);
-                catHeader.setLayoutParams(chLp);
-                contentContainer.addView(catHeader);
+                cLp.bottomMargin = (int) (8 * density);
+                catCard.setLayoutParams(cLp);
 
-                for (SettingItem item : group.items) {
-                    final BooleanSetting setting = item.setting;
-                    boolean isEnabled = SharedPref.getBooleanPref(setting);
+                // Text Column
+                LinearLayout catTextCol = new LinearLayout(context);
+                catTextCol.setOrientation(LinearLayout.VERTICAL);
+                LinearLayout.LayoutParams catTextLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+                catTextCol.setLayoutParams(catTextLp);
 
-                    LinearLayout card = new LinearLayout(context);
-                    card.setOrientation(LinearLayout.HORIZONTAL);
-                    card.setGravity(Gravity.CENTER_VERTICAL);
-                    card.setClickable(true);
-                    card.setFocusable(true);
+                TextView catName = new TextView(context);
+                catName.setText(group.name);
+                catName.setTextColor(Color.WHITE);
+                catName.setTextSize(14f);
+                catName.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
+                catTextCol.addView(catName);
 
-                    GradientDrawable cardBg = new GradientDrawable();
-                    cardBg.setColor(Color.parseColor(CARD_BG_COLOR));
-                    cardBg.setCornerRadius(14 * density);
-                    cardBg.setStroke((int) (1 * density), Color.parseColor(CARD_BORDER_COLOR));
+                TextView catSum = new TextView(context);
+                catSum.setText(group.summary + " (" + group.items.length + " Opsi)");
+                catSum.setTextColor(Color.parseColor("#A7A7A7"));
+                catSum.setTextSize(11f);
+                LinearLayout.LayoutParams cslp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                cslp.topMargin = (int) (3 * density);
+                catSum.setLayoutParams(cslp);
+                catTextCol.addView(catSum);
 
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                        card.setBackground(new RippleDrawable(
-                            ColorStateList.valueOf(Color.parseColor("#33FFFFFF")),
-                            cardBg,
-                            null
-                        ));
-                    } else {
-                        card.setBackground(cardBg);
-                    }
+                catCard.addView(catTextCol);
 
-                    int cardPadH = (int) (14 * density);
-                    int cardPadV = (int) (12 * density);
-                    card.setPadding(cardPadH, cardPadV, cardPadH, cardPadV);
+                // Arrow indicator ->
+                TextView arrow = new TextView(context);
+                arrow.setText("->");
+                arrow.setTextColor(Color.parseColor(ACCENT_COLOR));
+                arrow.setTextSize(14f);
+                arrow.setTypeface(Typeface.DEFAULT_BOLD);
+                catCard.addView(arrow);
 
-                    LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    );
-                    cardLp.bottomMargin = (int) (8 * density);
-                    card.setLayoutParams(cardLp);
+                catCard.setOnClickListener(v -> {
+                    showCategorySubDialog(context, group, density);
+                });
 
-                    // Text Column
-                    LinearLayout textCol = new LinearLayout(context);
-                    textCol.setOrientation(LinearLayout.VERTICAL);
-                    LinearLayout.LayoutParams textLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
-                    textCol.setLayoutParams(textLp);
-
-                    TextView itemTitle = new TextView(context);
-                    itemTitle.setText(item.title);
-                    itemTitle.setTextColor(Color.WHITE);
-                    itemTitle.setTextSize(13.5f);
-                    itemTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
-                    textCol.addView(itemTitle);
-
-                    TextView itemDesc = new TextView(context);
-                    itemDesc.setText(item.description);
-                    itemDesc.setTextColor(Color.parseColor("#A7A7A7"));
-                    itemDesc.setTextSize(11f);
-                    LinearLayout.LayoutParams descLp = new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.WRAP_CONTENT,
-                        ViewGroup.LayoutParams.WRAP_CONTENT
-                    );
-                    descLp.topMargin = (int) (2 * density);
-                    itemDesc.setLayoutParams(descLp);
-                    textCol.addView(itemDesc);
-
-                    card.addView(textCol);
-
-                    // Switch
-                    final Switch toggle = createSwitch(context, isEnabled);
-                    card.addView(toggle);
-
-                    allSwitches.add(toggle);
-                    allSettingKeys.add(setting);
-
-                    toggle.setOnCheckedChangeListener((btn, checked) -> {
-                        SharedPref.setBooleanPref(setting.key, checked);
-                    });
-
-                    card.setOnClickListener(v -> toggle.setChecked(!toggle.isChecked()));
-
-                    contentContainer.addView(card);
-                }
+                contentContainer.addView(catCard);
             }
 
             scrollView.addView(contentContainer);
@@ -943,7 +958,7 @@ public class RhpatchInstagramDialog {
             // 3. QUICK ACTION: MENU PENGATURAN LENGKAP
             // ==========================================
             TextView advancedBtn = new TextView(context);
-            advancedBtn.setText("Buka Pengaturan Lanjutan (Developer & MobileConfig) →");
+            advancedBtn.setText("Buka Pengaturan Lanjutan (Developer & MobileConfig) ->");
             advancedBtn.setTextColor(Color.parseColor(ACCENT_COLOR));
             advancedBtn.setTextSize(11.5f);
             advancedBtn.setTypeface(Typeface.DEFAULT_BOLD);
@@ -995,11 +1010,9 @@ public class RhpatchInstagramDialog {
             int resetPad = (int) (6 * density);
             resetBtn.setPadding(resetPad, resetPad, resetPad, resetPad);
             resetBtn.setOnClickListener(v -> {
-                for (int i = 0; i < allSettingKeys.size(); i++) {
-                    BooleanSetting s = allSettingKeys.get(i);
-                    SharedPref.setBooleanPref(s.key, s.defaultValue);
-                    if (i < allSwitches.size() && allSwitches.get(i) != null) {
-                        allSwitches.get(i).setChecked(s.defaultValue);
+                for (CategoryGroup g : CATEGORIES) {
+                    for (SettingItem s : g.items) {
+                        SharedPref.setBooleanPref(s.setting.key, s.setting.defaultValue);
                     }
                 }
                 RhpatchTextColorManager.setEnabled(false);
@@ -1031,6 +1044,220 @@ public class RhpatchInstagramDialog {
             dialog.show();
         } catch (Throwable t) {
             PikoUtils.logger("RhpatchInstagramDialog", "Gagal menampilkan dialog pengaturan: " + t.getMessage(), t);
+        }
+    }
+
+    /**
+     * Menampilkan sub-dialog untuk kategori tertentu dengan tampilan kartu yang bersih dan fokus.
+     */
+    private static void showCategorySubDialog(final Context context, final CategoryGroup group, final float density) {
+        if (context == null || group == null) return;
+
+        try {
+            final Dialog subDialog = new Dialog(context);
+            subDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+            DisplayMetrics dm = context.getResources().getDisplayMetrics();
+
+            LinearLayout root = new LinearLayout(context);
+            root.setOrientation(LinearLayout.VERTICAL);
+            GradientDrawable rootBg = new GradientDrawable();
+            rootBg.setColor(Color.parseColor("#121212"));
+            rootBg.setCornerRadius(22 * density);
+            rootBg.setStroke((int) (1 * density), Color.parseColor("#282828"));
+            root.setBackground(rootBg);
+
+            int rootPadH = (int) (18 * density);
+            int rootPadV = (int) (18 * density);
+            root.setPadding(rootPadH, rootPadV, rootPadH, rootPadV);
+
+            // Header: Back Button + Category Title
+            LinearLayout subHeader = new LinearLayout(context);
+            subHeader.setOrientation(LinearLayout.HORIZONTAL);
+            subHeader.setGravity(Gravity.CENTER_VERTICAL);
+
+            TextView backBtn = new TextView(context);
+            backBtn.setText("<- Kembali");
+            backBtn.setTextColor(Color.parseColor(ACCENT_COLOR));
+            backBtn.setTextSize(13f);
+            backBtn.setTypeface(Typeface.DEFAULT_BOLD);
+            int bPad = (int) (6 * density);
+            backBtn.setPadding(0, bPad, (int) (10 * density), bPad);
+            backBtn.setOnClickListener(v -> subDialog.dismiss());
+            subHeader.addView(backBtn);
+
+            TextView subTitle = new TextView(context);
+            subTitle.setText(group.name);
+            subTitle.setTextColor(Color.WHITE);
+            subTitle.setTextSize(15f);
+            subTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
+            LinearLayout.LayoutParams stLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+            subTitle.setLayoutParams(stLp);
+            subHeader.addView(subTitle);
+
+            TextView closeBtn = new TextView(context);
+            closeBtn.setText("X");
+            closeBtn.setTextColor(Color.parseColor("#A7A7A7"));
+            closeBtn.setTextSize(16f);
+            closeBtn.setTypeface(Typeface.DEFAULT_BOLD);
+            closeBtn.setGravity(Gravity.CENTER);
+            closeBtn.setPadding(bPad, bPad, bPad, bPad);
+            closeBtn.setOnClickListener(v -> subDialog.dismiss());
+            subHeader.addView(closeBtn);
+
+            root.addView(subHeader);
+
+            // Summary text
+            TextView summaryView = new TextView(context);
+            summaryView.setText(group.summary);
+            summaryView.setTextColor(Color.parseColor("#8E8E93"));
+            summaryView.setTextSize(11.5f);
+            LinearLayout.LayoutParams sumLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            sumLp.topMargin = (int) (4 * density);
+            sumLp.bottomMargin = (int) (14 * density);
+            summaryView.setLayoutParams(sumLp);
+            root.addView(summaryView);
+
+            // ScrollView for category items
+            ScrollView subScroll = new ScrollView(context);
+            subScroll.setVerticalScrollBarEnabled(false);
+            LinearLayout.LayoutParams scrollLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                0,
+                1.0f
+            );
+            subScroll.setLayoutParams(scrollLp);
+
+            LinearLayout itemsContainer = new LinearLayout(context);
+            itemsContainer.setOrientation(LinearLayout.VERTICAL);
+
+            for (final SettingItem item : group.items) {
+                final BooleanSetting setting = item.setting;
+                boolean isEnabled = SharedPref.getBooleanPref(setting);
+
+                LinearLayout card = new LinearLayout(context);
+                card.setOrientation(LinearLayout.HORIZONTAL);
+                card.setGravity(Gravity.CENTER_VERTICAL);
+                card.setClickable(true);
+                card.setFocusable(true);
+
+                GradientDrawable cardBg = new GradientDrawable();
+                cardBg.setColor(Color.parseColor(CARD_BG_COLOR));
+                cardBg.setCornerRadius(14 * density);
+                cardBg.setStroke((int) (1 * density), Color.parseColor(CARD_BORDER_COLOR));
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    card.setBackground(new RippleDrawable(
+                        ColorStateList.valueOf(Color.parseColor("#33FFFFFF")),
+                        cardBg,
+                        null
+                    ));
+                } else {
+                    card.setBackground(cardBg);
+                }
+
+                int cardPadH = (int) (14 * density);
+                int cardPadV = (int) (12 * density);
+                card.setPadding(cardPadH, cardPadV, cardPadH, cardPadV);
+
+                LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                cardLp.bottomMargin = (int) (8 * density);
+                card.setLayoutParams(cardLp);
+
+                // Text Column
+                LinearLayout textCol = new LinearLayout(context);
+                textCol.setOrientation(LinearLayout.VERTICAL);
+                LinearLayout.LayoutParams textLp = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1.0f);
+                textCol.setLayoutParams(textLp);
+
+                TextView itemTitle = new TextView(context);
+                itemTitle.setText(item.title);
+                itemTitle.setTextColor(Color.WHITE);
+                itemTitle.setTextSize(13.5f);
+                itemTitle.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
+                textCol.addView(itemTitle);
+
+                TextView itemDesc = new TextView(context);
+                itemDesc.setText(item.description);
+                itemDesc.setTextColor(Color.parseColor("#A7A7A7"));
+                itemDesc.setTextSize(11f);
+                LinearLayout.LayoutParams descLp = new LinearLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                );
+                descLp.topMargin = (int) (2 * density);
+                itemDesc.setLayoutParams(descLp);
+                textCol.addView(itemDesc);
+
+                card.addView(textCol);
+
+                // Switch
+                final Switch toggle = createSwitch(context, isEnabled);
+                card.addView(toggle);
+
+                toggle.setOnCheckedChangeListener((btn, checked) -> {
+                    SharedPref.setBooleanPref(setting.key, checked);
+                });
+
+                card.setOnClickListener(v -> toggle.setChecked(!toggle.isChecked()));
+
+                itemsContainer.addView(card);
+            }
+
+            subScroll.addView(itemsContainer);
+            root.addView(subScroll);
+
+            // Bottom Back Button
+            TextView doneBtn = new TextView(context);
+            doneBtn.setText("Simpan & Kembali");
+            doneBtn.setTextColor(Color.WHITE);
+            doneBtn.setTextSize(13.5f);
+            doneBtn.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
+            doneBtn.setGravity(Gravity.CENTER);
+
+            GradientDrawable doneBg = new GradientDrawable();
+            doneBg.setColor(Color.parseColor(ACCENT_COLOR));
+            doneBg.setCornerRadius(24 * density);
+            doneBtn.setBackground(doneBg);
+
+            int donePadV = (int) (12 * density);
+            doneBtn.setPadding(0, donePadV, 0, donePadV);
+
+            LinearLayout.LayoutParams doneLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            doneLp.topMargin = (int) (10 * density);
+            doneBtn.setLayoutParams(doneLp);
+            doneBtn.setOnClickListener(v -> subDialog.dismiss());
+            root.addView(doneBtn);
+
+            subDialog.setContentView(root);
+            Window window = subDialog.getWindow();
+            if (window != null) {
+                window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                WindowManager.LayoutParams wlp = window.getAttributes();
+                int screenW = dm.widthPixels;
+                int screenH = dm.heightPixels;
+
+                int targetW = Math.min((int) (screenW * 0.94f), (int) (480 * density));
+                int targetH = (int) (screenH * 0.88f);
+
+                wlp.width = targetW;
+                wlp.height = targetH;
+                wlp.gravity = Gravity.CENTER;
+                window.setAttributes(wlp);
+            }
+
+            subDialog.show();
+        } catch (Throwable t) {
+            PikoLog.e("RhpatchInstagramDialog", "Gagal menampilkan sub-dialog kategori: " + t.getMessage(), t);
         }
     }
 

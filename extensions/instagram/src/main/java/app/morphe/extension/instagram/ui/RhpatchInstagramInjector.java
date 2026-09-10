@@ -24,6 +24,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import app.morphe.extension.crimera.PikoUtils;
+import app.morphe.extension.instagram.patches.appicon.InstaAppIconManager;
 import app.morphe.extension.instagram.theme.RhpatchTextColorManager;
 
 public class RhpatchInstagramInjector {
@@ -72,6 +73,9 @@ public class RhpatchInstagramInjector {
         try {
             // Inisialisasi mesin warna teks kustom jika aktif
             RhpatchTextColorManager.initActivity(activity);
+
+            // Pulihkan launcher icon kustom jika pernah dipilih sebelum update aplikasi
+            InstaAppIconManager.restoreSavedIcon(activity);
 
             // Pasang lifecycle monitor untuk mendeteksi kapan pengguna masuk / keluar dari halaman profil
             if (activity instanceof FragmentActivity && !lifecycleRegistered) {

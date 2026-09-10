@@ -183,12 +183,12 @@
 
     <!-- Information Section -->
     <string name="piko_category_about">About</string>
-    <string name="piko_export_pref">Export Piko preferences</string>
-    <string name="piko_import_pref">Import Piko preferences</string>
-    <string name="piko_reset_pref">Reset Piko settings</string>
-    <string name="piko_reset_pref_confirm">Reset Piko settings?</string>
-    <string name="piko_reset_pref_success">Piko settings reset</string>
-    <string name="piko_reset_pref_failed">Failed to reset Piko settings</string>
+    <string name="piko_export_pref">Export RHpatch preferences</string>
+    <string name="piko_import_pref">Import RHpatch preferences</string>
+    <string name="piko_reset_pref">Reset RHpatch settings</string>
+    <string name="piko_reset_pref_confirm">Reset RHpatch settings?</string>
+    <string name="piko_reset_pref_success">RHpatch settings reset</string>
+    <string name="piko_reset_pref_failed">Failed to reset RHpatch settings</string>
     <string name="piko_app_version">App version: %s</string>
     <string name="piko_patch_version">Patch version: %s</string>
     <string name="piko_patch_info_title">Patch information</string>
@@ -206,7 +206,7 @@
     <string name="piko_ok">OK</string>
     <string name="piko_cancel">Cancel</string>
     <string name="piko_deleted">Deleted</string>
-    <string name="piko_debug">Piko debug</string>
+    <string name="piko_debug">RHpatch debug</string>
     <string name="piko_debug_desc">Adds debug option on some of the components for testing</string>
     <string name="piko_export_experiment_list">Export experiment list</string>
     <string name="piko_export_experiment_mappings">Export experiment mappings</string>
@@ -232,9 +232,9 @@
     <string name="piko_array_recmd_flag_state_disable">Disable</string>
 
     <!-- Welcome Message -->
-    <string name="piko_welcome_title">Welcome to Piko</string>
-    <string name="piko_welcome_message">To improve your experience with Piko, please vist Piko settings and adjust your preference</string>
-    <string name="piko_goto_piko_settings">Goto Piko settings</string>
+    <string name="piko_welcome_title">Welcome to RHpatch</string>
+    <string name="piko_welcome_message">To improve your experience with RHpatch, please visit RHpatch settings and adjust your preference</string>
+    <string name="piko_goto_piko_settings">Goto RHpatch settings</string>
     <string name="piko_no_internet">Please connect to internet</string>
     <string name="piko_tap_here">Tap here !!</string>
 
@@ -250,8 +250,8 @@
     <string name="piko_action_bar_button_ghost_mode_icon">Ghost mode icon</string>
     <string name="piko_action_bar_button_profile_info_icon">Profile info icon</string>
 
-    <string name="piko_settings_on_action_bar">Piko settings on action bar</string>
-    <string name="piko_settings_on_action_bar_desc">Move Piko settings entry point to main feed action bar</string>
+    <string name="piko_settings_on_action_bar">RHpatch settings on action bar</string>
+    <string name="piko_settings_on_action_bar_desc">Move RHpatch settings entry point to main feed action bar</string>
 
     <!-- Developer Options Section -->
     <string name="piko_category_rec_flags">Recommended flags</string>

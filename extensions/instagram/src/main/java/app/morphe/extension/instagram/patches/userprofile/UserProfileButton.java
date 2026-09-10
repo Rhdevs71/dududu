@@ -65,39 +65,8 @@ public class UserProfileButton {
                 }
             });
 
-            // Ikon mini estetik melingkar (minimalis, tidak merusak proporsi tata letak profil)
-            if (viewGroup.findViewWithTag(TAG_MINI_PROFILE_ICON) == null && userData != null) {
-                float density = context.getResources().getDisplayMetrics().density;
-                int size = (int) (34 * density);
-
-                TextView miniBtn = new TextView(context);
-                miniBtn.setTag(TAG_MINI_PROFILE_ICON);
-                miniBtn.setText("⋮");
-                miniBtn.setTextColor(Color.WHITE);
-                miniBtn.setTextSize(18f);
-                miniBtn.setGravity(Gravity.CENTER);
-
-                GradientDrawable bg = new GradientDrawable();
-                bg.setShape(GradientDrawable.OVAL);
-                bg.setColor(Color.parseColor("#26FFFFFF")); // Semi-transparan elegan
-                bg.setStroke((int) (1 * density), Color.parseColor("#4DFFFFFF"));
-                miniBtn.setBackground(bg);
-
-                ViewGroup.MarginLayoutParams lp = new ViewGroup.MarginLayoutParams(size, size);
-                lp.setMargins((int) (6 * density), (int) (4 * density), (int) (6 * density), (int) (4 * density));
-                miniBtn.setLayoutParams(lp);
-
-                final UserData targetData = userData;
-                miniBtn.setOnClickListener(v -> {
-                    try {
-                        ProfileMoreOption.moreOptionsDailogueBox(context, targetData);
-                    } catch (Throwable t) {
-                        PikoLog.e("UserProfileButton", "Error opening profile more options", t);
-                    }
-                });
-
-                viewGroup.addView(miniBtn);
-            }
+            // Kapsul RHpatch otomatis aktif di halaman profil dan lenyap saat keluar.
+            // Tidak menginjeksi tombol titik tiga (⋮) agar layout profil tetap 100% bersih seperti original.
         } catch (Throwable t) {
             PikoLog.e("UserProfileButton", "addButtons failed", t);
         }
