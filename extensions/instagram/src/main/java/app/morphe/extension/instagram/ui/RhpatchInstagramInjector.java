@@ -32,7 +32,7 @@ public class RhpatchInstagramInjector {
     private static boolean lifecycleRegistered = false;
 
     /**
-     * Mengatur visibilitas tombol kapsul ● RHpatch secara real-time.
+     * Mengatur visibilitas tombol kapsul [RHpatch] secara real-time.
      */
     public static void setCapsuleVisibility(Context context, final int visibility) {
         if (context == null) return;
@@ -64,7 +64,7 @@ public class RhpatchInstagramInjector {
     }
 
     /**
-     * Menyematkan tombol kapsul mengambang draggable ● RHpatch pada DecorView activity Instagram.
+     * Menyematkan tombol kapsul mengambang draggable [RHpatch] pada DecorView activity Instagram.
      * Default: GONE (hanya muncul saat berada di halaman/tab Profil).
      */
     public static void onActivityResume(final Activity activity) {
@@ -107,7 +107,7 @@ public class RhpatchInstagramInjector {
 
                     TextView btn = new TextView(activity);
                     btn.setTag(TAG_RHPATCH_BTN);
-                    btn.setText("● RHpatch");
+                    btn.setText("[RHpatch]");
                     btn.setTextColor(Color.WHITE);
                     btn.setTextSize(12f);
                     btn.setTypeface(Typeface.create("sans-serif-medium", Typeface.BOLD));
