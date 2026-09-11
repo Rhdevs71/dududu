@@ -1,3 +1,9 @@
+## [1.8.0](https://github.com/Rhdevs71/dududu/compare/v1.7.1...v1.8.0) (2026-09-11)
+
+### ✨ New Features
+
+* integrate duolingo super patches and eliminate instagram system freeze triggers ([57bae69](https://github.com/Rhdevs71/dududu/commit/57bae692252b9eef0a5e1c042b4fb033bca37c2d))
+
 ## [1.7.1](https://github.com/Rhdevs71/dududu/compare/v1.7.0...v1.7.1) (2026-09-10)
 
 ### 🔧 Improvements

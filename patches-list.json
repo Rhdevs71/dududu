@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -2040,6 +2040,61 @@
             {
               "version": "12.19.1-release.0",
               "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Enable Debug Menu",
+      "description": "Enables Duolingo internal debug menu in settings.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.duolingo",
+          "name": "Duolingo",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#58CC02",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "6.95.4",
+              "versionCodes": {
+                "ARM64_V8A": 2470,
+                "ARMEABI_V7A": 2470,
+                "X86_64": 2470,
+                "X86": 2470
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
+              "version": "6.90.3",
+              "versionCodes": {
+                "ARM64_V8A": 2422,
+                "ARMEABI_V7A": 2422,
+                "X86_64": 2422,
+                "X86": 2422
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
+              "version": "6.88.3",
+              "versionCodes": {
+                "ARM64_V8A": 2390,
+                "ARMEABI_V7A": 2390,
+                "X86_64": 2390,
+                "X86": 2390
+              },
               "isExperimental": false,
               "minSdk": null,
               "description": null
@@ -4821,6 +4876,81 @@
         }
       ],
       "options": []
+    },
+    {
+      "name": "Unlock Subscription",
+      "description": "Unlocks user-selectable Duolingo subscription tiers (Default: Super).",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.duolingo",
+          "name": "Duolingo",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#58CC02",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "6.95.4",
+              "versionCodes": {
+                "ARM64_V8A": 2470,
+                "ARMEABI_V7A": 2470,
+                "X86_64": 2470,
+                "X86": 2470
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
+              "version": "6.90.3",
+              "versionCodes": {
+                "ARM64_V8A": 2422,
+                "ARMEABI_V7A": 2422,
+                "X86_64": 2422,
+                "X86": 2422
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            },
+            {
+              "version": "6.88.3",
+              "versionCodes": {
+                "ARM64_V8A": 2390,
+                "ARMEABI_V7A": 2390,
+                "X86_64": 2390,
+                "X86": 2390
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": [
+        {
+          "key": "subscriptionTier",
+          "title": "Subscription tier",
+          "description": "Choose Super, Max, Lite, or Immersive metadata.",
+          "required": false,
+          "type": "kotlin.String",
+          "default": "super",
+          "values": {
+            "Super": "super",
+            "Super Family": "super_family",
+            "Super Immersive": "super_immersive",
+            "Super Immersive Family": "super_immersive_family",
+            "Lite": "lite",
+            "Max": "max",
+            "Max Family": "max_family",
+            "Max Immersive": "max_immersive",
+            "Max Immersive Family": "max_immersive_family"
+          }
+        }
+      ]
     },
     {
       "name": "Unlock WhatsApp Plus (Nova)",

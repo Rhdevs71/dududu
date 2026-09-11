@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.7.1](https://github.com/Rhdevs71/dududu/releases/tag/v1.7.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;150 patches total
+> **[v1.8.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.8.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;152 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -250,6 +250,22 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 | [Hide Read Receipts (Blue Ticks)](#hide-read-receipts-blue-ticks) | Prevents sending read receipts (blue ticks) when viewing messages. Optionally sends blue ticks only when you reply. |  |
 | [Status & Media Downloader](#status-media-downloader) | Adds the capability to download status photos/videos and media directly to storage (/sdcard/Download/Piko/WhatsApp/). |  |
 | [Unlock WhatsApp Plus (Nova)](#unlock-whatsapp-plus-nova) | Unlocks official Meta Nova / WhatsApp Plus features including Custom App Themes, Custom App Icons, Pinned Chats Limit increase, and exclusive stickers. |  |
+
+</details>
+
+<details>
+<summary>📦 Duolingo&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 6.95.4 | 6.90.3 | 6.88.3 |
+| :---: | :---: | :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Enable Debug Menu](#enable-debug-menu) | Enables Duolingo internal debug menu in settings. |  |
+| [Unlock Subscription](#unlock-subscription) | Unlocks user-selectable Duolingo subscription tiers (Default: Super). | • Subscription tier |
 
 </details>
 
