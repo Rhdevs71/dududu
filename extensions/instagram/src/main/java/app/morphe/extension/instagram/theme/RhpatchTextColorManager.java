@@ -107,15 +107,15 @@ public class RhpatchTextColorManager {
                 decorView.setTag(TAG_LISTENER_ATTACHED, Boolean.TRUE);
 
                 ViewTreeObserver vto = decorView.getViewTreeObserver();
-                // Gunakan OnPreDrawListener terukur (200ms debounce) tanpa OnGlobalLayoutListener
-                // untuk menjamin kestabilan 120 FPS tanpa drop frame / lag saat scroll
+                // Gunakan OnPreDrawListener terukur (400ms debounce) tanpa OnGlobalLayoutListener
+                // untuk menjamin kestabilan dan mencegah render loop
                 vto.addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
                     private long lastRun = 0;
                     @Override
                     public boolean onPreDraw() {
                         if (isEnabled()) {
                             long now = SystemClock.uptimeMillis();
-                            if (now - lastRun > 200) {
+                            if (now - lastRun > 400) {
                                 lastRun = now;
                                 try {
                                     applyToViewTree(decorView, true, getParsedColor());
@@ -250,10 +250,6 @@ public class RhpatchTextColorManager {
                         CharSequence text = layout.getText();
                         if (text instanceof Spanned && text.length() > 0) {
                             recolorSpanned((Spanned) text, targetColor);
-                        }
-
-                        if (modified) {
-                            view.invalidate();
                         }
                     }
                 }

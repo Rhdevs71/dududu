@@ -40,51 +40,52 @@ public class InstaAppIconManager {
     private static final String PREF_NAME = "rhpatch_app_icon_pref";
     private static final String KEY_SAVED_ALIAS = "saved_icon_alias";
     private static final String KEY_SAVED_NAME = "saved_icon_name";
-    private static boolean sRestored = false;
+    private static final java.util.concurrent.atomic.AtomicBoolean sRestoreStarted = new java.util.concurrent.atomic.AtomicBoolean(false);
+    private static final java.util.concurrent.ExecutorService sExecutor = java.util.concurrent.Executors.newSingleThreadExecutor();
 
     /**
      * Memulihkan icon launcher kustom pengguna yang tersimpan setelah aplikasi diperbarui/di-reinstall.
+     * Dijalankan di background thread hanya 1 kali per cold-boot agar tidak membebani PackageManagerService.
      */
     public static void restoreSavedIcon(Context context) {
-        if (sRestored) return;
-        sRestored = true;
-        if (context == null) {
-            context = PikoUtils.getContext();
-        }
-        if (context == null) return;
+        if (sRestoreStarted.getAndSet(true)) return;
+        final Context appContext = (context != null) ? context.getApplicationContext() : PikoUtils.getContext();
+        if (appContext == null) return;
 
-        try {
-            String savedAlias = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
-                    .getString(KEY_SAVED_ALIAS, null);
-            if (savedAlias == null || savedAlias.isEmpty()) return;
+        sExecutor.execute(() -> {
+            try {
+                String savedAlias = appContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+                        .getString(KEY_SAVED_ALIAS, null);
+                if (savedAlias == null || savedAlias.isEmpty()) return;
 
-            PackageManager pm = context.getPackageManager();
-            String pkgName = context.getPackageName();
-            ComponentName targetComponent = new ComponentName(pkgName, savedAlias);
-            int state = pm.getComponentEnabledSetting(targetComponent);
-            if (state != PackageManager.COMPONENT_ENABLED_STATE_ENABLED) {
-                PikoLog.e(TAG, "Restoring custom launcher icon across update: " + savedAlias, null);
-                pm.setComponentEnabledSetting(
-                    targetComponent,
-                    PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
-                    PackageManager.DONT_KILL_APP
-                );
-                for (String alias : ALL_ICON_ALIASES) {
-                    if (!alias.equals(savedAlias)) {
-                        try {
-                            ComponentName otherComp = new ComponentName(pkgName, alias);
-                            pm.setComponentEnabledSetting(
-                                otherComp,
-                                PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
-                                PackageManager.DONT_KILL_APP
-                            );
-                        } catch (Throwable ignored) {}
+                PackageManager pm = appContext.getPackageManager();
+                String pkgName = appContext.getPackageName();
+                ComponentName targetComponent = new ComponentName(pkgName, savedAlias);
+                int state = pm.getComponentEnabledSetting(targetComponent);
+                if (state != PackageManager.COMPONENT_ENABLED_STATE_ENABLED) {
+                    PikoLog.e(TAG, "Restoring custom launcher icon across update: " + savedAlias, null);
+                    pm.setComponentEnabledSetting(
+                        targetComponent,
+                        PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                        PackageManager.DONT_KILL_APP
+                    );
+                    for (String alias : ALL_ICON_ALIASES) {
+                        if (!alias.equals(savedAlias)) {
+                            try {
+                                ComponentName otherComp = new ComponentName(pkgName, alias);
+                                pm.setComponentEnabledSetting(
+                                    otherComp,
+                                    PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                                    PackageManager.DONT_KILL_APP
+                                );
+                            } catch (Throwable ignored) {}
+                        }
                     }
                 }
+            } catch (Throwable t) {
+                PikoLog.e(TAG, "Failed to restore custom app icon on startup", t);
             }
-        } catch (Throwable t) {
-            PikoLog.e(TAG, "Failed to restore custom app icon on startup", t);
-        }
+        });
     }
 
     /**
