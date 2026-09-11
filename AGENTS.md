@@ -641,3 +641,17 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
     3. Hook Piko pada `LX/07qq;->A02` seketika memicu `InstaAppIconManager.applyIcon`, mengaktifkan launcher alias yang dipilih tanpa jeda dan tanpa dialog pop-up paywall.
     4. `LX/06Pb;->A02` menyimpan status kepemilikan benefit aktif di shared preferences, memastikan icon tidak pernah di-reset oleh sistem bawaan.
 
+#### 8. Integrasi Duolingo SUPER & Eliminasi Freeze Sistem Android (Rilis v1.8.0 - Terkini)
+* **Integrasi Duolingo Modul Bytecode Patches (`app.crimera.patches.duolingo`)**:
+  - `Constants.kt`: Menetapkan kompatibilitas Duolingo v6.95.4, v6.90.3, dan v6.88.3.
+  - `Fingerprints.kt`: `UserSubscriptionInfoFingerprint` dibuat fleksibel tanpa pembatasan nama method statis (`name = "s"`), mendukung `r()` pada v6.95.4 dan `s()` pada v6.90.3.
+  - `UnlockSubscriptionPatch.kt`: Tier default ditetapkan ke **`super`** (`PREMIUM`), membuka nyawa tak terbatas (`UNLIMITED_HEARTS`), review kesalahan tak terbatas, ujian level legendaris gratis, dan bebas iklan. Terbebas dari error koneksi server cloud AI Lili.
+  - `DebugMenuPatch.kt`: Mengaktifkan menu debug internal Duolingo.
+* **Eliminasi Freeze Sistem pada Instagram & UI Teks Warna**:
+  - `InstaAppIconManager.java`: `restoreSavedIcon` dipindahkan ke background worker thread terpisah dan diproteksi `AtomicBoolean` agar hanya dieksekusi 1 kali per cold boot, mencegah IPC lock contention pada `system_server` Android 15.
+  - `RhpatchTextColorManager.java`: Menghapus pemanggilan `view.invalidate()` di dalam siklus daun `onPreDraw` dan menaikkan debounce ke 400ms untuk mencegah render loop.
+* **Hasil Distribusi APK Rilis v1.8.0 (Signed Resmi Android SDK 35 `apksigner`)**:
+  - Duolingo: `duolingo_v1.8.0_signed.apk` (195.9 MB, Scheme v3 valid).
+  - Instagram: `instagram_v1.8.0_signed.apk` (152.1 MB, Scheme v2 & v3 valid).
+  - Spotify: `spotify_v1.8.0_signed.apk` (76.0 MB, Scheme v2 & v3 valid).
+
