@@ -357,6 +357,37 @@
       - *Modal Dialog Lengkap (`RhpatchInstagramDialog.java`)*: Menghapus seluruh sebutan nama lama, memuat kartu Aksi Cepat Profil (9 Opsi), Studio Warna Teks Kustom, Kecepatan Video, dan ~50 Pengaturan Terkategori.
       - *Folder Unduhan (`Constants.java`)*: Folder penyimpanan diperbarui menjadi `RHpatch-Instagram`.
 
+21. **Tahap 21: Perbaikan Modul Duolingo - Panggilan Video Lili & Eliminasi Paywall Super/Max (Rilis v1.8.0 - Terkini)**
+    - *Latar Belakang & Permintaan Pengguna*: Pengguna meminta perbaikan patch Duolingo terkait fitur Panggilan Video Lili (Lily Video Call) di mana saat membuka misi harian muncul popup tawaran Super/Max (paywall), serta ketika panggilan dimulai terjadi kendala koneksi server (*"Lily ada masalah koneksi. Coba lagi."* / `lily_had_trouble_connecting_try_again`) sehingga XP tidak didapatkan dan misi harian tidak selesai.
+    - *Analisis Reverse Engineering Duolingo (`com.duolingo` v6.95.4)*:
+      1. *Paywall Dialog Upsell*: Controller Practice Hub (`tmq.smali`) mengecek `SubscriptionFeatures.VIDEO_CALL_IN_PRACTICE_HUB` dan `User.hasGold` (`Q0`). Pada rilis sebelumnya, tier default disetel `super` (`PREMIUM`) sehingga fitur Video Call bernilai `false`, memicu cabang `PRACTICE_HUB_SUPER_VIDEO_CALL` yang menampilkan dialog langganan Super/Max.
+      2. *Sesi Panggilan Video & Misi Harian*: Duolingo memanggil `StartVideoCallRequest` yang ditolak di level server Meta/Duo untuk akun non-subscriber, memicu `y470` (`CallStartFailed`) yang menampilkan toast error `0x7f130bae`. Duolingo memiliki class debug internal `ts60` (`VideoCallDebugSettings`) dengan flag `completeSessionOnHangup`, `showPromptSelect`, `showVideoCallTab`, `showVideoCallTabWelcomeVideoMessage`, `forceCallFailed`, `forceCallTimeout`, serta evaluator kelayakan tab `z570` (`Video call tab eligibility`).
+    - *Solusi & Implementasi*:
+      1. *Fingerprints Presisi (`Fingerprints.kt`)*:
+         - `VideoCallDebugSettingsFingerprint`: Menarget class `ts60` (`VideoCallDebugSettings(showPromptSelect=...`).
+         - `VideoCallTabEligibilityFingerprint`: Menarget class `z570` (`Video call tab eligibility: ...`).
+      2. *Unlock Subscription Patch (`UnlockSubscriptionPatch.kt`)*:
+         - Mengubah default tier menjadi `max` dan default `productId` ke `gold_subscription_twelve_month`.
+         - Mengaktifkan metadata Max secara penuh (`hasGold = true`, `hasPlus = true`, `subscriberLevel = GOLD`, `MaxHooks.hasMax = true`).
+         - Meng-unconditional unlock seluruh fitur: `VIDEO_CALL_IN_PATH`, `VIDEO_CALL_IN_PRACTICE_HUB`, `EXPLAIN_MY_ANSWER`, `ROLEPLAY_FOR_INTERMEDIATE_LEARNERS`, `UNLIMITED_HEARTS` agar selalu return `true` (memusnahkan dialog paywall upsell secara tuntas).
+      3. *Debug Menu Patch (`DebugMenuPatch.kt`)*:
+         - Mengaktifkan menu debug internal Duolingo.
+         - Menginjeksi konstruktor `ts60.<init>` sebelum `return-void` dengan register nilai aman `v1` (menjaga `p0`/`v0` tetap utuh):
+           - `a` (`showPromptSelect`) = `1` (true)
+           - `b` (`showDebugMessageInSession`) = `1` (true)
+           - `c` (`completeSessionOnHangup`) = `1` (true — saat panggilan ditutup/terputus, sesi langsung diselesaikan dan XP 100% diberikan serta quest tuntas!)
+           - `d` (`showVideoCallTab`) = `1` (true)
+           - `h` (`forceCallFailed`) = `0` (false)
+           - `i` (`forceCallTimeout`) = `0` (false)
+         - Menginjeksi `z570.invokeSuspend` di index 1 (menggunakan register 4-bit `v0` dari `move-object/from16 v0, v16`):
+           - `j` (`showVideoCallTabDebugOverride`) = `1` (true — tab video call selalu eligible).
+    - *Hasil Build & Audit Bytecode*:
+      - MPP Artefak: `patches/build/libs/patches-1.8.0.mpp` (6.96 MB) dibangun dengan JDK 17 dan Android SDK 35.
+      - Morphe CLI patching sukses 100% pada `duo.apkm` (exit code: 0, 0 error, 0 warning).
+      - Audit DEX (`dexdump.exe`): Seluruh instruksi terverifikasi di `classes.dex`, 0 Dalvik/ART VerifyError.
+      - Ditandatangani dan diverifikasi dengan Android SDK 35 `apksigner` (**v3 scheme: true, verifies: true**).
+      - File APK Siap Instal: **`C:\Users\Rhdevs\Downloads\duolingo_v1.8.0_lili_signed.apk`** (196 MB).
+
 
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)
 

@@ -79,3 +79,20 @@ object BuildTargetFieldFingerprint : Fingerprint(
         Opcode.IF_EQZ,
     ),
 )
+
+// Targets VideoCallDebugSettings (e.g. ts60).
+// Controls showPromptSelect, showVideoCallTab, completeSessionOnHangup.
+object VideoCallDebugSettingsFingerprint : Fingerprint(
+    strings = listOf(
+        "VideoCallDebugSettings(showPromptSelect=",
+        ", showVideoCallTab=",
+    ),
+)
+
+// Targets VideoCallTabEligibility evaluator (e.g. z570).
+object VideoCallTabEligibilityFingerprint : Fingerprint(
+    strings = listOf(
+        "Video call tab eligibility: ",
+        ", hasVideoCallInPath=",
+    ),
+)

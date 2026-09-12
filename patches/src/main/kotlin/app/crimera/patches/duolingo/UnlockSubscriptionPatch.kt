@@ -44,20 +44,20 @@ val duolingoUnlockSubscriptionPatch = bytecodePatch(
 
     val subscriptionTier by stringOption(
         key = "subscriptionTier",
-        default = "super",
+        default = "max",
         values = mapOf(
+            "Max" to "max",
+            "Max Family" to "max_family",
+            "Max Immersive" to "max_immersive",
+            "Max Immersive Family" to "max_immersive_family",
             "Super" to "super",
             "Super Family" to "super_family",
             "Super Immersive" to "super_immersive",
             "Super Immersive Family" to "super_immersive_family",
             "Lite" to "lite",
-            "Max" to "max",
-            "Max Family" to "max_family",
-            "Max Immersive" to "max_immersive",
-            "Max Immersive Family" to "max_immersive_family",
         ),
         title = "Subscription tier",
-        description = "Choose Super, Max, Lite, or Immersive metadata.",
+        description = "Choose Max (recommended for Video Call), Super, Lite, or Immersive metadata.",
     )
 
     execute {
@@ -83,7 +83,7 @@ val duolingoUnlockSubscriptionPatch = bytecodePatch(
                 ?: throw PatchException("Could not resolve Duolingo $label field")
         }
 
-        val tier = subscriptionTier ?: "super"
+        val tier = subscriptionTier ?: "max"
         val productId = when (tier) {
             "max_family" -> "gold_subscription_fam_twelve_month"
             "max_immersive" -> "immersive_gold_subscription"
@@ -93,7 +93,7 @@ val duolingoUnlockSubscriptionPatch = bytecodePatch(
             "super_immersive" -> "immersive_subscription"
             "super_immersive_family" -> "immersive_family_subscription"
             "lite" -> "lite_subscription"
-            else -> "gold_subscription"
+            else -> "gold_subscription_twelve_month"
         }
         val vendorPurchaseId = "rhpatch_$tier"
         val periodLength = 12
@@ -184,44 +184,42 @@ val duolingoUnlockSubscriptionPatch = bytecodePatch(
                 )
             }
 
-        // 3. MaxHooksUserData.hasMax field (MAX tier only)
-        if (tier.startsWith("max")) {
-            val maxHooksClass = MaxHooksUserDataFingerprint.classDef
-            val hasMaxField = MaxHooksUserDataFingerprint.method.instructions
-                .mapNotNull { instruction ->
-                    ((instruction as? ReferenceInstruction)?.reference as? FieldReference)
-                        ?.takeIf { field -> field.definingClass == maxHooksClass.type && field.type == "Z" }
-                }
-                .distinctBy { field -> field.name }
-                .getOrNull(1)
-                ?: throw PatchException("Could not resolve Duolingo MaxHooks hasMax field")
-
-            val constructor = maxHooksClass.methods
-                .firstOrNull { method -> method.name == "<init>" && method.returnType == "V" }
-                ?: throw PatchException("Could not find Duolingo MaxHooks constructor")
-            val setFieldIndex = constructor.instructions.indexOfFirst { instruction ->
-                instruction.opcode == Opcode.IPUT_BOOLEAN &&
-                    ((instruction as? ReferenceInstruction)?.reference as? FieldReference)
-                        ?.let { field ->
-                            field.definingClass == hasMaxField.definingClass &&
-                                field.name == hasMaxField.name &&
-                                field.type == hasMaxField.type
-                        } == true
+        // 3. MaxHooksUserData.hasMax field
+        val maxHooksClass = MaxHooksUserDataFingerprint.classDef
+        val hasMaxField = MaxHooksUserDataFingerprint.method.instructions
+            .mapNotNull { instruction ->
+                ((instruction as? ReferenceInstruction)?.reference as? FieldReference)
+                    ?.takeIf { field -> field.definingClass == maxHooksClass.type && field.type == "Z" }
             }
-            if (setFieldIndex < 0) throw PatchException("Could not find Duolingo MaxHooks hasMax assignment")
+            .distinctBy { field -> field.name }
+            .getOrNull(1)
+            ?: throw PatchException("Could not resolve Duolingo MaxHooks hasMax field")
 
-            val register = constructor.instructions
-                .elementAt(setFieldIndex)
-                .let { instruction -> (instruction as? TwoRegisterInstruction)?.registerA }
-                ?: throw PatchException("Could not resolve Duolingo MaxHooks hasMax register")
-            constructor.addInstructions(setFieldIndex, "const/4 v$register, 0x1")
+        val constructor = maxHooksClass.methods
+            .firstOrNull { method -> method.name == "<init>" && method.returnType == "V" }
+            ?: throw PatchException("Could not find Duolingo MaxHooks constructor")
+        val setFieldIndex = constructor.instructions.indexOfFirst { instruction ->
+            instruction.opcode == Opcode.IPUT_BOOLEAN &&
+                ((instruction as? ReferenceInstruction)?.reference as? FieldReference)
+                    ?.let { field ->
+                        field.definingClass == hasMaxField.definingClass &&
+                            field.name == hasMaxField.name &&
+                            field.type == hasMaxField.type
+                    } == true
         }
+        if (setFieldIndex < 0) throw PatchException("Could not find Duolingo MaxHooks hasMax assignment")
+
+        val register = constructor.instructions
+            .elementAt(setFieldIndex)
+            .let { instruction -> (instruction as? TwoRegisterInstruction)?.registerA }
+            ?: throw PatchException("Could not resolve Duolingo MaxHooks hasMax register")
+        constructor.addInstructions(setFieldIndex, "const/4 v$register, 0x1")
 
         // 4. User premium fields in LoggedIn constructor
         val subscriberLevel = when {
-            tier.startsWith("max") -> "GOLD"
             tier == "lite" -> "LITE"
-            else -> "PREMIUM"
+            tier.startsWith("super") -> "PREMIUM"
+            else -> "GOLD"
         }
         val userClass = mutableClassDefBy("Lcom/duolingo/data/user/User;")
         val hasGoldField = resolvedField(UserHasGoldFieldUsageFingerprint, "hasGold/P0")
@@ -247,7 +245,7 @@ val duolingoUnlockSubscriptionPatch = bytecodePatch(
                     """
                     const/4 v0, 0x1
                     iput-boolean v0, p1, ${hasPlusField.definingClass}->${hasPlusField.name}:${hasPlusField.type}
-                    const/4 v0, ${if (tier.startsWith("max")) "0x1" else "0x0"}
+                    const/4 v0, ${if (tier.startsWith("super") || tier == "lite") "0x0" else "0x1"}
                     iput-boolean v0, p1, ${hasGoldField.definingClass}->${hasGoldField.name}:${hasGoldField.type}
                     sget-object v0, ${subscriberLevelField.type}->$subscriberLevel:${subscriberLevelField.type}
                     iput-object v0, p1, ${subscriberLevelField.definingClass}->${subscriberLevelField.name}:${subscriberLevelField.type}
@@ -255,33 +253,20 @@ val duolingoUnlockSubscriptionPatch = bytecodePatch(
                 )
             }
 
-        // 5. SubscriptionFeatures gating (UNLIMITED_HEARTS for all paid tiers)
-        duolingoSubscriptionFeatureFingerprint("UNLIMITED_HEARTS").matchAll().forEach { match ->
-            val moveResultIndex = match.instructionMatches.last().index
-            val register = match.method.instructions
-                .elementAt(moveResultIndex) as OneRegisterInstruction
-            match.method.addInstructions(moveResultIndex + 1, "const/4 v${register.registerA}, 0x1")
-        }
-
-        if (tier.startsWith("max")) {
-            val features = setOf(
-                "VIDEO_CALL_IN_PATH",
-                "VIDEO_CALL_IN_PRACTICE_HUB",
-                "EXPLAIN_MY_ANSWER",
-                "ROLEPLAY_FOR_INTERMEDIATE_LEARNERS",
-            )
-            var patchedFeatures = 0
-            features.forEach { feature ->
-                duolingoSubscriptionFeatureFingerprint(feature).matchAll().forEach { match ->
-                    val moveResultIndex = match.instructionMatches.last().index
-                    val register = match.method.instructions
-                        .elementAt(moveResultIndex) as OneRegisterInstruction
-                    match.method.addInstructions(moveResultIndex + 1, "const/4 v${register.registerA}, 0x1")
-                    patchedFeatures++
-                }
-            }
-            if (patchedFeatures == 0) {
-                throw PatchException("Could not find Max feature checks")
+        // 5. SubscriptionFeatures gating - Unconditional Unlock for all premium features
+        val allFeatures = setOf(
+            "UNLIMITED_HEARTS",
+            "VIDEO_CALL_IN_PATH",
+            "VIDEO_CALL_IN_PRACTICE_HUB",
+            "EXPLAIN_MY_ANSWER",
+            "ROLEPLAY_FOR_INTERMEDIATE_LEARNERS",
+        )
+        allFeatures.forEach { feature ->
+            duolingoSubscriptionFeatureFingerprint(feature).matchAll().forEach { match ->
+                val moveResultIndex = match.instructionMatches.last().index
+                val register = match.method.instructions
+                    .elementAt(moveResultIndex) as OneRegisterInstruction
+                match.method.addInstructions(moveResultIndex + 1, "const/4 v${register.registerA}, 0x1")
             }
         }
     }
