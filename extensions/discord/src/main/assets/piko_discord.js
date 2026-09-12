@@ -15575,12 +15575,25 @@ function initPikoBooster() {
         var findByProps = metro.findByProps;
         var findByStoreName = metro.findByStoreName;
 
-        // 1. UserStore -> Nitro Full
+        var UserStore = null;
+        var EmojiStore = null;
+        var StickersStore = null;
+        var ChannelStore = null;
+
+        try { UserStore = findByStoreName("UserStore") || findByProps("getCurrentUser", "getUser"); } catch (e) {}
+        try { EmojiStore = findByStoreName("EmojiStore") || findByProps("getCustomEmojiById"); } catch (e) {}
+        try { StickersStore = findByStoreName("StickersStore") || findByStoreName("StickerStore") || findByProps("getStickerById"); } catch (e) {}
+        try { ChannelStore = findByStoreName("ChannelStore") || findByProps("getChannel", "getDMFromUserId"); } catch (e) {}
+
+        var hasRealNitro = false;
         try {
-            var UserStore = findByStoreName("UserStore");
             if (UserStore && UserStore.getCurrentUser) {
-                var u = UserStore.getCurrentUser();
-                if (u) u.premiumType = 2;
+                var rawUser = UserStore.getCurrentUser();
+                if (rawUser) {
+                    var realType = Number(rawUser.premiumType ?? rawUser.premium_type ?? 0) || 0;
+                    hasRealNitro = (realType === 2);
+                }
+                if (rawUser) rawUser.premiumType = 2;
                 patcher.after("getCurrentUser", UserStore, function(_, res) {
                     if (res) res.premiumType = 2;
                     return res;
@@ -15588,7 +15601,6 @@ function initPikoBooster() {
             }
         } catch (e) {}
 
-        // 2. Helper to hook properties across modules
         function hookProps(props, overrideVal) {
             for (var i = 0; i < props.length; i++) {
                 var prop = props[i];
@@ -15603,58 +15615,51 @@ function initPikoBooster() {
             }
         }
 
-        // 3. Launcher App Icons (prevent upsell modal + allow all icons)
-        try {
-            hookProps([
-                "canUsePremiumAppIcons",
-                "canUseCustomAppIcons",
-                "canUseAppIcons",
-                "isFreemiumAppIcon"
-            ], true);
+        hookProps([
+            "canUsePremiumAppIcons",
+            "canUseCustomAppIcons",
+            "canUseAppIcons",
+            "isFreemiumAppIcon"
+        ], true);
 
+        try {
             var appIconMod = findByProps("canUsePremiumAppIcons", "setAppIcon") || findByProps("canUsePremiumAppIcons");
             if (appIconMod) {
                 patcher.instead("canUsePremiumAppIcons", appIconMod, function() { return true; });
             }
         } catch (e) {}
 
-        // 4. Soundboard Everywhere (cross-server soundboard)
-        try {
-            hookProps([
-                "canUseSoundboardEverywhere",
-                "canUseExternalSounds",
-                "canUsePremiumSoundboard",
-                "canPlaySound",
-                "canUseSoundboardSound",
-                "canChannelUseSoundboard",
-                "canSelectedVoiceChannelUseSoundboard",
-                "canUseCustomCallSound"
-            ], true);
-        } catch (e) {}
+        hookProps([
+            "canUseSoundboardEverywhere",
+            "canUseExternalSounds",
+            "canUsePremiumSoundboard",
+            "canPlaySound",
+            "canUseSoundboardSound",
+            "canChannelUseSoundboard",
+            "canSelectedVoiceChannelUseSoundboard",
+            "canUseCustomCallSound"
+        ], true);
 
-        // 5. Emojis & Stickers Everywhere
-        try {
-            hookProps([
-                "canUseCustomStickersEverywhere",
-                "canUseEmojisEverywhere",
-                "canUseAnimatedEmojis",
-                "canUseExternalEmojis",
-                "canUsePremiumEmojis",
-                "canUseCustomEmojisEverywhere",
-                "canUseCustomEmojis"
-            ], true);
-        } catch (e) {}
+        hookProps([
+            "canUseCustomStickersEverywhere",
+            "canUseExternalStickers",
+            "canUseStickersEverywhere",
+            "canUsePremiumStickers",
+            "canUseCustomStickers",
+            "canUseEmojisEverywhere",
+            "canUseAnimatedEmojis",
+            "canUseExternalEmojis",
+            "canUsePremiumEmojis",
+            "canUseCustomEmojisEverywhere",
+            "canUseCustomEmojis"
+        ], true);
 
-        // 6. Client Themes
-        try {
-            hookProps([
-                "canUseClientThemes",
-                "canUsePremiumThemes",
-                "canUseGradientThemes"
-            ], true);
-        } catch (e) {}
+        hookProps([
+            "canUseClientThemes",
+            "canUsePremiumThemes",
+            "canUseGradientThemes"
+        ], true);
 
-        // 7. Silent Typing
         try {
             var typingModule = findByProps("startTyping", "stopTyping");
             if (typingModule && typingModule.startTyping) {
@@ -15662,7 +15667,6 @@ function initPikoBooster() {
             }
         } catch (e) {}
 
-        // 8. Message Logger: Anti-Delete
         try {
             var Dispatcher = findByProps("dispatch", "subscribe");
             if (Dispatcher && Dispatcher.subscribe) {
@@ -15680,6 +15684,321 @@ function initPikoBooster() {
                         }
                     } catch (e) {}
                 });
+            }
+        } catch (e) {}
+
+        function cloneAvailable(obj) {
+            if (!obj || typeof obj !== "object") return obj;
+            if (obj.available !== false) return obj;
+            try {
+                var c = Array.isArray(obj) ? obj.slice() : Object.assign(Object.create(Object.getPrototypeOf(obj)), obj);
+                c.__pikoOriginalAvailable = false;
+                c.available = true;
+                return c;
+            } catch (e) {
+                obj.available = true;
+                return obj;
+            }
+        }
+
+        function mapAvailability(ret) {
+            if (ret == null) return ret;
+            if (Array.isArray(ret)) {
+                for (var i = 0; i < ret.length; i++) {
+                    if (ret[i] && ret[i].available === false) ret[i] = cloneAvailable(ret[i]);
+                }
+                return ret;
+            }
+            if (typeof ret === "object") {
+                if (ret.available === false) return cloneAvailable(ret);
+                for (var k of ["emojis", "stickers", "sounds", "soundboardSounds", "items"]) {
+                    if (Array.isArray(ret[k])) {
+                        for (var j = 0; j < ret[k].length; j++) {
+                            if (ret[k][j] && ret[k][j].available === false) ret[k][j] = cloneAvailable(ret[k][j]);
+                        }
+                    }
+                }
+            }
+            return ret;
+        }
+
+        try {
+            if (EmojiStore) {
+                var emojiMethods = ["getCustomEmojiById", "getGuildEmoji", "getGuildEmojis", "getGuildEmojiForEmojiPicker", "getAllGuildEmoji"];
+                for (var em = 0; em < emojiMethods.length; em++) {
+                    var emKey = emojiMethods[em];
+                    if (typeof EmojiStore[emKey] === "function") {
+                        patcher.after(emKey, EmojiStore, function(_, ret) { return mapAvailability(ret); });
+                    }
+                }
+            }
+        } catch (e) {}
+
+        try {
+            if (StickersStore) {
+                var stickerMethods = ["getStickerById", "getStickersByGuildId", "getGuildStickers", "getStickersForGuild"];
+                for (var sm = 0; sm < stickerMethods.length; sm++) {
+                    var smKey = stickerMethods[sm];
+                    if (typeof StickersStore[smKey] === "function") {
+                        patcher.after(smKey, StickersStore, function(_, ret) { return mapAvailability(ret); });
+                    }
+                }
+            }
+        } catch (e) {}
+
+        function safeName(v, fallback) {
+            var s = String(v || fallback || "item").replace(/[\r\n]/g, " ").trim();
+            return s || fallback || "item";
+        }
+
+        function spacingAround(orig, start, len) {
+            var before = (start <= 0 || /\s/.test(orig[start - 1] || "")) ? "" : " ";
+            var after = (start + len >= orig.length || /\s/.test(orig[start + len] || "")) ? "" : " ";
+            return [before, after];
+        }
+
+        function emojiUrl(id, name, animated) {
+            var ext = animated ? "gif" : "webp";
+            var n = encodeURIComponent(safeName(name, "emoji"));
+            return "https://cdn.discordapp.com/emojis/" + id + "." + ext + "?size=48&quality=lossless&name=" + n;
+        }
+
+        function stickerFormat(sticker) {
+            var f = sticker?.format_type ?? sticker?.formatType;
+            return (f === 4 || String(f).toUpperCase() === "GIF") ? "gif" : "png";
+        }
+
+        function stickerUrl(sticker) {
+            var sId = sticker?.id;
+            var format = stickerFormat(sticker);
+            var n = encodeURIComponent(safeName(sticker?.name, "sticker"));
+            return "https://media.discordapp.net/stickers/" + sId + "." + format + "?size=160&name=" + n + "&lossless=true";
+        }
+
+        function currentGuildId(channelId) {
+            try {
+                if (!ChannelStore || !channelId) return null;
+                var ch = ChannelStore.getChannel(channelId);
+                return ch?.guild_id || ch?.guildId || null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function shouldFakeEmoji(emoji, channelId) {
+            if (!emoji || !emoji.id) return false;
+            if (emoji.type === 0) return false;
+            if (hasRealNitro) return false;
+            if (emoji.animated) return true;
+            var guild = currentGuildId(channelId);
+            if (!guild) return true;
+            var emojiGuild = emoji.guildId || emoji.guild_id || null;
+            if (emojiGuild && emojiGuild !== guild) return true;
+            if (emoji.available === false) return true;
+            return false;
+        }
+
+        function shouldFakeSticker(sticker, channelId) {
+            if (!sticker || !sticker.id) return false;
+            if (sticker.pack_id || sticker.packId) return false;
+            if (hasRealNitro) return false;
+            var guild = currentGuildId(channelId);
+            if (!guild) return true;
+            var stickerGuild = sticker.guild_id || sticker.guildId || null;
+            if (stickerGuild && stickerGuild !== guild) return true;
+            if (sticker.available === false) return true;
+            return false;
+        }
+
+        function locateMessageObject(args) {
+            if (args && args[1] && typeof args[1] === "object" && typeof args[1].content === "string") return args[1];
+            for (var i = 0; i < (args ? args.length : 0); i++) {
+                if (args[i] && typeof args[i] === "object" && typeof args[i].content === "string") return args[i];
+            }
+            if (args && args[1] && typeof args[1] === "object") return args[1];
+            return null;
+        }
+
+        function locateStickerOptions(args) {
+            for (var i = 0; i < (args ? args.length : 0); i++) {
+                var a = args[i];
+                if (!a || typeof a !== "object") continue;
+                if (Array.isArray(a.stickerIds) && a.stickerIds.length) return a;
+                if (Array.isArray(a.sticker_ids) && a.sticker_ids.length) return a;
+                if (a.options && Array.isArray(a.options.stickerIds) && a.options.stickerIds.length) return a.options;
+                if (a.options && Array.isArray(a.options.sticker_ids) && a.options.sticker_ids.length) return a.options;
+            }
+            return null;
+        }
+
+        function transformEmojiToken(content, emoji, channelId) {
+            if (!shouldFakeEmoji(emoji, channelId)) return content;
+            var eId = String(emoji.id);
+            var re = new RegExp("<a?:[^:>]+:" + eId + ">", "g");
+            var replacement = emojiUrl(emoji.id, emoji.name || emoji.originalName, !!emoji.animated);
+            return String(content).replace(re, function(match, offset, orig) {
+                var sp = spacingAround(orig, offset, match.length);
+                return sp[0] + replacement + sp[1];
+            });
+        }
+
+        function transformRawEmojiSyntax(content, channelId) {
+            if (typeof content !== "string") return content;
+            return content.replace(/<(a?):([^:\n>]+):(\d+)>/g, function(full, a, name, id, offset, orig) {
+                if (offset > 0 && orig[offset - 1] === "\\\\") return full;
+                var emoji = null;
+                try {
+                    emoji = EmojiStore ? (EmojiStore.getCustomEmojiById(id) || EmojiStore.getCustomEmojiById(String(id))) : null;
+                } catch (e) {}
+                if (!emoji) {
+                    emoji = { id: id, name: name, originalName: name, animated: (a === "a"), available: false };
+                }
+                if (!shouldFakeEmoji(emoji, channelId)) return full;
+                var sp = spacingAround(orig, offset, full.length);
+                return sp[0] + emojiUrl(id, name, (a === "a" || emoji.animated)) + sp[1];
+            });
+        }
+
+        function transformOutgoing(channelId, messageObj, options, rawArgs) {
+            if (!messageObj) return;
+            if (typeof messageObj.content !== "string") messageObj.content = "";
+
+            var stickerList = null;
+            if (options && Array.isArray(options.stickerIds) && options.stickerIds.length) {
+                stickerList = options.stickerIds;
+            } else if (options && Array.isArray(options.sticker_ids) && options.sticker_ids.length) {
+                stickerList = options.sticker_ids;
+            } else if (messageObj && Array.isArray(messageObj.stickerIds) && messageObj.stickerIds.length) {
+                stickerList = messageObj.stickerIds;
+            } else if (messageObj && Array.isArray(messageObj.sticker_ids) && messageObj.sticker_ids.length) {
+                stickerList = messageObj.sticker_ids;
+            }
+
+            if (stickerList && stickerList.length) {
+                var sId = String(stickerList[0]);
+                var sticker = null;
+                try {
+                    sticker = StickersStore ? (StickersStore.getStickerById(sId) || StickersStore.getStickerById(Number(sId))) : null;
+                } catch (e) {}
+                if (!sticker) sticker = { id: sId, name: "sticker", available: false, format_type: 1 };
+                if (shouldFakeSticker(sticker, channelId)) {
+                    var sLink = stickerUrl(sticker);
+                    var cur = messageObj.content;
+                    messageObj.content = cur ? (cur + " " + sLink) : sLink;
+                    stickerList.length = 0;
+                    try {
+                        delete messageObj.stickerIds;
+                        delete messageObj.sticker_ids;
+                        if (options) {
+                            delete options.stickerIds;
+                            delete options.sticker_ids;
+                        }
+                        for (var aIdx = 0; aIdx < (rawArgs ? rawArgs.length : 0); aIdx++) {
+                            if (rawArgs[aIdx] && typeof rawArgs[aIdx] === "object") {
+                                delete rawArgs[aIdx].stickerIds;
+                                delete rawArgs[aIdx].sticker_ids;
+                                if (rawArgs[aIdx].options) {
+                                    delete rawArgs[aIdx].options.stickerIds;
+                                    delete rawArgs[aIdx].options.sticker_ids;
+                                }
+                            }
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            var list = Array.isArray(messageObj.validNonShortcutEmojis) ? messageObj.validNonShortcutEmojis : [];
+            var text = messageObj.content;
+            for (var ei = 0; ei < list.length; ei++) {
+                text = transformEmojiToken(text, list[ei], channelId);
+            }
+            text = transformRawEmojiSyntax(text, channelId);
+            messageObj.content = text;
+        }
+
+        try {
+            var msgMods = [];
+            var direct = findByProps("sendMessage", "editMessage");
+            if (direct) msgMods.push(direct);
+            try {
+                var allMods = metro.findByPropsAll("sendMessage");
+                if (Array.isArray(allMods)) msgMods.push(...allMods);
+            } catch (e) {}
+
+            var uniqueMods = Array.from(new Set(msgMods));
+            for (var mIdx = 0; mIdx < uniqueMods.length; mIdx++) {
+                var mod = uniqueMods[mIdx];
+                if (!mod || typeof mod.sendMessage !== "function") continue;
+
+                patcher.before("sendMessage", mod, function(args) {
+                    try {
+                        var cId = String(args?.[0] ?? locateMessageObject(args)?.channel_id ?? "");
+                        var msg = locateMessageObject(args);
+                        var opts = locateStickerOptions(args);
+                        transformOutgoing(cId, msg, opts, args);
+                    } catch (e) {}
+                    return args;
+                });
+
+                if (typeof mod.editMessage === "function") {
+                    patcher.before("editMessage", mod, function(args) {
+                        try {
+                            var cId = String(args?.[0] ?? locateMessageObject(args)?.channel_id ?? "");
+                            var msg = locateMessageObject(args);
+                            if (msg && typeof msg.content === "string") {
+                                msg.content = transformRawEmojiSyntax(msg.content, cId);
+                            }
+                        } catch (e) {}
+                        return args;
+                    });
+                }
+
+                if (typeof mod.sendStickers === "function") {
+                    patcher.instead("sendStickers", mod, function(args, orig) {
+                        try {
+                            var cId = String(args?.[0] ?? "");
+                            var sIds = args?.[1];
+                            if (Array.isArray(sIds) && sIds.length > 0) {
+                                var sId = String(sIds[0]?.id || sIds[0]);
+                                var sticker = null;
+                                try {
+                                    sticker = StickersStore ? (StickersStore.getStickerById(sId) || StickersStore.getStickerById(Number(sId))) : null;
+                                } catch (e) {}
+                                if (!sticker) sticker = { id: sId, name: "sticker", available: false, format_type: 1 };
+                                if (shouldFakeSticker(sticker, cId)) {
+                                    var sLink = stickerUrl(sticker);
+                                    if (typeof mod.sendMessage === "function") {
+                                        return mod.sendMessage(cId, { content: sLink });
+                                    }
+                                }
+                            }
+                        } catch (e) {}
+                        return orig.apply(this, args);
+                    });
+                }
+
+                if (typeof mod.sendSticker === "function") {
+                    patcher.instead("sendSticker", mod, function(args, orig) {
+                        try {
+                            var cId = String(args?.[0] ?? "");
+                            var sId = String((args?.[1]?.id || args?.[1]) ?? "");
+                            if (sId) {
+                                var sticker = null;
+                                try {
+                                    sticker = StickersStore ? (StickersStore.getStickerById(sId) || StickersStore.getStickerById(Number(sId))) : null;
+                                } catch (e) {}
+                                if (!sticker) sticker = { id: sId, name: "sticker", available: false, format_type: 1 };
+                                if (shouldFakeSticker(sticker, cId)) {
+                                    var sLink = stickerUrl(sticker);
+                                    if (typeof mod.sendMessage === "function") {
+                                        return mod.sendMessage(cId, { content: sLink });
+                                    }
+                                }
+                            }
+                        } catch (e) {}
+                        return orig.apply(this, args);
+                    });
+                }
             }
         } catch (e) {}
 
