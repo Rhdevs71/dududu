@@ -1,3 +1,9 @@
+## [1.8.1](https://github.com/Rhdevs71/dududu/compare/v1.8.0...v1.8.1) (2026-09-12)
+
+### 🐛 Bug Fixes
+
+* **duolingo:** eliminate paywall upsell popup and unlock video call debug overrides ([6054091](https://github.com/Rhdevs71/dududu/commit/605409190297df0bcb5cbe4865c7259fcaa67dec))
+
 ## [1.8.0](https://github.com/Rhdevs71/dududu/compare/v1.7.1...v1.8.0) (2026-09-11)
 
 ### ✨ New Features

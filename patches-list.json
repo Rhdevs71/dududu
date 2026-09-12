@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -2051,7 +2051,7 @@
     },
     {
       "name": "Enable Debug Menu",
-      "description": "Enables Duolingo internal debug menu in settings.",
+      "description": "Enables Duolingo internal debug menu in settings and unlocks video call debug overrides.",
       "default": true,
       "dependencies": [],
       "compatiblePackages": [
@@ -4934,20 +4934,20 @@
         {
           "key": "subscriptionTier",
           "title": "Subscription tier",
-          "description": "Choose Super, Max, Lite, or Immersive metadata.",
+          "description": "Choose Max (recommended for Video Call), Super, Lite, or Immersive metadata.",
           "required": false,
           "type": "kotlin.String",
-          "default": "super",
+          "default": "max",
           "values": {
+            "Max": "max",
+            "Max Family": "max_family",
+            "Max Immersive": "max_immersive",
+            "Max Immersive Family": "max_immersive_family",
             "Super": "super",
             "Super Family": "super_family",
             "Super Immersive": "super_immersive",
             "Super Immersive Family": "super_immersive_family",
-            "Lite": "lite",
-            "Max": "max",
-            "Max Family": "max_family",
-            "Max Immersive": "max_immersive",
-            "Max Immersive Family": "max_immersive_family"
+            "Lite": "lite"
           }
         }
       ]

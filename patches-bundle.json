@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-11T04:57:39",
-  "description": "## [1.8.0](https://github.com/Rhdevs71/dududu/compare/v1.7.1...v1.8.0) (2026-09-11)\n\n### ✨ New Features\n\n* integrate duolingo super patches and eliminate instagram system freeze triggers ([57bae69](https://github.com/Rhdevs71/dududu/commit/57bae692252b9eef0a5e1c042b4fb033bca37c2d))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.8.0/patches-1.8.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.8.0/patches-1.8.0.mpp.asc",
-  "version": "1.8.0"
+  "created_at": "2026-09-12T03:02:19",
+  "description": "## [1.8.1](https://github.com/Rhdevs71/dududu/compare/v1.8.0...v1.8.1) (2026-09-12)\n\n### 🐛 Bug Fixes\n\n* **duolingo:** eliminate paywall upsell popup and unlock video call debug overrides ([6054091](https://github.com/Rhdevs71/dududu/commit/605409190297df0bcb5cbe4865c7259fcaa67dec))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.8.1/patches-1.8.1.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.8.1/patches-1.8.1.mpp.asc",
+  "version": "1.8.1"
 }

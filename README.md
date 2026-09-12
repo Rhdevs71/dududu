@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.8.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.8.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;152 patches total
+> **[v1.8.1](https://github.com/Rhdevs71/dududu/releases/tag/v1.8.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;152 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -264,7 +264,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Enable Debug Menu](#enable-debug-menu) | Enables Duolingo internal debug menu in settings. |  |
+| [Enable Debug Menu](#enable-debug-menu) | Enables Duolingo internal debug menu in settings and unlocks video call debug overrides. |  |
 | [Unlock Subscription](#unlock-subscription) | Unlocks user-selectable Duolingo subscription tiers (Default: Super). | • Subscription tier |
 
 </details>
