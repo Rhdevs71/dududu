@@ -36,10 +36,9 @@ val unlockNitroAppIconsPatch =
                         0,
                         """
                         :try_start_piko
-                        sget-object v0, Lcom/discord/app_icon/AppIconUtil;->INSTANCE:Lcom/discord/app_icon/AppIconUtil;
                         invoke-virtual {p0}, Lcom/facebook/react/bridge/BaseJavaModule;->getReactApplicationContext()Lcom/facebook/react/bridge/ReactApplicationContext;
-                        move-result-object v1
-                        invoke-virtual {v0, v1, p1}, Lcom/discord/app_icon/AppIconUtil;->setAppIcon(Landroid/content/Context;Ljava/lang/String;)V
+                        move-result-object v0
+                        invoke-static {v0, p1}, Lapp/morphe/extension/discord/appicon/PikoAppIconManager;->applyAppIcon(Landroid/content/Context;Ljava/lang/String;)V
                         sget-object v0, Ljava/lang/Boolean;->TRUE:Ljava/lang/Boolean;
                         invoke-interface {p2, v0}, Lcom/facebook/react/bridge/Promise;->resolve(Ljava/lang/Object;)V
                         return-void
