@@ -58,8 +58,11 @@ val duolingoEnableDebugMenuPatch = bytecodePatch(
                         const/4 v1, 0x1
                         iput-boolean v1, p0, $debugSettingsType->a:Z
                         iput-boolean v1, p0, $debugSettingsType->b:Z
+                        const/4 v1, 0x0
                         iput-boolean v1, p0, $debugSettingsType->c:Z
+                        const/4 v1, 0x1
                         iput-boolean v1, p0, $debugSettingsType->d:Z
+                        iput-boolean v1, p0, $debugSettingsType->e:Z
                         const/4 v1, 0x0
                         iput-boolean v1, p0, $debugSettingsType->h:Z
                         iput-boolean v1, p0, $debugSettingsType->i:Z
