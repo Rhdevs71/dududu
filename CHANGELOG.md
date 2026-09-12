@@ -1,3 +1,14 @@
+## [1.10.0](https://github.com/Rhdevs71/dududu/compare/v1.9.0...v1.10.0) (2026-09-12)
+
+### 🐛 Bug Fixes
+
+* **discord:** fix PikoUtils.toast argument signature ([f8147b4](https://github.com/Rhdevs71/dududu/commit/f8147b4491f39db75a6c46370411f1a6934aa630))
+* **discord:** specify namespace in build.gradle.kts and clean manifest ([7a3a89c](https://github.com/Rhdevs71/dududu/commit/7a3a89c98aa21bbea224e3a056fd77edbb1cffe9))
+
+### ✨ New Features
+
+* **discord:** add out-of-the-box mod loader, nitro perks, launcher app icons, and roadblock removals ([8e62417](https://github.com/Rhdevs71/dududu/commit/8e6241750767180e3dbf8b0338c6b9b02cd23960))
+
 ## [1.9.0](https://github.com/Rhdevs71/dududu/compare/v1.8.2...v1.9.0) (2026-09-12)
 
 ### 🐛 Bug Fixes

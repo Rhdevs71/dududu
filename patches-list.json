@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -2020,9 +2020,11 @@
     },
     {
       "name": "Discord Client Mod Loader",
-      "description": "Allows dynamic loading of external JS bundles (Pyoncord / Revenge / custom mods) from /sdcard/Download/Piko/Discord/bundle.js.",
+      "description": "Injects out-of-the-box Revenge/Pyoncord client mod runtime with built-in Nitro perks, and supports dynamic loading from internal app storage.",
       "default": true,
-      "dependencies": [],
+      "dependencies": [
+        "ResourcePatch"
+      ],
       "compatiblePackages": [
         {
           "packageName": "com.discord",
@@ -4982,6 +4984,37 @@
           "values": null
         }
       ]
+    },
+    {
+      "name": "Unlock Nitro Emojis & Roadblocks",
+      "description": "Unlocks custom emojis from all servers in the emoji picker and neutralizes Nitro locked sections.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.discord",
+          "name": "Discord",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#5865F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "346.0 - Alpha",
+              "versionCodes": {
+                "ARM64_V8A": 346200,
+                "ARMEABI_V7A": 346200,
+                "X86_64": 346200,
+                "X86": 346200
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
     },
     {
       "name": "Unlock Nitro Launcher Icons",

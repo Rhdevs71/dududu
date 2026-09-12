@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.9.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.9.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;158 patches total
+> **[v1.10.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.10.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;159 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -234,7 +234,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 </details>
 
 <details>
-<summary>📦 Discord&nbsp;&nbsp;•&nbsp;&nbsp;6 patches</summary>
+<summary>📦 Discord&nbsp;&nbsp;•&nbsp;&nbsp;7 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -247,7 +247,8 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 | [Allow Screenshots & Screen Recording](#allow-screenshots-screen-recording) | Removes FLAG_SECURE window restrictions so screenshots and screen recording work everywhere. |  |
 | [Clone](#clone) | Changes the package name and app name for Discord. This allows you to install the patched Discord alongside the original Discord app.<br>Default cloned package: com.discord.pikoo | • Package name<br>• App name |
 | [Disable Telemetry & Tracking](#disable-telemetry-tracking) | Blocks Discord analytics, Sentry crash reporting, install referrers, and telemetry logging. |  |
-| [Discord Client Mod Loader](#discord-client-mod-loader) | Allows dynamic loading of external JS bundles (Pyoncord / Revenge / custom mods) from /sdcard/Download/Piko/Discord/bundle.js. |  |
+| [Discord Client Mod Loader](#discord-client-mod-loader) | Injects out-of-the-box Revenge/Pyoncord client mod runtime with built-in Nitro perks, and supports dynamic loading from internal app storage. |  |
+| [Unlock Nitro Emojis & Roadblocks](#unlock-nitro-emojis-roadblocks) | Unlocks custom emojis from all servers in the emoji picker and neutralizes Nitro locked sections. |  |
 | [Unlock Nitro Launcher Icons](#unlock-nitro-launcher-icons) | Unlocks custom Discord app launcher icons on your home screen without Nitro restrictions. |  |
 | [Unlock Staff & Developer Experiments](#unlock-staff-developer-experiments) | Unlocks internal Discord Developer Settings, staff flags, and experiment features. |  |
 
