@@ -1,3 +1,9 @@
+## [1.8.2](https://github.com/Rhdevs71/dududu/compare/v1.8.1...v1.8.2) (2026-09-12)
+
+### 🐛 Bug Fixes
+
+* **duolingo:** disable completeSessionOnHangup to prevent false quest completion and enable welcome video message ([29876de](https://github.com/Rhdevs71/dududu/commit/29876de0784f5660a87f38a24b10b18209ff4fbd))
+
 ## [1.8.1](https://github.com/Rhdevs71/dududu/compare/v1.8.0...v1.8.1) (2026-09-12)
 
 ### 🐛 Bug Fixes
