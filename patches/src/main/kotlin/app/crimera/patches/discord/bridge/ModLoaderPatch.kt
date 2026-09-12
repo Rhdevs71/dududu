@@ -7,6 +7,7 @@
 package app.crimera.patches.discord.bridge
 
 import app.crimera.patches.discord.Constants.DISCORD_COMPATIBILITY
+import app.crimera.patches.discord.misc.extension.discordExtensionPatch
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.extensions.InstructionExtensions.instructions
@@ -43,7 +44,7 @@ val modLoaderPatch =
     ) {
         compatibleWith(DISCORD_COMPATIBILITY)
 
-        dependsOn(modLoaderResourcePatch)
+        dependsOn(discordExtensionPatch, modLoaderResourcePatch)
 
         execute {
             ReactInstanceLoadJSBundleFingerprint.classDefOrNull?.methods?.forEach { method ->

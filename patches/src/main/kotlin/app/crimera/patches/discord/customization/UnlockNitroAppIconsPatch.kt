@@ -7,6 +7,7 @@
 package app.crimera.patches.discord.customization
 
 import app.crimera.patches.discord.Constants.DISCORD_COMPATIBILITY
+import app.crimera.patches.discord.misc.extension.discordExtensionPatch
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
@@ -27,6 +28,8 @@ val unlockNitroAppIconsPatch =
         default = true,
     ) {
         compatibleWith(DISCORD_COMPATIBILITY)
+
+        dependsOn(discordExtensionPatch)
 
         execute {
             // Ensure AppIconModule.setIcon succeeds without throwing rejected promises
