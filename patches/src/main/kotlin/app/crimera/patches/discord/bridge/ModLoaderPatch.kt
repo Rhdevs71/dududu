@@ -10,7 +10,6 @@ import app.crimera.patches.discord.Constants.DISCORD_COMPATIBILITY
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
-import com.android.tools.smali.dexlib2.builder.MutableMethodImplementation
 
 internal object DCDReactNativeHostFingerprint : Fingerprint(
     definingClass = "Lcom/discord/bridge/DCDReactNativeHost;",
@@ -28,10 +27,6 @@ val modLoaderPatch =
         execute {
             DCDReactNativeHostFingerprint.classDefOrNull?.methods?.forEach { method ->
                 if (method.name == "getJSBundleFile" && method.returnType == "Ljava/lang/String;") {
-                    val impl = method.implementation as? MutableMethodImplementation
-                    if (impl != null && impl.registerCount < 3) {
-                        impl.registerCount = 3
-                    }
 
                     method.addInstructions(
                         0,
