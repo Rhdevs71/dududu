@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-12T11:06:45",
-  "description": "## [1.10.2](https://github.com/Rhdevs71/dududu/compare/v1.10.1...v1.10.2) (2026-09-12)\n\n### 🐛 Bug Fixes\n\n* **discord:** load piko_discord.js before host bundle, hook Soundboard & AppIcons via Vendetta/Revenge runtime ([19608da](https://github.com/Rhdevs71/dududu/commit/19608dab737c3b283e1ed6709b9071fb53effbbf))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.2/patches-1.10.2.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.2/patches-1.10.2.mpp.asc",
-  "version": "1.10.2"
+  "created_at": "2026-09-12T11:22:41",
+  "description": "## [1.10.3](https://github.com/Rhdevs71/dududu/compare/v1.10.2...v1.10.3) (2026-09-12)\n\n### 🐛 Bug Fixes\n\n* **discord:** guard console access and invoke booster cleanly inside startDiscord ([96674a1](https://github.com/Rhdevs71/dududu/commit/96674a150572548dc7af7ac5c25d5f54472a4b86))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.3/patches-1.10.3.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.3/patches-1.10.3.mpp.asc",
+  "version": "1.10.3"
 }

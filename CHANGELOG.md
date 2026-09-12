@@ -1,3 +1,9 @@
+## [1.10.3](https://github.com/Rhdevs71/dududu/compare/v1.10.2...v1.10.3) (2026-09-12)
+
+### 🐛 Bug Fixes
+
+* **discord:** guard console access and invoke booster cleanly inside startDiscord ([96674a1](https://github.com/Rhdevs71/dududu/commit/96674a150572548dc7af7ac5c25d5f54472a4b86))
+
 ## [1.10.2](https://github.com/Rhdevs71/dududu/compare/v1.10.1...v1.10.2) (2026-09-12)
 
 ### 🐛 Bug Fixes
