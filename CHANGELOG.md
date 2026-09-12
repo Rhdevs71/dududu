@@ -1,3 +1,9 @@
+## [1.11.0](https://github.com/Rhdevs71/dududu/compare/v1.10.3...v1.11.0) (2026-09-12)
+
+### ✨ New Features
+
+* **discord:** add FakeNitro outgoing emoji & sticker transformer to bypass Clyde bot ([26bbe47](https://github.com/Rhdevs71/dududu/commit/26bbe4727da51d7c6659a87bfb9b1b0259cac21d))
+
 ## [1.10.3](https://github.com/Rhdevs71/dududu/compare/v1.10.2...v1.10.3) (2026-09-12)
 
 ### 🐛 Bug Fixes

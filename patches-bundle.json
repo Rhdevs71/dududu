@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-12T11:22:41",
-  "description": "## [1.10.3](https://github.com/Rhdevs71/dududu/compare/v1.10.2...v1.10.3) (2026-09-12)\n\n### 🐛 Bug Fixes\n\n* **discord:** guard console access and invoke booster cleanly inside startDiscord ([96674a1](https://github.com/Rhdevs71/dududu/commit/96674a150572548dc7af7ac5c25d5f54472a4b86))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.3/patches-1.10.3.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.3/patches-1.10.3.mpp.asc",
-  "version": "1.10.3"
+  "created_at": "2026-09-12T12:18:22",
+  "description": "## [1.11.0](https://github.com/Rhdevs71/dududu/compare/v1.10.3...v1.11.0) (2026-09-12)\n\n### ✨ New Features\n\n* **discord:** add FakeNitro outgoing emoji & sticker transformer to bypass Clyde bot ([26bbe47](https://github.com/Rhdevs71/dududu/commit/26bbe4727da51d7c6659a87bfb9b1b0259cac21d))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.11.0/patches-1.11.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.11.0/patches-1.11.0.mpp.asc",
+  "version": "1.11.0"
 }
