@@ -1,3 +1,9 @@
+## [1.10.2](https://github.com/Rhdevs71/dududu/compare/v1.10.1...v1.10.2) (2026-09-12)
+
+### 🐛 Bug Fixes
+
+* **discord:** load piko_discord.js before host bundle, hook Soundboard & AppIcons via Vendetta/Revenge runtime ([19608da](https://github.com/Rhdevs71/dududu/commit/19608dab737c3b283e1ed6709b9071fb53effbbf))
+
 ## [1.10.1](https://github.com/Rhdevs71/dududu/compare/v1.10.0...v1.10.1) (2026-09-12)
 
 ### 🐛 Bug Fixes

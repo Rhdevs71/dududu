@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-12T10:46:01",
-  "description": "## [1.10.1](https://github.com/Rhdevs71/dududu/compare/v1.10.0...v1.10.1) (2026-09-12)\n\n### 🐛 Bug Fixes\n\n* **discord:** register discordExtensionPatch and bind to mod loader and icon patches ([de77f69](https://github.com/Rhdevs71/dududu/commit/de77f69e4d72ef958ce97615d9100fa196fa9fcc))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.1/patches-1.10.1.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.1/patches-1.10.1.mpp.asc",
-  "version": "1.10.1"
+  "created_at": "2026-09-12T11:06:45",
+  "description": "## [1.10.2](https://github.com/Rhdevs71/dududu/compare/v1.10.1...v1.10.2) (2026-09-12)\n\n### 🐛 Bug Fixes\n\n* **discord:** load piko_discord.js before host bundle, hook Soundboard & AppIcons via Vendetta/Revenge runtime ([19608da](https://github.com/Rhdevs71/dududu/commit/19608dab737c3b283e1ed6709b9071fb53effbbf))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.2/patches-1.10.2.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.10.2/patches-1.10.2.mpp.asc",
+  "version": "1.10.2"
 }
