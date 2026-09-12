@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -68,6 +68,37 @@
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Allow Screenshots & Screen Recording",
+      "description": "Removes FLAG_SECURE window restrictions so screenshots and screen recording work everywhere.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.discord",
+          "name": "Discord",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#5865F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "346.0 - Alpha",
+              "versionCodes": {
+                "ARM64_V8A": 346200,
+                "ARMEABI_V7A": 346200,
+                "X86_64": 346200,
+                "X86": 346200
               },
               "isExperimental": false,
               "minSdk": null,
@@ -466,6 +497,58 @@
         }
       ],
       "options": []
+    },
+    {
+      "name": "Clone",
+      "description": "Changes the package name and app name for Discord. This allows you to install the patched Discord alongside the original Discord app.\nDefault cloned package: com.discord.pikoo",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.discord",
+          "name": "Discord",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#5865F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "346.0 - Alpha",
+              "versionCodes": {
+                "ARM64_V8A": 346200,
+                "ARMEABI_V7A": 346200,
+                "X86_64": 346200,
+                "X86": 346200
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": [
+        {
+          "key": "packageName",
+          "title": "Package name",
+          "description": "A new package name for the patched Discord app.",
+          "required": true,
+          "type": "kotlin.String",
+          "default": "com.discord.pikoo",
+          "values": null
+        },
+        {
+          "key": "appName",
+          "title": "App name",
+          "description": "A new app name (label). Entering \"Discord\" will skip changing the app name.",
+          "required": true,
+          "type": "kotlin.String",
+          "default": "Piko Discord",
+          "values": null
+        }
+      ]
     },
     {
       "name": "Clone",
@@ -1287,6 +1370,37 @@
       "options": []
     },
     {
+      "name": "Disable Telemetry & Tracking",
+      "description": "Blocks Discord analytics, Sentry crash reporting, install referrers, and telemetry logging.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.discord",
+          "name": "Discord",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#5865F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "346.0 - Alpha",
+              "versionCodes": {
+                "ARM64_V8A": 346200,
+                "ARMEABI_V7A": 346200,
+                "X86_64": 346200,
+                "X86": 346200
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Disable ads",
       "description": null,
       "default": true,
@@ -1894,6 +2008,37 @@
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Discord Client Mod Loader",
+      "description": "Allows dynamic loading of external JS bundles (Pyoncord / Revenge / custom mods) from /sdcard/Download/Piko/Discord/bundle.js.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.discord",
+          "name": "Discord",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#5865F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "346.0 - Alpha",
+              "versionCodes": {
+                "ARM64_V8A": 346200,
+                "ARMEABI_V7A": 346200,
+                "X86_64": 346200,
+                "X86": 346200
               },
               "isExperimental": false,
               "minSdk": null,
@@ -4839,6 +4984,37 @@
       ]
     },
     {
+      "name": "Unlock Nitro Launcher Icons",
+      "description": "Unlocks custom Discord app launcher icons on your home screen without Nitro restrictions.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.discord",
+          "name": "Discord",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#5865F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "346.0 - Alpha",
+              "versionCodes": {
+                "ARM64_V8A": 346200,
+                "ARMEABI_V7A": 346200,
+                "X86_64": 346200,
+                "X86": 346200
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Unlock Plus benefits",
       "description": "Unlocks 'Plus' subscription benefits that are checked locally. USE IT AT YOUR OWN RISK",
       "default": true,
@@ -4867,6 +5043,37 @@
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Unlock Staff & Developer Experiments",
+      "description": "Unlocks internal Discord Developer Settings, staff flags, and experiment features.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.discord",
+          "name": "Discord",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#5865F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "346.0 - Alpha",
+              "versionCodes": {
+                "ARM64_V8A": 346200,
+                "ARMEABI_V7A": 346200,
+                "X86_64": 346200,
+                "X86": 346200
               },
               "isExperimental": false,
               "minSdk": null,

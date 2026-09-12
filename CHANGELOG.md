@@ -1,3 +1,13 @@
+## [1.9.0](https://github.com/Rhdevs71/dududu/compare/v1.8.2...v1.9.0) (2026-09-12)
+
+### 🐛 Bug Fixes
+
+* **discord:** remove invalid registerCount reassignment in ModLoaderPatch ([7553605](https://github.com/Rhdevs71/dududu/commit/7553605192744958b1471388f9cf0eae6f8a93b7))
+
+### ✨ New Features
+
+* **discord:** add Discord Android support with Clone, Staff Experiments, No-Track, Allow Screenshot, Nitro Icons, and Mod Loader patches ([ca0f976](https://github.com/Rhdevs71/dududu/commit/ca0f976ebd59aed9be64d9d611070823c5161865))
+
 ## [1.8.2](https://github.com/Rhdevs71/dududu/compare/v1.8.1...v1.8.2) (2026-09-12)
 
 ### 🐛 Bug Fixes
