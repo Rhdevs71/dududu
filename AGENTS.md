@@ -416,7 +416,46 @@
       - Ditandatangani resmi dengan Android SDK 36 `apksigner` (**v2: true, v3: true, verifies: true**).
       - File APK Siap Instal: **`C:\Users\Rhdevs\Downloads\discord_v1.9.0_cloned.apk`** (175 MB).
 
+24. **Tahap 24: Injeksi Runtime Revenge & Inisialisasi Hermes Piko Discord (`piko_discord.js`) (Rilis v1.10.0 - v1.10.3)**
+    - *Tantangan Teknis*: Discord modern memuat bundle JavaScript langsung melalui Hermes C++ bytecode loader, bukan melalui `getJSBundleFile()`.
+    - *Solusi & Arsitektur*:
+      1. Menghubungkan modul extension DEX ke Discord via `DiscordInitHook.kt` dan `DiscordExtensionPatch.kt` (`sharedExtensionPatch(listOf("shared", "discord"), discordInitHook)`).
+      2. Menginjeksi bytecode Smali pada `ReactInstance$loadJSBundle$1` sebelum eksekusi host bundle dengan instruksi `loadScriptFromAssets(assetManager, "assets://piko_discord.js", false)` di index 0.
+      3. Menyelubungi runtime Revenge/Vendetta dan bootstrap booster di dalam `startDiscord()` setelah React Native globals dan `initializeRevenge()` aktif, menghilangkan error RedBox startup.
+    - *Status Rilis*: Rilis **`v1.10.3`** (`patches-1.10.3.mpp`).
 
+25. **Tahap 25: Bypass Pemblokiran Bot Clyde untuk Custom Emojis & Stiker via FakeNitro Outgoing Message Transformer (Rilis v1.11.0 - Terkini)**
+    - *Analisis Masalah Pengguna*:
+      - Pengguna melaporkan bahwa saat mencoba mengirim emoji custom/animasi atau stiker eksternal dari server lain di Discord, pesan langsung diblokir dan gagal kirim oleh bot sistem bawaan Discord (**Clyde**).
+    - *Akar Masalah Reverse Engineering*:
+      - Hook client-side sebelumnya (`canUseEmojisEverywhere`, `canUseCustomStickersEverywhere`, dll.) hanya membuka picker di UI client agar item dapat disentuh dan dipilih.
+      - Saat pengguna menekan tombol Kirim, Discord client mengirimkan pesan berformat mentah `<:name:id>`, `<a:name:id>`, atau `stickerIds: ["..."]`.
+      - Server backend Discord memverifikasi akun pengirim (non-Nitro, `premium_type: 0`) dan langsung menolak permintaan pesan dengan kode error `400 Bad Request`.
+      - Discord client menerima respons penolakan server dan memicu pesan ephemeral Clyde bot: *"Your message could not be delivered because it contains stickers or emojis you need Nitro to use."*
+    - *Solusi & Implementasi*:
+      1. **Outgoing Message Transformer (`MessageActions.sendMessage` & `editMessage`)**:
+         - Mencegat seluruh method pengiriman pesan sebelum paket REST request dikirim ke jaringan.
+         - Mendeteksi ketiadaan langganan Nitro resmi (`hasRealNitro === false`) sebelum mutasi objek.
+      2. **Transformasi Emoji Eksternal & Animasi**:
+         - Setiap token emoji animasi `<a:name:id>` diubah menjadi tautan media langsung Discord CDN:
+           `https://cdn.discordapp.com/emojis/{id}.gif?size=48&quality=lossless&name={name}`.
+         - Setiap token emoji eksternal (atau di ruang DM) `<:name:id>` diubah menjadi:
+           `https://cdn.discordapp.com/emojis/{id}.webp?size=48&quality=lossless&name={name}`.
+         - Spacing spasi otomatis disematkan sebelum dan sesudah URL agar Discord client memparsing tautan sebagai media embed mandiri.
+      3. **Transformasi Stiker Eksternal**:
+         - Mengambil stiker dari `StickersStore.getStickerById(id)`.
+         - Mengonversi stiker menjadi tautan media langsung:
+           `https://media.discordapp.net/stickers/{id}.png?size=160&name={name}&lossless=true` (atau format `.gif` untuk stiker animasi).
+         - Menyematkan tautan stiker ke `message.content` dan mengosongkan array `stickerIds` / `sticker_ids`.
+         - Mencegat juga panggilan langsung `sendStickers` dan `sendSticker` dengan membelokkannya ke `sendMessage({ content: stickerUrl })`.
+      4. **Bypass Ketersediaan Store (`EmojiStore` & `StickersStore`)**:
+         - Meng-hook method getter store (`getCustomEmojiById`, `getStickerById`, `getGuildEmojis`, dll.) agar seluruh emoji dan stiker ditandai `available = true` di UI picker tanpa ada overlay gembok.
+      5. **Hasil Transformasi**:
+         - Server Discord menerima pesan sebagai teks berisikan tautan media Discord CDN legal (bukan payload Nitro tertutup).
+         - Server menerima dan menyiarkan pesan ke seluruh anggota server/DM.
+         - Klien Discord penerima (dan pengirim) secara otomatis me-render tautan gambar/GIF tersebut secara inline di dalam chat room.
+         - Bot Clyde **tidak pernah** memblokir pesan lagi!
+    - *Status Rilis*: Rilis **`v1.11.0`** (`patches-1.11.0.mpp`, 7,132,281 bytes) berhasil dipublish melalui GitHub Actions CI Run #34693245563.
 
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)
 
