@@ -15563,8 +15563,135 @@ Type: ${asset.type}`,
       if (globalThis.RN$AppRegistry) {
         deferMethodExecution(globalThis.RN$AppRegistry, "runApplication");
       }
+      
+function initPikoBooster() {
+    try {
+        var api = globalThis.vendetta || globalThis.bunny || {};
+        globalThis.revenge = api;
+        var metro = api.metro || {};
+        var patcher = api.patcher;
+        if (!metro.findByProps || !patcher) return;
+
+        var findByProps = metro.findByProps;
+        var findByStoreName = metro.findByStoreName;
+
+        // 1. UserStore -> Nitro Full
+        try {
+            var UserStore = findByStoreName("UserStore");
+            if (UserStore && UserStore.getCurrentUser) {
+                var u = UserStore.getCurrentUser();
+                if (u) u.premiumType = 2;
+                patcher.after("getCurrentUser", UserStore, function(_, res) {
+                    if (res) res.premiumType = 2;
+                    return res;
+                });
+            }
+        } catch (e) {}
+
+        // 2. Helper to hook properties across modules
+        function hookProps(props, overrideVal) {
+            for (var i = 0; i < props.length; i++) {
+                var prop = props[i];
+                try {
+                    var mod = findByProps(prop);
+                    if (mod && typeof mod[prop] === "function") {
+                        patcher.instead(prop, mod, function() {
+                            return typeof overrideVal === "function" ? overrideVal() : overrideVal;
+                        });
+                    }
+                } catch (e) {}
+            }
+        }
+
+        // 3. Launcher App Icons (prevent upsell modal + allow all icons)
+        try {
+            hookProps([
+                "canUsePremiumAppIcons",
+                "canUseCustomAppIcons",
+                "canUseAppIcons",
+                "isFreemiumAppIcon"
+            ], true);
+
+            var appIconMod = findByProps("canUsePremiumAppIcons", "setAppIcon") || findByProps("canUsePremiumAppIcons");
+            if (appIconMod) {
+                patcher.instead("canUsePremiumAppIcons", appIconMod, function() { return true; });
+            }
+        } catch (e) {}
+
+        // 4. Soundboard Everywhere (cross-server soundboard)
+        try {
+            hookProps([
+                "canUseSoundboardEverywhere",
+                "canUseExternalSounds",
+                "canUsePremiumSoundboard",
+                "canPlaySound",
+                "canUseSoundboardSound",
+                "canChannelUseSoundboard",
+                "canSelectedVoiceChannelUseSoundboard",
+                "canUseCustomCallSound"
+            ], true);
+        } catch (e) {}
+
+        // 5. Emojis & Stickers Everywhere
+        try {
+            hookProps([
+                "canUseCustomStickersEverywhere",
+                "canUseEmojisEverywhere",
+                "canUseAnimatedEmojis",
+                "canUseExternalEmojis",
+                "canUsePremiumEmojis",
+                "canUseCustomEmojisEverywhere",
+                "canUseCustomEmojis"
+            ], true);
+        } catch (e) {}
+
+        // 6. Client Themes
+        try {
+            hookProps([
+                "canUseClientThemes",
+                "canUsePremiumThemes",
+                "canUseGradientThemes"
+            ], true);
+        } catch (e) {}
+
+        // 7. Silent Typing
+        try {
+            var typingModule = findByProps("startTyping", "stopTyping");
+            if (typingModule && typingModule.startTyping) {
+                patcher.instead("startTyping", typingModule, function() {});
+            }
+        } catch (e) {}
+
+        // 8. Message Logger: Anti-Delete
+        try {
+            var Dispatcher = findByProps("dispatch", "subscribe");
+            if (Dispatcher && Dispatcher.subscribe) {
+                Dispatcher.subscribe("MESSAGE_DELETE", function(event) {
+                    try {
+                        var MessageStore = findByStoreName("MessageStore");
+                        if (MessageStore && MessageStore.getMessage && event.channelId && event.id) {
+                            var msg = MessageStore.getMessage(event.channelId, event.id);
+                            if (msg) {
+                                msg.deleted = true;
+                                if (typeof msg.content === "string" && msg.content.indexOf("[DELETED]") === -1) {
+                                    msg.content = "🗑️ [DELETED]: " + msg.content;
+                                }
+                            }
+                        }
+                    } catch (e) {}
+                });
+            }
+        } catch (e) {}
+
+        if (typeof console !== "undefined" && console.log) {
+            console.log("[Piko] Nitro Booster & Mod Perks successfully initialized!");
+        }
+    } catch (err) {}
+}
+
       var startDiscord = () => _async_to_generator(function* () {
         yield initializeRevenge();
+        try { initPikoBooster(); } catch (e) {}
         for (var unpatch of unpatches)
           unpatch();
         unpatches.length = 0;
@@ -15613,149 +15740,3 @@ Type: ${asset.type}`,
   var onceIndexRequired;
 })();
 //# sourceURL=revenge
-
-
-/* === PIKO DISCORD CLIENT MOD & NITRO BOOSTER === */
-(function() {
-    console.log("[Piko] Starting Piko Discord Nitro & Mod Booster v2...");
-
-    function initPikoBooster() {
-        try {
-            const api = globalThis.vendetta || globalThis.bunny || globalThis.revenge;
-            if (!api || !api.metro || !api.patcher) {
-                setTimeout(initPikoBooster, 100);
-                return;
-            }
-
-            globalThis.revenge = api;
-            const { findByProps, findByStoreName } = api.metro;
-            const patcher = api.patcher;
-
-            console.log("[Piko] Revenge/Vendetta runtime detected! Applying Nitro perks...");
-
-            // 1. Unlock Nitro in UserStore
-            try {
-                const UserStore = findByStoreName("UserStore");
-                if (UserStore && UserStore.getCurrentUser) {
-                    const u = UserStore.getCurrentUser();
-                    if (u) u.premiumType = 2; // Nitro Full
-                    patcher.after("getCurrentUser", UserStore, (_, res) => {
-                        if (res) res.premiumType = 2;
-                    });
-                }
-            } catch (e) {
-                console.error("[Piko] Failed to hook UserStore", e);
-            }
-
-            // 2. Helper to hook capabilities across all matching modules
-            function hookProps(props, overrideVal) {
-                for (const prop of props) {
-                    try {
-                        const mod = findByProps(prop);
-                        if (mod && typeof mod[prop] === "function") {
-                            patcher.instead(prop, mod, () => (typeof overrideVal === "function" ? overrideVal() : overrideVal));
-                        }
-                    } catch (e) {}
-                }
-            }
-
-            // 3. Unlock Launcher App Icons
-            try {
-                hookProps([
-                    "canUsePremiumAppIcons",
-                    "canUseCustomAppIcons",
-                    "canUseAppIcons",
-                    "isFreemiumAppIcon"
-                ], true);
-
-                const appIconModule = findByProps("canUsePremiumAppIcons", "setAppIcon") || findByProps("canUsePremiumAppIcons");
-                if (appIconModule) {
-                    patcher.instead("canUsePremiumAppIcons", appIconModule, () => true);
-                }
-            } catch (e) {
-                console.error("[Piko] Failed to hook AppIconModule", e);
-            }
-
-            // 4. Unlock Soundboard Everywhere
-            try {
-                hookProps([
-                    "canUseSoundboardEverywhere",
-                    "canUseExternalSounds",
-                    "canUsePremiumSoundboard",
-                    "canPlaySound",
-                    "canUseSoundboardSound",
-                    "canChannelUseSoundboard",
-                    "canSelectedVoiceChannelUseSoundboard",
-                    "canUseCustomCallSound"
-                ], true);
-            } catch (e) {
-                console.error("[Piko] Failed to hook Soundboard", e);
-            }
-
-            // 5. Unlock Nitro Emojis & Stickers Everywhere
-            try {
-                hookProps([
-                    "canUseCustomStickersEverywhere",
-                    "canUseEmojisEverywhere",
-                    "canUseAnimatedEmojis",
-                    "canUseExternalEmojis",
-                    "canUsePremiumEmojis",
-                    "canUseCustomEmojisEverywhere",
-                    "canUseCustomEmojis"
-                ], true);
-            } catch (e) {
-                console.error("[Piko] Failed to hook Emoji permissions", e);
-            }
-
-            // 6. Unlock Client Themes
-            try {
-                hookProps([
-                    "canUseClientThemes",
-                    "canUsePremiumThemes",
-                    "canUseGradientThemes"
-                ], true);
-            } catch (e) {
-                console.error("[Piko] Failed to hook Themes", e);
-            }
-
-            // 7. Ghost Stealth Mode: Silent Typing
-            try {
-                const typingModule = findByProps("startTyping", "stopTyping");
-                if (typingModule && typingModule.startTyping) {
-                    patcher.instead("startTyping", typingModule, () => {});
-                }
-            } catch (e) {
-                console.error("[Piko] Failed to hook TypingModule", e);
-            }
-
-            // 8. Message Logger: Anti-Delete Tracker
-            try {
-                const Dispatcher = findByProps("dispatch", "subscribe");
-                if (Dispatcher && Dispatcher.subscribe) {
-                    Dispatcher.subscribe("MESSAGE_DELETE", (event) => {
-                        try {
-                            const MessageStore = findByStoreName("MessageStore");
-                            if (MessageStore && MessageStore.getMessage && event.channelId && event.id) {
-                                const msg = MessageStore.getMessage(event.channelId, event.id);
-                                if (msg) {
-                                    msg.deleted = true;
-                                    if (typeof msg.content === "string" && !msg.content.includes("[DELETED]")) {
-                                        msg.content = "🗑️ [DELETED]: " + msg.content;
-                                    }
-                                }
-                            }
-                        } catch (e) {}
-                    });
-                }
-            } catch (e) {
-                console.error("[Piko] Failed to hook MessageStore", e);
-            }
-
-            console.log("[Piko] Discord Mod & Nitro Perks successfully initialized!");
-        } catch (err) {
-            console.error("[Piko] Global booster error", err);
-        }
-    }
-
-    setTimeout(initPikoBooster, 100);
-})();
