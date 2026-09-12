@@ -77,7 +77,7 @@ public class PikoAppIconManager {
 
             String displayName = matchedAlias.substring(matchedAlias.lastIndexOf('.') + 1).replace("Main", "");
             DiscordLog.i("PikoAppIconManager", "Activated Discord launcher icon alias: " + matchedAlias + " (" + displayName + ")");
-            PikoUtils.toast(context, "Icon Discord berhasil diubah ke: " + displayName + "!\n(Muat ulang launcher jika belum berubah)");
+            PikoUtils.toast("Icon Discord berhasil diubah ke: " + displayName + "!\n(Muat ulang launcher jika belum berubah)");
         } catch (Throwable t) {
             DiscordLog.e("PikoAppIconManager", "Failed to switch app icon to " + targetIdOrAlias, t);
         }
