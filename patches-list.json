@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.10.0",
+  "version": "1.10.1",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -2023,6 +2023,7 @@
       "description": "Injects out-of-the-box Revenge/Pyoncord client mod runtime with built-in Nitro perks, and supports dynamic loading from internal app storage.",
       "default": true,
       "dependencies": [
+        "BytecodePatch",
         "ResourcePatch"
       ],
       "compatiblePackages": [
@@ -5020,7 +5021,9 @@
       "name": "Unlock Nitro Launcher Icons",
       "description": "Unlocks custom Discord app launcher icons on your home screen without Nitro restrictions.",
       "default": true,
-      "dependencies": [],
+      "dependencies": [
+        "BytecodePatch"
+      ],
       "compatiblePackages": [
         {
           "packageName": "com.discord",

@@ -1,3 +1,9 @@
+## [1.10.1](https://github.com/Rhdevs71/dududu/compare/v1.10.0...v1.10.1) (2026-09-12)
+
+### 🐛 Bug Fixes
+
+* **discord:** register discordExtensionPatch and bind to mod loader and icon patches ([de77f69](https://github.com/Rhdevs71/dududu/commit/de77f69e4d72ef958ce97615d9100fa196fa9fcc))
+
 ## [1.10.0](https://github.com/Rhdevs71/dududu/compare/v1.9.0...v1.10.0) (2026-09-12)
 
 ### 🐛 Bug Fixes
