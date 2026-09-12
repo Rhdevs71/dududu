@@ -49,27 +49,19 @@ val modLoaderPatch =
         execute {
             ReactInstanceLoadJSBundleFingerprint.classDefOrNull?.methods?.forEach { method ->
                 if (method.name == "loadScriptFromAssets" && method.parameters.size == 3) {
-                    val returnIndex = method.instructions.indexOfLast { it.opcode == Opcode.RETURN_VOID }
-                    if (returnIndex >= 0) {
-                        method.addInstructions(
-                            returnIndex,
-                            """
-                            iget-object p3, p0, Lcom/facebook/react/runtime/ReactInstance${'$'}loadJSBundle${'$'}1;->this$0:Lcom/facebook/react/runtime/ReactInstance;
-                            invoke-static {p3, p1, p2}, Lapp/morphe/extension/discord/loader/PikoDiscordLoader;->onAssetBundleLoaded(Ljava/lang/Object;Landroid/content/res/AssetManager;Ljava/lang/String;)V
-                            """.trimIndent(),
-                        )
-                    }
+                    method.addInstructions(
+                        0,
+                        """
+                        invoke-static {p0, p1, p2}, Lapp/morphe/extension/discord/loader/PikoDiscordLoader;->beforeLoadScriptFromAssets(Ljava/lang/Object;Landroid/content/res/AssetManager;Ljava/lang/String;)V
+                        """.trimIndent(),
+                    )
                 } else if (method.name == "loadScriptFromFile" && method.parameters.size == 3) {
-                    val returnIndex = method.instructions.indexOfLast { it.opcode == Opcode.RETURN_VOID }
-                    if (returnIndex >= 0) {
-                        method.addInstructions(
-                            returnIndex,
-                            """
-                            iget-object p3, p0, Lcom/facebook/react/runtime/ReactInstance${'$'}loadJSBundle${'$'}1;->this$0:Lcom/facebook/react/runtime/ReactInstance;
-                            invoke-static {p3, p1, p2}, Lapp/morphe/extension/discord/loader/PikoDiscordLoader;->onFileBundleLoaded(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
-                            """.trimIndent(),
-                        )
-                    }
+                    method.addInstructions(
+                        0,
+                        """
+                        invoke-static {p0, p1, p2}, Lapp/morphe/extension/discord/loader/PikoDiscordLoader;->beforeLoadScriptFromFile(Ljava/lang/Object;Ljava/lang/String;Ljava/lang/String;)V
+                        """.trimIndent(),
+                    )
                 }
             }
         }

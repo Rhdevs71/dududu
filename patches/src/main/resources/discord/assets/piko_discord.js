@@ -15617,65 +15617,108 @@ Type: ${asset.type}`,
 
 /* === PIKO DISCORD CLIENT MOD & NITRO BOOSTER === */
 (function() {
-    console.log("[Piko] Starting Piko Discord Nitro & Mod Booster...");
+    console.log("[Piko] Starting Piko Discord Nitro & Mod Booster v2...");
 
     function initPikoBooster() {
         try {
-            const revenge = globalThis.revenge;
-            if (!revenge || !revenge.metro) {
-                setTimeout(initPikoBooster, 150);
+            const api = globalThis.vendetta || globalThis.bunny || globalThis.revenge;
+            if (!api || !api.metro || !api.patcher) {
+                setTimeout(initPikoBooster, 100);
                 return;
             }
 
-            const { findByProps, findByStoreName } = revenge.metro;
-            const patcher = revenge.patcher;
+            globalThis.revenge = api;
+            const { findByProps, findByStoreName } = api.metro;
+            const patcher = api.patcher;
+
+            console.log("[Piko] Revenge/Vendetta runtime detected! Applying Nitro perks...");
 
             // 1. Unlock Nitro in UserStore
             try {
                 const UserStore = findByStoreName("UserStore");
-                if (UserStore) {
-                    if (UserStore.getCurrentUser) {
-                        const u = UserStore.getCurrentUser();
-                        if (u) u.premiumType = 2; // Nitro Full
-                        patcher.after("getCurrentUser", UserStore, (_, res) => {
-                            if (res) res.premiumType = 2;
-                        });
-                    }
+                if (UserStore && UserStore.getCurrentUser) {
+                    const u = UserStore.getCurrentUser();
+                    if (u) u.premiumType = 2; // Nitro Full
+                    patcher.after("getCurrentUser", UserStore, (_, res) => {
+                        if (res) res.premiumType = 2;
+                    });
                 }
             } catch (e) {
                 console.error("[Piko] Failed to hook UserStore", e);
             }
 
-            // 2. Unlock Custom Launcher App Icons
+            // 2. Helper to hook capabilities across all matching modules
+            function hookProps(props, overrideVal) {
+                for (const prop of props) {
+                    try {
+                        const mod = findByProps(prop);
+                        if (mod && typeof mod[prop] === "function") {
+                            patcher.instead(prop, mod, () => (typeof overrideVal === "function" ? overrideVal() : overrideVal));
+                        }
+                    } catch (e) {}
+                }
+            }
+
+            // 3. Unlock Launcher App Icons
             try {
-                const appIconModule = findByProps("canUsePremiumAppIcons");
+                hookProps([
+                    "canUsePremiumAppIcons",
+                    "canUseCustomAppIcons",
+                    "canUseAppIcons",
+                    "isFreemiumAppIcon"
+                ], true);
+
+                const appIconModule = findByProps("canUsePremiumAppIcons", "setAppIcon") || findByProps("canUsePremiumAppIcons");
                 if (appIconModule) {
                     patcher.instead("canUsePremiumAppIcons", appIconModule, () => true);
-                }
-                const freemiumModule = findByProps("isFreemiumAppIcon");
-                if (freemiumModule) {
-                    patcher.instead("isFreemiumAppIcon", freemiumModule, () => true);
                 }
             } catch (e) {
                 console.error("[Piko] Failed to hook AppIconModule", e);
             }
 
-            // 3. Unlock Nitro Emojis & Stickers Everywhere
+            // 4. Unlock Soundboard Everywhere
             try {
-                const emojiPermissions = findByProps("canUseCustomStickersEverywhere", "canUseEmojisEverywhere");
-                if (emojiPermissions) {
-                    if (emojiPermissions.canUseCustomStickersEverywhere) {
-                        patcher.instead("canUseCustomStickersEverywhere", emojiPermissions, () => true);
-                    }
-                    if (emojiPermissions.canUseEmojisEverywhere) {
-                        patcher.instead("canUseEmojisEverywhere", emojiPermissions, () => true);
-                    }
-                }
+                hookProps([
+                    "canUseSoundboardEverywhere",
+                    "canUseExternalSounds",
+                    "canUsePremiumSoundboard",
+                    "canPlaySound",
+                    "canUseSoundboardSound",
+                    "canChannelUseSoundboard",
+                    "canSelectedVoiceChannelUseSoundboard",
+                    "canUseCustomCallSound"
+                ], true);
+            } catch (e) {
+                console.error("[Piko] Failed to hook Soundboard", e);
+            }
+
+            // 5. Unlock Nitro Emojis & Stickers Everywhere
+            try {
+                hookProps([
+                    "canUseCustomStickersEverywhere",
+                    "canUseEmojisEverywhere",
+                    "canUseAnimatedEmojis",
+                    "canUseExternalEmojis",
+                    "canUsePremiumEmojis",
+                    "canUseCustomEmojisEverywhere",
+                    "canUseCustomEmojis"
+                ], true);
             } catch (e) {
                 console.error("[Piko] Failed to hook Emoji permissions", e);
             }
 
-            // 4. Ghost Stealth Mode: Silent Typing
+            // 6. Unlock Client Themes
+            try {
+                hookProps([
+                    "canUseClientThemes",
+                    "canUsePremiumThemes",
+                    "canUseGradientThemes"
+                ], true);
+            } catch (e) {
+                console.error("[Piko] Failed to hook Themes", e);
+            }
+
+            // 7. Ghost Stealth Mode: Silent Typing
             try {
                 const typingModule = findByProps("startTyping", "stopTyping");
                 if (typingModule && typingModule.startTyping) {
@@ -15685,7 +15728,7 @@ Type: ${asset.type}`,
                 console.error("[Piko] Failed to hook TypingModule", e);
             }
 
-            // 5. Message Logger: Anti-Delete Tracker
+            // 8. Message Logger: Anti-Delete Tracker
             try {
                 const Dispatcher = findByProps("dispatch", "subscribe");
                 if (Dispatcher && Dispatcher.subscribe) {
@@ -15696,25 +15739,16 @@ Type: ${asset.type}`,
                                 const msg = MessageStore.getMessage(event.channelId, event.id);
                                 if (msg) {
                                     msg.deleted = true;
-                                    msg.content = "🗑️ [Dihapus]: " + (msg.content || "");
-                                    event.id = null; // suppress deletion from UI state
+                                    if (typeof msg.content === "string" && !msg.content.includes("[DELETED]")) {
+                                        msg.content = "🗑️ [DELETED]: " + msg.content;
+                                    }
                                 }
                             }
-                        } catch (err) {}
+                        } catch (e) {}
                     });
                 }
             } catch (e) {
                 console.error("[Piko] Failed to hook MessageStore", e);
-            }
-
-            // 6. Developer Experiments / Staff Tab Unlocked
-            try {
-                const DevModule = findByProps("isDeveloper", "hasLoadedExperiments");
-                if (DevModule) {
-                    patcher.instead("isDeveloper", DevModule, () => true);
-                }
-            } catch (e) {
-                console.error("[Piko] Failed to hook DevModule", e);
             }
 
             console.log("[Piko] Discord Mod & Nitro Perks successfully initialized!");
@@ -15723,5 +15757,5 @@ Type: ${asset.type}`,
         }
     }
 
-    setTimeout(initPikoBooster, 300);
+    setTimeout(initPikoBooster, 100);
 })();
