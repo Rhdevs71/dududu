@@ -388,6 +388,35 @@
       - Ditandatangani dan diverifikasi dengan Android SDK 35 `apksigner` (**v3 scheme: true, verifies: true**).
       - File APK Siap Instal: **`C:\Users\Rhdevs\Downloads\duolingo_v1.8.0_lili_signed.apk`** (196 MB).
 
+22. **Tahap 22: Duolingo v1.8.2 - Eliminasi Penyelesaian Misi Palsu & Optimalisasi Panggilan Lili**
+    - *Masalah*: Flag `completeSessionOnHangup` (`c:Z`) membuat sesi panggilan video otomatis selesai dan quest tuntas palsu hanya dengan membuka lalu menutup panggilan.
+    - *Solusi*:
+      - Disetel `c:Z = false` (menonaktifkan auto-complete saat hangup).
+      - `a:Z = true` (`showPromptSelect` aktif).
+      - `b:Z = true` (`showDebugMessageInSession` aktif).
+      - `e:Z = true` (`showVideoCallTabWelcomeVideoMessage` aktif).
+    - *Hasil Rilis*:
+      - Rilis GitHub: **`v1.8.2`** (`patches-1.8.2.mpp`, 6.99 MB).
+      - APK Siap Instal: **`C:\Users\Rhdevs\Downloads\duolingo_v1.8.2_signed.apk`** (196 MB, Android SDK 36 apksigner scheme v3 valid).
+
+23. **Tahap 23: Peluncuran Modul Discord Android (Piko Discord) & 6 Patch Inti (Rilis v1.9.0 - Terkini)**
+    - *Target Aplikasi*: `C:\Users\Rhdevs\Downloads\dcc.apkm` (Discord Android `346.0 - Alpha`, versionCode: `346200`, Target SDK 36 Android 16, React Native + Hermes Bytecode).
+    - *6 Fitur & Tambalan yang Dibuat (`app.crimera.patches.discord`)*:
+      1. **Clone Patch (`ClonePatch.kt`)**: Mengubah package name menjadi `com.discord.pikoo`, memetakan ulang seluruh 8 Content Provider authorities (`com.discord.pikoo.*`), memperbarui dynamic permission `DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, dan mengubah nama aplikasi menjadi `Piko Discord`.
+      2. **Unlock Staff & Developer Experiments (`StaffExperimentsPatch.kt`)**: Memaksa `ClientInfo.isDeveloperBuild() -> true`, `ClientInfo.isDebugBuild() -> true`, `CrashPersistence.isStaff() -> true`, dan `DCDReactNativeHost.getUseDeveloperSupport() -> true` untuk membuka tab internal Developer Settings dan fitur eksperimen staf.
+      3. **Disable Telemetry & Tracking (`NoTrackPatch.kt`)**: Memaksa `CrashReporting.isDisabled() -> true` (mematikan Sentry crash reporter SDK), men-stub out breadcrumbs dan exception capture, serta menonaktifkan TelemetryRing dan install referrers.
+      4. **Allow Screenshots & Screen Recording (`AllowScreenshotPatch.kt`)**: Menambahkan handler `onResume()` pada `MainActivity` yang membersihkan `FLAG_SECURE` (`0x2000`) dari Window sehingga screenshot dan screen recording selalu diizinkan.
+      5. **Unlock Nitro Launcher Icons (`UnlockNitroAppIconsPatch.kt`)**: Menyelubungi `AppIconModule.setIcon` agar aktivasi 46 launcher icon alias kustom di beranda langsung berhasil tanpa ditolak oleh pengecekan status Nitro.
+      6. **Discord Client Mod Loader (`ModLoaderPatch.kt`)**: Meng-hook `DCDReactNativeHost.getJSBundleFile()` agar mendeteksi bundle JS modifikasi eksternal di `/sdcard/Download/Piko/Discord/bundle.js` atau `/sdcard/Download/Piko/discord_bundle.js` (kompatibel dengan plugin ekosistem Pyoncord / Revenge).
+    - *Hasil Rilis & Audit Bytecode*:
+      - Rilis GitHub: **`v1.9.0`** (`patches-1.9.0.mpp`, 7.00 MB) melalui CI Run #34679721076.
+      - Morphe CLI patching sukses 100% pada `dcc.apkm` (exit code: 0, 0 warning, 0 error).
+      - Seluruh 5 modul split APK (`base`, `arm64_v8a`, `en`, `xxhdpi`, `xxxhdpi`) digabung menjadi satu APK mandiri.
+      - Audit AXML & DEX: Package name `com.discord.pikoo`, 8 provider authorities `com.discord.pikoo.*`, hook bundle path, dan flags terverifikasi 100%.
+      - Ditandatangani resmi dengan Android SDK 36 `apksigner` (**v2: true, v3: true, verifies: true**).
+      - File APK Siap Instal: **`C:\Users\Rhdevs\Downloads\discord_v1.9.0_cloned.apk`** (175 MB).
+
+
 
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)
 
