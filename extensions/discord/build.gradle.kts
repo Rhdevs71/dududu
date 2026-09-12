@@ -1,4 +1,6 @@
 android {
+    namespace = "app.morphe.extension.discord"
+
     defaultConfig {
         minSdk = 26
     }
