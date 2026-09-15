@@ -1,3 +1,9 @@
+## [1.11.2](https://github.com/Rhdevs71/dududu/compare/v1.11.1...v1.11.2) (2026-09-15)
+
+### 🐛 Bug Fixes
+
+* **instagram:** fix anonymous live stream viewing and update agent memory ([c11aa82](https://github.com/Rhdevs71/dududu/commit/c11aa82b94e79e2c65521e17accf9cb91294e076))
+
 ## [1.11.1](https://github.com/Rhdevs71/dududu/compare/v1.11.0...v1.11.1) (2026-09-15)
 
 ### 🐛 Bug Fixes
