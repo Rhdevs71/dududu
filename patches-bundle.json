@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-12T12:18:22",
-  "description": "## [1.11.0](https://github.com/Rhdevs71/dududu/compare/v1.10.3...v1.11.0) (2026-09-12)\n\n### ✨ New Features\n\n* **discord:** add FakeNitro outgoing emoji & sticker transformer to bypass Clyde bot ([26bbe47](https://github.com/Rhdevs71/dududu/commit/26bbe4727da51d7c6659a87bfb9b1b0259cac21d))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.11.0/patches-1.11.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.11.0/patches-1.11.0.mpp.asc",
-  "version": "1.11.0"
+  "created_at": "2026-09-15T19:47:32",
+  "description": "## [1.11.1](https://github.com/Rhdevs71/dududu/compare/v1.11.0...v1.11.1) (2026-09-15)\n\n### 🐛 Bug Fixes\n\n* **spotify:** eliminate infinite recursion in AutoValue_Restrictions disallow methods ([341c95e](https://github.com/Rhdevs71/dududu/commit/341c95ee2547cdec1bac2ea28e08498ffe37bcc8))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.11.1/patches-1.11.1.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.11.1/patches-1.11.1.mpp.asc",
+  "version": "1.11.1"
 }

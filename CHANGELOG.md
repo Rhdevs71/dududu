@@ -1,3 +1,9 @@
+## [1.11.1](https://github.com/Rhdevs71/dududu/compare/v1.11.0...v1.11.1) (2026-09-15)
+
+### 🐛 Bug Fixes
+
+* **spotify:** eliminate infinite recursion in AutoValue_Restrictions disallow methods ([341c95e](https://github.com/Rhdevs71/dududu/commit/341c95ee2547cdec1bac2ea28e08498ffe37bcc8))
+
 ## [1.11.0](https://github.com/Rhdevs71/dududu/compare/v1.10.3...v1.11.0) (2026-09-12)
 
 ### ✨ New Features
