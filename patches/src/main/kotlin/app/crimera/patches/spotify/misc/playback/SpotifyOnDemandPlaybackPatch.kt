@@ -36,12 +36,10 @@ val spotifyOnDemandPlaybackPatch =
                     "disallowPlayAsNextInQueueReasons",
                     "disallowAddToQueueReasons",
                     "disallowAddToQueueTrackReasons" -> {
-                        val returnType = method.returnType
                         method.addInstructions(
                             0,
                             """
-                            sget-object v0, $RESTRICTIONS_CLASS->EMPTY:$RESTRICTIONS_CLASS
-                            invoke-virtual {v0}, $RESTRICTIONS_CLASS->${method.name}()$returnType
+                            invoke-static {}, Ljava/util/Collections;->emptySet()Ljava/util/Set;
                             move-result-object v0
                             return-object v0
                             """.trimIndent(),
