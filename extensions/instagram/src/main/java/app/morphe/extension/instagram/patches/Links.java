@@ -119,8 +119,7 @@ public class Links {
                 String host = uri.getHost();
                 String path = uri.getPath();
 
-                if (host.contains("graph.instagram.com")
-                        || host.contains("graph.facebook.com")
+                if ((host != null && (host.contains("graph.instagram.com") || host.contains("graph.facebook.com")))
                         || path.contains("/logging_client_events")) {
                     shouldBlockUri = DISABLE_ANALYTICS;
                 } else if (path.contains("/consent/existing_user_flow/")
@@ -128,8 +127,13 @@ public class Links {
                     shouldBlockUri = DISABLE_ONBOARDING_PERMISSION_PROMPTS;
                 } else if (path.contains("/api/v2/media/seen/")) {
                     shouldBlockUri = Pref.viewStoriesAnonymously();
-                } else if (path.contains("/heartbeat_and_get_viewer_count/")) {
+                } else if (path.contains("heartbeat_and_get_viewer_count")
+                        || path.contains("live/get_live_presence")
+                        || path.contains("get_viewer_list")) {
                     shouldBlockUri = Pref.viewLiveAnonymously();
+                    if (shouldBlockUri) {
+                        PikoLog.d("Links", "Blocked live presence/heartbeat URI: " + path);
+                    }
                 } else if (path.contains("/presence/report_activity/")
                         || path.contains("/presence/set_presence/")
                         || path.contains("/threads/presence/report/")) {
@@ -142,8 +146,8 @@ public class Links {
                     shouldBlockUri = DISABLE_STORIES;
                 } else if (path.contains("/discover/topical_explore")
                         || path.contains("/discover/topical_explore_stream")
-                        || (host.contains("i.instagram.com") && path.contains("/fbsearch/recent_searches/"))
-                        || (host.contains("i.instagram.com") && path.contains("/fbsearch/top_serp/"))) {
+                        || (host != null && host.contains("i.instagram.com") && path.contains("/fbsearch/recent_searches/"))
+                        || (host != null && host.contains("i.instagram.com") && path.contains("/fbsearch/top_serp/"))) {
                     shouldBlockUri = DISABLE_EXPLORE;
                 } else if (path.contains("/api/v1/media/") && path.contains("comments/")) {
                     shouldBlockUri = DISABLE_COMMENTS;

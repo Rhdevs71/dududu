@@ -457,6 +457,22 @@
          - Bot Clyde **tidak pernah** memblokir pesan lagi!
     - *Status Rilis*: Rilis **`v1.11.0`** (`patches-1.11.0.mpp`, 7,132,281 bytes) berhasil dipublish melalui GitHub Actions CI Run #34693245563.
 
+26. **Tahap 26: Perbaikan StackOverflowError Spotify On-Demand Playback & Rilis v1.11.1 (Terkini)**
+    - *Masalah*: Crash berulang pada `SpotifyOnDemandPlaybackPatch.kt` akibat pemanggilan rekursif ke `Restrictions.EMPTY->${method.name}()`.
+    - *Solusi*: Mengganti injeksi bytecode menjadi `invoke-static {}, Ljava/util/Collections;->emptySet()Ljava/util/Set;` dan `emptyMap()`.
+    - *Status Rilis*: Rilis **`v1.11.1`** (`patches-1.11.1.mpp`) berhasil dipublish melalui GitHub Actions CI Run #34693892711.
+
+27. **Tahap 27: Dukungan Versi WhatsApp Baru (RHpatch WaEnhancer) & Perbaikan Anonymous Live Stream Viewer (Piko Instagram) (Terkini)**
+    - *WhatsApp WaEnhancer (RHpatch)*:
+      - Menambahkan rentang versi WhatsApp hingga `2.26.40.xx` (dan bantalan hingga `2.26.45.xx`) di `arrays.xml` (`supported_versions_wpp` dan `supported_versions_business`) serta menghapus versi tertua `2.26.28.xx` & `2.26.29.xx`.
+      - Di `FeatureLoader.kt`, menambahkan pengecekan awalan versi `packageInfo.versionName?.startsWith("2.26.") == true` dan menyetel `bypass_version_check` default `true` agar update versi WhatsApp mendatang tidak memicu exception fatal `Unsupported version: ...`.
+    - *Instagram Anonymous Live Stream Viewer (Piko)*:
+      - Menambahkan proteksi `host != null` di `Links.java` untuk mencegah `NullPointerException` pada request relatif/internal Tigon.
+      - Memperluas filter pemblokiran URL penonton live stream ke `heartbeat_and_get_viewer_count`, `live/get_live_presence`, dan `get_viewer_list`.
+      - Memperbaiki salah mapping di `SettingsStatus.java` di mana `piko_view_live_anonymously` sebelumnya salah dipetakan ke `disableScreenshotDetection`.
+      - Memperbaiki `Pref.viewLiveAnonymously()` agar membaca langsung preferensi pengguna tanpa hambatan flag uninitialized.
+    - *Status*: Commit dan push ke repo `Rhdevs71/apahayo` (`main`) dan `Rhdevs71/dududu` (`main`).
+
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)
 
 File log berada di penyimpanan internal perangkat:

@@ -98,11 +98,11 @@ public class Pref {
     }
 
     public static boolean viewStoriesAnonymously() {
-        return (SharedPref.getBooleanPref(Settings.VIEW_STORIES_ANONYMOUSLY) && SettingsStatus.viewStoriesAnonymously) || Pref.getTurnOnAllGhostModes();
+        return SharedPref.getBooleanPref(Settings.VIEW_STORIES_ANONYMOUSLY) || Pref.getTurnOnAllGhostModes();
     }
 
     public static boolean viewLiveAnonymously() {
-        return (SharedPref.getBooleanPref(Settings.VIEW_LIVE_ANONYMOUSLY) && SettingsStatus.viewLiveAnonymously) || Pref.getTurnOnAllGhostModes();
+        return SharedPref.getBooleanPref(Settings.VIEW_LIVE_ANONYMOUSLY) || Pref.getTurnOnAllGhostModes();
     }
 
     public static boolean disableScreenshotDetection() {

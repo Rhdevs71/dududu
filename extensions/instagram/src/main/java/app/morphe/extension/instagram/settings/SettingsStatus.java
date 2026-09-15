@@ -291,9 +291,9 @@ public class SettingsStatus {
 
         FLAGS.put(str("piko_view_dm_anonymously"),SettingsStatus.viewDmAnonymously);
         FLAGS.put(str("piko_save_deleted_messages"),SettingsStatus.saveDeletedMessages);
-        FLAGS.put(str("piko_view_live_anonymously"),SettingsStatus.disableScreenshotDetection);
+        FLAGS.put(str("piko_view_live_anonymously"),SettingsStatus.viewLiveAnonymously);
         FLAGS.put(str("piko_disable_typing_status"),SettingsStatus.disableTypingStatus);
-        FLAGS.put(str("piko_more_profile_options"),SettingsStatus.viewLiveAnonymously);
+        FLAGS.put(str("piko_disable_screenshot_detection"),SettingsStatus.disableScreenshotDetection);
         FLAGS.put(str("piko_view_stories_anonymously"),SettingsStatus.viewStoriesAnonymously);
 
         FLAGS.put(str("piko_sanitize_share_links"),SettingsStatus.sanitizeShareLinks);
