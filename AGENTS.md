@@ -473,6 +473,25 @@
       - Memperbaiki `Pref.viewLiveAnonymously()` agar membaca langsung preferensi pengguna tanpa hambatan flag uninitialized.
     - *Status*: Commit dan push ke repo `Rhdevs71/apahayo` (`main`) dan `Rhdevs71/dududu` (`main`).
 
+28. **Tahap 28: Varian Lengkap Bio Font Instagram, Perbaikan Ghost DM Saluran Siaran (Broadcast Channel), serta Modul Patch Morphe Brave Browser (Brave Leo AI Premium & Default Background Video Playback) (Terkini)**
+    - *Instagram Bio Font Styling (`BioFontTransformer.java`)*:
+      - Menghubungkan secara presisi seluruh font identifier resmi bawaan Meta Instagram:
+        1. `"editor"` -> `toMonospace` (`𝚝𝚎𝚔𝚜 𝚋𝚒𝚘`)
+        2. `"signature"` -> `toScriptBold` (`𝓽𝓮𝓴𝓼 𝓫𝓲𝓸`)
+        3. `"serif"` -> `toSerifBold` (`𝐭𝐞𝐤𝐬 𝐛𝐢𝐨`)
+        4. `"deco"` -> `toDoubleStruck` (`𝕥𝕖𝕜𝕤 𝕓𝕚𝕠`)
+      - Mengeliminasi bug monoton di mana seluruh font jatuh ke fallback tunggal Sans Bold.
+      - Mempertahankan `sanitizeFontParam` (`"classic"`) untuk melewati paywall server Meta HTTP 402.
+    - *Perbaikan Bug Ghost DM Saluran Siaran / Broadcast Channel (`Pref.java` & `ViewDmAnonymouslyPatch.kt`)*:
+      - Menambahkan helper `shouldSuppressDmSeen(session, dummyOrKey, threadId)` dan `isBroadcastChannel(session, dummyOrKey, threadId)`.
+      - Mendeteksi Saluran Siaran (threadType 29, 32, 33 atau recipient list kosong).
+      - Menjaga seen receipt tetap terkirim untuk Saluran Siaran agar aplikasi tidak menganggap pengguna sebagai peninjau sementara (*guest preview*), melenyapkan pop-up konfirmasi "Gabung" berulang, serta mencegah saluran terhapus dari inbox saat tombol Back ditekan.
+    - *Modul Patch Morphe Brave Browser (`app.crimera.patches.brave`)*:
+      - Menambahkan target aplikasi `com.brave.browser` (v1.95.101, versionCode 429510104) di `Constants.kt`.
+      - **Unlock Brave Leo AI Premium (`UnlockLeoPremiumPatch.kt`)**: Memotong method `Lkd2;->a` (`BraveLeoPrefUtils.getIsSubscriptionActive`) agar mengembalikan `true`, membuka akses model AI premium tanpa langganan.
+      - **Default Background Video Playback (`BackgroundPlayPatch.kt`)**: Memotong method `Lf53;->c` (`BraveBackgroundVideoPlayback`) agar mengembalikan `true`, memastikan pemutaran video/musik di latar belakang selalu aktif out-of-the-box.
+
+
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)
 
 File log berada di penyimpanan internal perangkat:

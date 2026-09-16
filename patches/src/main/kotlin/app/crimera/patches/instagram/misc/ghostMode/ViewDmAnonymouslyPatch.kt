@@ -37,7 +37,7 @@ val viewDmAnonymouslyPatch =
                 addInstructionsWithLabels(
                     1,
                     """
-                    invoke-static {}, $PREF_DESCRIPTOR->viewDmAnonymously()Z
+                    invoke-static {p0, p1, p2}, $PREF_DESCRIPTOR->shouldSuppressDmSeen(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/String;)Z
                     move-result v$shouldDisableRegister
                     if-eqz v$shouldDisableRegister, :piko_continue
                     return-void

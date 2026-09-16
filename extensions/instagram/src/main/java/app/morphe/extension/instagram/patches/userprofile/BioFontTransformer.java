@@ -6,6 +6,7 @@
 package app.morphe.extension.instagram.patches.userprofile;
 
 import android.util.Log;
+import app.morphe.extension.crimera.PikoLog;
 
 public class BioFontTransformer {
     private static final String TAG = "BioFontTransformer";
@@ -18,9 +19,21 @@ public class BioFontTransformer {
             return rawText;
         }
 
-        Log.d(TAG, "Transforming bio with style: " + fontStyle + ", length: " + rawText.length());
-        String style = fontStyle.toLowerCase();
+        PikoLog.d(TAG, "Transforming bio with style: " + fontStyle + ", length: " + rawText.length());
+        String style = fontStyle.toLowerCase().trim();
 
+        // 1. Official Instagram Bio Fonts (from LX/0XNI & LX/01QA)
+        if (style.equals("editor") || style.contains("editor")) {
+            return toMonospace(rawText);
+        } else if (style.equals("signature") || style.contains("signature")) {
+            return toScriptBold(rawText);
+        } else if (style.equals("serif") || style.contains("serif")) {
+            return toSerifBold(rawText);
+        } else if (style.equals("deco") || style.contains("deco")) {
+            return toDoubleStruck(rawText);
+        }
+
+        // 2. Custom & Extended Styles
         if (style.contains("bold") || style.contains("modern")) {
             return toSansBold(rawText);
         } else if (style.contains("italic") || style.contains("slant")) {
@@ -43,8 +56,25 @@ public class BioFontTransformer {
 
     public static String sanitizeFontParam(String fontStyle) {
         // Always pass "classic" or empty to the server so server entitlement check passes (HTTP 200 OK)
-        Log.d(TAG, "Sanitizing font parameter to 'classic' to bypass server paywall");
+        PikoLog.d(TAG, "Sanitizing font parameter to 'classic' to bypass server paywall");
         return "classic";
+    }
+
+    private static String toSerifBold(String text) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (c >= 'A' && c <= 'Z') {
+                sb.appendCodePoint(0x1D400 + (c - 'A'));
+            } else if (c >= 'a' && c <= 'z') {
+                sb.appendCodePoint(0x1D41A + (c - 'a'));
+            } else if (c >= '0' && c <= '9') {
+                sb.appendCodePoint(0x1D7CE + (c - '0'));
+            } else {
+                sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 
     private static String toSansBold(String text) {

@@ -14,6 +14,7 @@ import app.morphe.extension.instagram.settings.SettingsStatus;
 import app.morphe.extension.instagram.constants.Constants;
 
 import app.morphe.extension.crimera.sharedPreference.SharedPref;
+import app.morphe.extension.crimera.PikoLog;
 
 @SuppressWarnings("unused")
 public class Pref {
@@ -124,6 +125,57 @@ public class Pref {
             return false;
         }
         return SharedPref.getBooleanPref(Settings.VIEW_DM_ANONYMOUSLY) || Pref.getTurnOnAllGhostModes();
+    }
+
+    /**
+     * Determines whether DM seen receipts should be suppressed.
+     * Broadcast Channels (Saluran Siaran) are excluded from suppression so membership status
+     * and thread retention work seamlessly without repeated join pop-ups.
+     *
+     * @return true to block the seen API call (ghost DM), false to allow it to proceed.
+     */
+    public static boolean shouldSuppressDmSeen(Object session, Object dummyOrKey, String threadId) {
+        if (!viewDmAnonymously()) {
+            return false;
+        }
+        if (isBroadcastChannel(session, dummyOrKey, threadId)) {
+            PikoLog.d("Pref", "Allowing seen receipt for broadcast channel: " + threadId);
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isBroadcastChannel(Object session, Object dummyOrKey, String threadId) {
+        try {
+            if (dummyOrKey == null) {
+                // If directThreadKey is null, it could be broadcast channel or manual seen call
+                return true;
+            }
+            Class<?> clazz = dummyOrKey.getClass();
+            String className = clazz.getName();
+            if (className.contains("Channel") || className.contains("Broadcast")) {
+                return true;
+            }
+            for (java.lang.reflect.Field f : clazz.getDeclaredFields()) {
+                f.setAccessible(true);
+                Object val = f.get(dummyOrKey);
+                if (val instanceof java.util.List) {
+                    java.util.List list = (java.util.List) val;
+                    if (list.isEmpty()) {
+                        return true;
+                    }
+                } else if (val instanceof Integer) {
+                    int type = ((Integer) val).intValue();
+                    // 29 = Broadcast Channel, 32 = Social Channel, 33 = Subscriber Channel
+                    if (type == 29 || type == 32 || type == 33 || type >= 28) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            PikoLog.e("Pref", "Error detecting broadcast channel", t);
+        }
+        return false;
     }
 
     public static boolean disableVideoAutoplay() {
