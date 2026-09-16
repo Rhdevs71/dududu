@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.11.2](https://github.com/Rhdevs71/dududu/releases/tag/v1.11.2)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;159 patches total
+> **[v1.12.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.12.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;161 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -271,6 +271,22 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 | [Hide Read Receipts (Blue Ticks)](#hide-read-receipts-blue-ticks) | Prevents sending read receipts (blue ticks) when viewing messages. Optionally sends blue ticks only when you reply. |  |
 | [Status & Media Downloader](#status-media-downloader) | Adds the capability to download status photos/videos and media directly to storage (/sdcard/Download/Piko/WhatsApp/). |  |
 | [Unlock WhatsApp Plus (Nova)](#unlock-whatsapp-plus-nova) | Unlocks official Meta Nova / WhatsApp Plus features including Custom App Themes, Custom App Icons, Pinned Chats Limit increase, and exclusive stickers. |  |
+
+</details>
+
+<details>
+<summary>📦 Brave Browser&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 1.95.101 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Default Background Video Playback](#default-background-video-playback) | Enables background video playback by default so media continues playing when switching apps or locking the screen. |  |
+| [Unlock Brave Leo AI Premium](#unlock-brave-leo-ai-premium) | Unlocks Brave Leo AI Premium subscription status and premium models without a paywall. |  |
 
 </details>
 

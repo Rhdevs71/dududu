@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-15T21:07:07",
-  "description": "## [1.11.2](https://github.com/Rhdevs71/dududu/compare/v1.11.1...v1.11.2) (2026-09-15)\n\n### 🐛 Bug Fixes\n\n* **instagram:** fix anonymous live stream viewing and update agent memory ([c11aa82](https://github.com/Rhdevs71/dududu/commit/c11aa82b94e79e2c65521e17accf9cb91294e076))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.11.2/patches-1.11.2.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.11.2/patches-1.11.2.mpp.asc",
-  "version": "1.11.2"
+  "created_at": "2026-09-16T20:44:51",
+  "description": "## [1.12.0](https://github.com/Rhdevs71/dududu/compare/v1.11.2...v1.12.0) (2026-09-16)\n\n### 🐛 Bug Fixes\n\n* **instagram:** correct PikoLog import in BioFontTransformer and Pref ([f48e575](https://github.com/Rhdevs71/dududu/commit/f48e575fc8283c6c70d18b51a0eb47d1ee909904))\n\n### ✨ New Features\n\n* **brave,instagram:** add Brave Leo & Background play patches, fix IG broadcast channel DM seen, and complete bio font variants ([a69523a](https://github.com/Rhdevs71/dududu/commit/a69523a475a0653b9af744375888a25ee7be0ce7))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.12.0/patches-1.12.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.12.0/patches-1.12.0.mpp.asc",
+  "version": "1.12.0"
 }

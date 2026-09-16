@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.11.2",
+  "version": "1.12.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -1295,6 +1295,37 @@
             {
               "version": "12.19.1-release.0",
               "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Default Background Video Playback",
+      "description": "Enables background video playback by default so media continues playing when switching apps or locking the screen.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.brave.browser",
+          "name": "Brave Browser",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#FF4400",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "1.95.101",
+              "versionCodes": {
+                "ARM64_V8A": 429510104,
+                "ARMEABI_V7A": 429510104,
+                "X86_64": 429510104,
+                "X86": 429510104
+              },
               "isExperimental": false,
               "minSdk": null,
               "description": null
@@ -4985,6 +5016,37 @@
           "values": null
         }
       ]
+    },
+    {
+      "name": "Unlock Brave Leo AI Premium",
+      "description": "Unlocks Brave Leo AI Premium subscription status and premium models without a paywall.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.brave.browser",
+          "name": "Brave Browser",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#FF4400",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "1.95.101",
+              "versionCodes": {
+                "ARM64_V8A": 429510104,
+                "ARMEABI_V7A": 429510104,
+                "X86_64": 429510104,
+                "X86": 429510104
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
     },
     {
       "name": "Unlock Nitro Emojis & Roadblocks",

@@ -1,3 +1,13 @@
+## [1.12.0](https://github.com/Rhdevs71/dududu/compare/v1.11.2...v1.12.0) (2026-09-16)
+
+### 🐛 Bug Fixes
+
+* **instagram:** correct PikoLog import in BioFontTransformer and Pref ([f48e575](https://github.com/Rhdevs71/dududu/commit/f48e575fc8283c6c70d18b51a0eb47d1ee909904))
+
+### ✨ New Features
+
+* **brave,instagram:** add Brave Leo & Background play patches, fix IG broadcast channel DM seen, and complete bio font variants ([a69523a](https://github.com/Rhdevs71/dududu/commit/a69523a475a0653b9af744375888a25ee7be0ce7))
+
 ## [1.11.2](https://github.com/Rhdevs71/dududu/compare/v1.11.1...v1.11.2) (2026-09-15)
 
 ### 🐛 Bug Fixes
