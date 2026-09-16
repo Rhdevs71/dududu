@@ -18,7 +18,6 @@ object BraveLeoSubscriptionFingerprint :
         filters =
             listOf(
                 string("brave.ai_chat.subscription_active_android"),
-                string("BraveLeoPrefUtils.getIsSubscriptionActive profile is null"),
             ),
     )
 
