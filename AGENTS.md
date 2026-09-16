@@ -490,6 +490,12 @@
       - Menambahkan target aplikasi `com.brave.browser` (v1.95.101, versionCode 429510104) di `Constants.kt`.
       - **Unlock Brave Leo AI Premium (`UnlockLeoPremiumPatch.kt`)**: Memotong method `Lkd2;->a` (`BraveLeoPrefUtils.getIsSubscriptionActive`) agar mengembalikan `true`, membuka akses model AI premium tanpa langganan.
       - **Default Background Video Playback (`BackgroundPlayPatch.kt`)**: Memotong method `Lf53;->c` (`BraveBackgroundVideoPlayback`) agar mengembalikan `true`, memastikan pemutaran video/musik di latar belakang selalu aktif out-of-the-box.
+    - *Status Rilis & Hasil Pengujian Morphe CLI*:
+      - Rilis GitHub: **`v1.12.1`** (`patches-1.12.1.mpp`, 7,140,691 bytes) berhasil dipublish melalui GitHub Actions CI Run #35148766499.
+      - Pengujian Morphe CLI sukses 100% pada target `C:\Users\Rhdevs\Downloads\brv.apkm` (29 split APKs berhasil digabung, 2/2 patches applied cleanly, exit code 0).
+      - Ditandatangani resmi dengan Android SDK 36 `apksigner` (v3 scheme: true, verifies: true).
+      - File APK Siap Instal: **`C:\Users\Rhdevs\Downloads\brave_v1.95.101_piko_signed.apk`** (282,714,373 bytes).
+
 
 
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)
