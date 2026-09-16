@@ -1,3 +1,9 @@
+## [1.12.1](https://github.com/Rhdevs71/dududu/compare/v1.12.0...v1.12.1) (2026-09-16)
+
+### 🐛 Bug Fixes
+
+* **brave:** simplify BraveLeoSubscriptionFingerprint filter ([aa015ed](https://github.com/Rhdevs71/dududu/commit/aa015ed55cf802ea78f014720304f85ba18bd5c2))
+
 ## [1.12.0](https://github.com/Rhdevs71/dududu/compare/v1.11.2...v1.12.0) (2026-09-16)
 
 ### 🐛 Bug Fixes
