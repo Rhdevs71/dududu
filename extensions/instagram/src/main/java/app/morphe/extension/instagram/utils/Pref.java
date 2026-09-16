@@ -14,7 +14,6 @@ import app.morphe.extension.instagram.settings.SettingsStatus;
 import app.morphe.extension.instagram.constants.Constants;
 
 import app.morphe.extension.crimera.sharedPreference.SharedPref;
-import app.morphe.extension.crimera.PikoLog;
 
 @SuppressWarnings("unused")
 public class Pref {

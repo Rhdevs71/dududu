@@ -6,7 +6,7 @@
 package app.morphe.extension.instagram.patches.userprofile;
 
 import android.util.Log;
-import app.morphe.extension.crimera.PikoLog;
+import app.morphe.extension.instagram.utils.PikoLog;
 
 public class BioFontTransformer {
     private static final String TAG = "BioFontTransformer";
