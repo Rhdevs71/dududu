@@ -1,3 +1,9 @@
+## [1.15.1](https://github.com/Rhdevs71/dududu/compare/v1.15.0...v1.15.1) (2026-09-18)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve bio custom font single-style bug and strengthen broadcast channels sync ([be0f398](https://github.com/Rhdevs71/dududu/commit/be0f398836cf83a5d3018fadbec15826e926e0d4))
+
 ## [1.15.0](https://github.com/Rhdevs71/dududu/compare/v1.14.0...v1.15.0) (2026-09-18)
 
 ### ✨ New Features
