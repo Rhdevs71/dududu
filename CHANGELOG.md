@@ -1,3 +1,9 @@
+## [1.13.0](https://github.com/Rhdevs71/dududu/compare/v1.12.3...v1.13.0) (2026-09-18)
+
+### ✨ New Features
+
+* **efootball:** add in-game mod menu overlay and google play license guard for eFootball v11.0.1 ([0b050d2](https://github.com/Rhdevs71/dududu/commit/0b050d2bc20e0a1cc167ec9e2251037cdbfef594))
+
 ## [1.12.3](https://github.com/Rhdevs71/dududu/compare/v1.12.2...v1.12.3) (2026-09-18)
 
 ### 🐛 Bug Fixes

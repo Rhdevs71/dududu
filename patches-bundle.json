@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-18T08:18:26",
-  "description": "## [1.12.3](https://github.com/Rhdevs71/dududu/compare/v1.12.2...v1.12.3) (2026-09-18)\n\n### 🐛 Bug Fixes\n\n* **instagram:** use invoke-static/range in SaveBioRepositoryFingerprint for high register v16 ([6eaa75f](https://github.com/Rhdevs71/dududu/commit/6eaa75f2cb1c2d1d2dda84c0bd0e54e1f38d0750))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.12.3/patches-1.12.3.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.12.3/patches-1.12.3.mpp.asc",
-  "version": "1.12.3"
+  "created_at": "2026-09-18T10:30:39",
+  "description": "## [1.13.0](https://github.com/Rhdevs71/dududu/compare/v1.12.3...v1.13.0) (2026-09-18)\n\n### ✨ New Features\n\n* **efootball:** add in-game mod menu overlay and google play license guard for eFootball v11.0.1 ([0b050d2](https://github.com/Rhdevs71/dududu/commit/0b050d2bc20e0a1cc167ec9e2251037cdbfef594))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.13.0/patches-1.13.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.13.0/patches-1.13.0.mpp.asc",
+  "version": "1.13.0"
 }

@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.12.3](https://github.com/Rhdevs71/dududu/releases/tag/v1.12.3)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;161 patches total
+> **[v1.13.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.13.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;163 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -303,6 +303,22 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 |----------|----------------|-----------|
 | [Enable Debug Menu](#enable-debug-menu) | Enables Duolingo internal debug menu in settings and unlocks video call debug overrides. |  |
 | [Unlock Subscription](#unlock-subscription) | Unlocks user-selectable Duolingo subscription tiers (Default: Super). | • Subscription tier |
+
+</details>
+
+<details>
+<summary>📦 eFootball&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 11.0.1 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Google Play License Guard](#google-play-license-guard) | Guards and maintains Google Play License verification and OBB delivery for modified eFootball installs. |  |
+| [In-Game Mod Menu Overlay](#in-game-mod-menu-overlay) | Adds draggable in-game mod menu overlay with match speed, camera drone FOV, player scale, and graphics controls. |  |
 
 </details>
 

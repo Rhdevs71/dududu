@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.12.3",
+  "version": "1.13.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -2577,6 +2577,34 @@
       "options": []
     },
     {
+      "name": "Google Play License Guard",
+      "description": "Guards and maintains Google Play License verification and OBB delivery for modified eFootball installs.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "jp.konami.pesam",
+          "name": "eFootball",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#002B7F",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "11.0.1",
+              "versionCodes": {
+                "ARM64_V8A": 311000101
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Handle custom twitter links",
       "description": "Adds support for opening custom twitter links such as vxtwitter, fxtwitter, and fixupx within the app. These will have to be manually enabled under the \"Open by default\" section in the app info!",
       "default": true,
@@ -3480,6 +3508,36 @@
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "In-Game Mod Menu Overlay",
+      "description": "Adds draggable in-game mod menu overlay with match speed, camera drone FOV, player scale, and graphics controls.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "jp.konami.pesam",
+          "name": "eFootball",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#002B7F",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "11.0.1",
+              "versionCodes": {
+                "ARM64_V8A": 311000101
               },
               "isExperimental": false,
               "minSdk": null,
