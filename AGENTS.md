@@ -496,7 +496,19 @@
       - Ditandatangani resmi dengan Android SDK 36 `apksigner` (v3 scheme: true, verifies: true).
       - File APK Siap Instal: **`C:\Users\Rhdevs\Downloads\brave_v1.95.101_piko_signed.apk`** (282,714,373 bytes).
 
-
+29. **Tahap 29: Perbaikan Tuntas Ghost DM Saluran Siaran (Broadcast Channels), Hook Modern Bio Repository v444 (`EditProfileBioRepository`), dan Inline Font Styling Tags (Rilis v1.12.2 - Terkini)**
+    - *Perbaikan Saluran Siaran / Broadcast Channels (`Pref.java`)*:
+      - *Masalah*: Saat membuka saluran siaran di DM Instagram, banner penawaran *"Lain kali | Gabung"* selalu muncul kembali meskipun pengguna sudah bergabung ke saluran. Saat menekan tombol Back, saluran siaran tersebut hilang dari inbox DM dan harus di-refresh secara manual.
+      - *Penyebab*: Instagram menganggap status keanggotaan pengguna sebagai peninjau sementara (*guest preview*) karena pengiriman seen receipt/sync ditahan oleh filter `shouldSuppressDmSeen`. Pada Instagram Direct v444, method `LX/0833;->A0B` mengoper parameter `LX/01AX;` yang tidak lagi memuat field `List` atau `Integer` threadType yang dicari oleh refleksi sebelumnya, sehingga saluran siaran terdeteksi sebagai chat biasa dan ditahan.
+      - *Solusi*: Mengidentifikasi format `threadId` Meta: obrolan 1-on-1 selalu memuat tanda hubung bawah `_` (misal `user1_user2`), sedangkan saluran siaran (*broadcast channel*) selalu berupa satu ID numerik murni berdigit panjang (15–20 digit, tanpa `_`). Ditambahkan deteksi regex `^[0-9]{15,20}$` dan inspeksi `dummyOrKey.toString()`. Seen receipt tidak lagi ditahan untuk saluran siaran, memastikan keanggotaan saluran tersimpan permanen dan saluran tetap berada di inbox tanpa dialog "Gabung" berulang.
+    - *Hook Modern Bio Repository GraphQL v444 & Inline Font Tags (`BioFontTransformer.java` & `UnlockPlusBenefitsPatch.kt`)*:
+      - *Masalah*: Pengubahan gaya tulisan (custom font) pada biografi profil Instagram tidak tersimpan atau tidak berubah saat disimpan melalui antarmuka modern Instagram v444.
+      - *Penyebab*: Instagram v444 telah memigrasikan penyimpanan biografi profil dari REST endpoint lama (`accounts/set_biography/`) ke GraphQL mutation repository modern: `com.instagram.profile.edit/bio/data/EditProfileBioRepository;->A02(String bio, String font, String, Continuation)`. Hook lama hanya menargetkan `SetBiographyRequestBuilderFingerprint` (REST), sehingga request bio dari UI baru lolos tanpa transformasi.
+      - *Solusi*:
+        1. Menambahkan `SaveBioRepositoryFingerprint` pada `EditProfileBioRepository;->A02` di `UnlockPlusBenefitsPatch.kt`.
+        2. Menginjeksi `BioFontTransformer.transformBio(p1, p2)` dan `sanitizeFontParam(p2)` langsung pada entry point `A02`.
+        3. Menambahkan dukungan *inline font styling tags* di `BioFontTransformer.java`: pengguna kini dapat mengetikkan tag font langsung di awal bio (contoh: `[editor] Teks Bio`, `[serif] Teks Bio`, `[signature] Teks Bio`, `[deco] Teks Bio`, `[bold] Teks Bio`), memudahkan pengguna memilih gaya font apa pun secara langsung dari keyboard tanpa tergantung pada UI picker Instagram.
+    - *Status*: Rilis GitHub **`v1.12.2`** (`patches-1.12.2.mpp`, 7,143,135 bytes) sukses dipublish via GitHub Actions CI Run #35322077656.
 
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)
 

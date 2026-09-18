@@ -222,9 +222,9 @@ val unlockPlusBenefitsPatch =
                 addInstructions(
                     0,
                     """
-                    invoke-static {p1, p2}, $PATCHES_DESCRIPTOR/userprofile/BioFontTransformer;->transformBio(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+                    invoke-static/range {p1 .. p2}, $PATCHES_DESCRIPTOR/userprofile/BioFontTransformer;->transformBio(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
                     move-result-object p1
-                    invoke-static {p2}, $PATCHES_DESCRIPTOR/userprofile/BioFontTransformer;->sanitizeFontParam(Ljava/lang/String;)Ljava/lang/String;
+                    invoke-static/range {p2 .. p2}, $PATCHES_DESCRIPTOR/userprofile/BioFontTransformer;->sanitizeFontParam(Ljava/lang/String;)Ljava/lang/String;
                     move-result-object p2
                     """.trimIndent(),
                 )
