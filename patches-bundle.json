@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-18T11:18:31",
-  "description": "## [1.14.0](https://github.com/Rhdevs71/dududu/compare/v1.13.1...v1.14.0) (2026-09-18)\n\n### ✨ New Features\n\n* **efootball:** add AFK smart match grinder, calibrated camera with fov 0 reset, free-cam, and match exploits ([8a00598](https://github.com/Rhdevs71/dududu/commit/8a0059872c89970c0fe36fcd5d18b7bcd2d6d563))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.14.0/patches-1.14.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.14.0/patches-1.14.0.mpp.asc",
-  "version": "1.14.0"
+  "created_at": "2026-09-18T18:41:01",
+  "description": "## [1.15.0](https://github.com/Rhdevs71/dududu/compare/v1.14.0...v1.15.0) (2026-09-18)\n\n### ✨ New Features\n\n* **efootball:** add 1-tap smart skill moves draggable pad, ultra hd super-sampling, and fix AFK grinder touch synthesis ([405081b](https://github.com/Rhdevs71/dududu/commit/405081b28159f3ead1a1c0e54a0a69960453f5e0))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.15.0/patches-1.15.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.15.0/patches-1.15.0.mpp.asc",
+  "version": "1.15.0"
 }

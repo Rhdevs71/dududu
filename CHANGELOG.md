@@ -1,3 +1,9 @@
+## [1.15.0](https://github.com/Rhdevs71/dududu/compare/v1.14.0...v1.15.0) (2026-09-18)
+
+### ✨ New Features
+
+* **efootball:** add 1-tap smart skill moves draggable pad, ultra hd super-sampling, and fix AFK grinder touch synthesis ([405081b](https://github.com/Rhdevs71/dududu/commit/405081b28159f3ead1a1c0e54a0a69960453f5e0))
+
 ## [1.14.0](https://github.com/Rhdevs71/dududu/compare/v1.13.1...v1.14.0) (2026-09-18)
 
 ### ✨ New Features
