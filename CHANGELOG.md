@@ -1,3 +1,9 @@
+## [1.13.1](https://github.com/Rhdevs71/dududu/compare/v1.13.0...v1.13.1) (2026-09-18)
+
+### 🐛 Bug Fixes
+
+* **efootball:** use addInstructions without trailing label in OverlayMenuPatch ([9d0eee8](https://github.com/Rhdevs71/dududu/commit/9d0eee8bc4904d4c2af8c385338fa3e4d9f81760))
+
 ## [1.13.0](https://github.com/Rhdevs71/dududu/compare/v1.12.3...v1.13.0) (2026-09-18)
 
 ### ✨ New Features
