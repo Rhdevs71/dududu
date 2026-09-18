@@ -13,6 +13,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -34,14 +35,12 @@ import app.morphe.extension.crimera.PikoUtils;
 
 /**
  * In-game Overlay Mod Menu for eFootball Mobile (PES Android).
- * Zero-permission DecorView floating overlay providing real-time UE4 console controls:
- * - Match Speed / Time Dilation (slomo 1.0 - 2.0x)
- * - Camera Field of View / Drone View (fov 90 - 120)
- * - In-game Player Scale / Height (1.0x - 1.6x)
- * - FPS Unlocker (30 - 120 FPS)
- * - Resolution Scale (100% - 150%)
- * - In-game FPS & Performance Stats
- * - Direct UE4 Console Command Terminal
+ * Features:
+ * 1. AFK Smart Event Grinder (Auto Match Loop, Auto Skip Replays, Auto Result Advance)
+ * 2. Precision Camera FOV with Default Reset (fov 0), Broadcast, Stadium, and Stepper [-]/[+]
+ * 3. 3D Free-Roam Camera (ToggleDebugCamera)
+ * 4. Match & Engine Exploits (PlayersOnly freeze opponents, FreezeFrame, t.MaxFPS unlocker)
+ * 5. Interactive UE4 Console Terminal
  */
 @SuppressWarnings("unused")
 public class EfbOverlayManager {
@@ -51,14 +50,26 @@ public class EfbOverlayManager {
     private static FrameLayout sRootOverlay = null;
     private static View sFloatingBall = null;
     private static View sMenuModal = null;
+    private static TextView sFloatingAfkBadge = null;
+
+    // AFK Grinder State
+    private static boolean sAfkRunning = false;
+    private static int sAfkCycle = 0;
+    private static Button sMenuAfkBtn = null;
+    private static TextView sMenuAfkStatus = null;
     private static final Handler sMainHandler = new Handler(Looper.getMainLooper());
+    private static final Handler sAfkHandler = new Handler(Looper.getMainLooper());
+
+    // Camera FOV State
+    private static int sCurrentFov = 0; // 0 = default
+    private static TextView sFovIndicator = null;
 
     public static void init(final Activity activity) {
         if (activity == null) return;
         sActivity = activity;
 
         try {
-            PikoUtils.logger(TAG + ": Initializing eFootball Overlay Mod Menu on " + activity.getClass().getName());
+            PikoUtils.logger(TAG + ": Initializing eFootball Overlay Mod Menu v2 on " + activity.getClass().getName());
         } catch (Throwable ignored) {}
 
         sMainHandler.postDelayed(new Runnable() {
@@ -72,7 +83,7 @@ public class EfbOverlayManager {
                     } catch (Throwable ignored) {}
                 }
             }
-        }, 1500); // 1.5s delay to let UE4 engine view surface settle
+        }, 1500);
     }
 
     private static void attachOverlay(final Activity activity) {
@@ -92,11 +103,16 @@ public class EfbOverlayManager {
         );
         sRootOverlay.setLayoutParams(rootParams);
 
-        // 1. Create Floating Ball
+        // 1. Floating Action Ball (Draggable)
         sFloatingBall = createFloatingBall(activity);
         sRootOverlay.addView(sFloatingBall);
 
-        // 2. Create Modal Menu (initially hidden)
+        // 2. Floating AFK Status Badge (Top-Center, visible when AFK active)
+        sFloatingAfkBadge = createFloatingAfkBadge(activity);
+        sFloatingAfkBadge.setVisibility(View.GONE);
+        sRootOverlay.addView(sFloatingAfkBadge);
+
+        // 3. Modal Menu (initially hidden)
         sMenuModal = createMenuModal(activity);
         sMenuModal.setVisibility(View.GONE);
         sRootOverlay.addView(sMenuModal);
@@ -104,7 +120,7 @@ public class EfbOverlayManager {
         decorView.addView(sRootOverlay);
         sOverlayAttached = true;
 
-        showToast("⚽ Piko eFootball Mod Menu Active!\nTap ⚽ to open menu.");
+        showToast("⚽ Piko eFootball Mod Menu Aktif!\nSentuh ⚽ untuk membuka menu.");
     }
 
     private static View createFloatingBall(final Activity activity) {
@@ -117,15 +133,13 @@ public class EfbOverlayManager {
         params.topMargin = dpToPx(activity, 80);
         ballContainer.setLayoutParams(params);
 
-        // Styling: Glassmorphism Dark Circle with Glowing Cyan Border
         GradientDrawable bg = new GradientDrawable();
         bg.setShape(GradientDrawable.OVAL);
         bg.setColor(Color.parseColor("#E60F172A")); // Deep slate 90%
-        bg.setStroke(dpToPx(activity, 2), Color.parseColor("#00E5FF")); // Glowing Cyan
+        bg.setStroke(dpToPx(activity, 2), Color.parseColor("#00E5FF")); // Cyan glow
         ballContainer.setBackground(bg);
         ballContainer.setElevation(dpToPx(activity, 8));
 
-        // Content
         LinearLayout content = new LinearLayout(activity);
         content.setOrientation(LinearLayout.VERTICAL);
         content.setGravity(Gravity.CENTER);
@@ -151,7 +165,6 @@ public class EfbOverlayManager {
 
         ballContainer.addView(content);
 
-        // Drag & Click Handler
         ballContainer.setOnTouchListener(new View.OnTouchListener() {
             private float dX, dY;
             private float startX, startY;
@@ -172,7 +185,6 @@ public class EfbOverlayManager {
                         float newX = event.getRawX() + dX;
                         float newY = event.getRawY() + dY;
 
-                        // Bounds checking
                         ViewGroup parent = (ViewGroup) v.getParent();
                         if (parent != null) {
                             newX = Math.max(0, Math.min(newX, parent.getWidth() - v.getWidth()));
@@ -189,7 +201,6 @@ public class EfbOverlayManager {
                         long duration = System.currentTimeMillis() - startTime;
 
                         if (diffX < dpToPx(activity, 10) && diffY < dpToPx(activity, 10) && duration < 300) {
-                            // Click detected
                             toggleMenu();
                         }
                         return true;
@@ -201,21 +212,52 @@ public class EfbOverlayManager {
         return ballContainer;
     }
 
+    private static TextView createFloatingAfkBadge(final Activity activity) {
+        TextView badge = new TextView(activity);
+        badge.setText("🟢 AFK GRINDER: AKTIF (Auto-Loop Match)");
+        badge.setTextColor(Color.WHITE);
+        badge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        badge.setTypeface(Typeface.DEFAULT_BOLD);
+        badge.setPadding(dpToPx(activity, 14), dpToPx(activity, 6), dpToPx(activity, 14), dpToPx(activity, 6));
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setShape(GradientDrawable.RECTANGLE);
+        bg.setCornerRadius(dpToPx(activity, 20));
+        bg.setColor(Color.parseColor("#E6065F46")); // Emerald dark 90%
+        bg.setStroke(dpToPx(activity, 2), Color.parseColor("#10B981")); // Glowing emerald
+        badge.setBackground(bg);
+        badge.setElevation(dpToPx(activity, 10));
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        params.topMargin = dpToPx(activity, 14);
+        badge.setLayoutParams(params);
+
+        badge.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleAfkGrinder();
+            }
+        });
+
+        return badge;
+    }
+
     private static View createMenuModal(final Activity activity) {
-        // Semi-transparent backdrop overlay
         final FrameLayout backdrop = new FrameLayout(activity);
         FrameLayout.LayoutParams backdropParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
         );
         backdrop.setLayoutParams(backdropParams);
-        backdrop.setBackgroundColor(Color.parseColor("#80000000")); // Dark backdrop
+        backdrop.setBackgroundColor(Color.parseColor("#80000000"));
         backdrop.setClickable(true);
 
-        // Menu card container
         DisplayMetrics dm = activity.getResources().getDisplayMetrics();
-        int menuWidth = Math.min(dpToPx(activity, 380), (int) (dm.widthPixels * 0.90f));
-        int menuMaxHeight = (int) (dm.heightPixels * 0.85f);
+        int menuWidth = Math.min(dpToPx(activity, 420), (int) (dm.widthPixels * 0.92f));
 
         FrameLayout.LayoutParams cardParams = new FrameLayout.LayoutParams(
                 menuWidth,
@@ -228,16 +270,15 @@ public class EfbOverlayManager {
         card.setOrientation(LinearLayout.VERTICAL);
         card.setPadding(dpToPx(activity, 16), dpToPx(activity, 16), dpToPx(activity, 16), dpToPx(activity, 16));
 
-        // Card Styling: Modern Dark Slate + Cyan Accent
         GradientDrawable cardBg = new GradientDrawable();
         cardBg.setShape(GradientDrawable.RECTANGLE);
         cardBg.setCornerRadius(dpToPx(activity, 18));
-        cardBg.setColor(Color.parseColor("#FA0B1120")); // 98% dark slate
-        cardBg.setStroke(dpToPx(activity, 1), Color.parseColor("#3300E5FF")); // Subtle cyan glow
+        cardBg.setColor(Color.parseColor("#FA0B1120")); // Dark slate 98%
+        cardBg.setStroke(dpToPx(activity, 1), Color.parseColor("#3300E5FF"));
         card.setBackground(cardBg);
         card.setElevation(dpToPx(activity, 16));
 
-        // 1. Header (Title + Close button)
+        // Header
         LinearLayout header = new LinearLayout(activity);
         header.setOrientation(LinearLayout.HORIZONTAL);
         header.setGravity(Gravity.CENTER_VERTICAL);
@@ -264,14 +305,13 @@ public class EfbOverlayManager {
         titleLayout.addView(titleView);
 
         TextView subtitleView = new TextView(activity);
-        subtitleView.setText("Piko v1.9.0 • Unreal Engine 4");
+        subtitleView.setText("Piko v2.0 • Precision Camera & AFK Grinder");
         subtitleView.setTextColor(Color.parseColor("#94A3B8"));
         subtitleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         titleLayout.addView(subtitleView);
 
         header.addView(titleLayout);
 
-        // Close button
         TextView closeBtn = new TextView(activity);
         closeBtn.setText("✕");
         closeBtn.setTextColor(Color.parseColor("#EF4444"));
@@ -294,7 +334,7 @@ public class EfbOverlayManager {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 dpToPx(activity, 1)
         );
-        divParams.setMargins(0, dpToPx(activity, 10), 0, dpToPx(activity, 10));
+        divParams.setMargins(0, dpToPx(activity, 8), 0, dpToPx(activity, 8));
         divider.setLayoutParams(divParams);
         divider.setBackgroundColor(Color.parseColor("#1E293B"));
         card.addView(divider);
@@ -311,76 +351,112 @@ public class EfbOverlayManager {
         LinearLayout contentLayout = new LinearLayout(activity);
         contentLayout.setOrientation(LinearLayout.VERTICAL);
 
-        // SECTION 1: GAMEPLAY & MATCH CONTROL
-        addSectionHeader(activity, contentLayout, "🎮 MATCH & GAMEPLAY CONTROLS");
+        // ==========================================
+        // SECTION 1: AFK MATCH GRINDER (AUTO EVENT)
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "🤖 AFK MATCH GRINDER (AUTO-LOOP EVENT)");
 
-        // 1.1 Match Speed / Time Dilation
-        addFeatureLabel(activity, contentLayout, "Match Speed (Time Dilation):");
-        LinearLayout speedRow = new LinearLayout(activity);
-        speedRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, speedRow, "1.0x (Normal)", "#334155", () -> executeCommand("slomo 1.0"));
-        addOptionButton(activity, speedRow, "1.25x", "#1E293B", () -> executeCommand("slomo 1.25"));
-        addOptionButton(activity, speedRow, "1.5x", "#1E293B", () -> executeCommand("slomo 1.5"));
-        addOptionButton(activity, speedRow, "2.0x (Turbo)", "#0F766E", () -> executeCommand("slomo 2.0"));
-        contentLayout.addView(speedRow);
+        sMenuAfkStatus = new TextView(activity);
+        sMenuAfkStatus.setText("Status: NONAKTIF (Tap Mulai untuk auto-loop match event)");
+        sMenuAfkStatus.setTextColor(Color.parseColor("#94A3B8"));
+        sMenuAfkStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        contentLayout.addView(sMenuAfkStatus);
 
-        // 1.2 Camera FOV / Drone View
-        addFeatureLabel(activity, contentLayout, "Camera Angle / Field of View (FOV):");
-        LinearLayout fovRow = new LinearLayout(activity);
-        fovRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, fovRow, "90° (Normal)", "#334155", () -> executeCommand("fov 90"));
-        addOptionButton(activity, fovRow, "100° (Wide)", "#1E293B", () -> executeCommand("fov 100"));
-        addOptionButton(activity, fovRow, "110° (Stadium)", "#1E293B", () -> executeCommand("fov 110"));
-        addOptionButton(activity, fovRow, "120° (Drone)", "#0369A1", () -> executeCommand("fov 120"));
-        contentLayout.addView(fovRow);
+        sMenuAfkBtn = new Button(activity);
+        sMenuAfkBtn.setText("🟢 MULAI AFK MATCH GRINDER");
+        sMenuAfkBtn.setTextColor(Color.WHITE);
+        sMenuAfkBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        sMenuAfkBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        updateAfkButtonVisual(activity);
+        sMenuAfkBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleAfkGrinder();
+            }
+        });
+        LinearLayout.LayoutParams afkBtnParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                dpToPx(activity, 42)
+        );
+        afkBtnParams.setMargins(0, dpToPx(activity, 6), 0, dpToPx(activity, 6));
+        sMenuAfkBtn.setLayoutParams(afkBtnParams);
+        contentLayout.addView(sMenuAfkBtn);
 
-        // 1.3 In-game Player Scale / Height (Pemain Raksasa)
-        addFeatureLabel(activity, contentLayout, "In-Game Player Height / Scale:");
-        LinearLayout scaleRow = new LinearLayout(activity);
-        scaleRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, scaleRow, "1.0x (Standard)", "#334155", () -> executePlayerScale(1.0f));
-        addOptionButton(activity, scaleRow, "1.15x (Tall)", "#1E293B", () -> executePlayerScale(1.15f));
-        addOptionButton(activity, scaleRow, "1.35x (Giant)", "#1E293B", () -> executePlayerScale(1.35f));
-        addOptionButton(activity, scaleRow, "1.60x (Titan)", "#7C2D12", () -> executePlayerScale(1.60f));
-        contentLayout.addView(scaleRow);
+        TextView afkHelp = new TextView(activity);
+        afkHelp.setText("💡 Grinder otomatis menekan tombol Lanjut, Klaim Hadiah, Lewati Replay, & Mulai Laga Berikutnya secara berkala saat HP ditinggal.");
+        afkHelp.setTextColor(Color.parseColor("#64748B"));
+        afkHelp.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        contentLayout.addView(afkHelp);
 
-        // SECTION 2: GRAPHICS & PERFORMANCE
-        addSectionHeader(activity, contentLayout, "⚡ GRAPHICS & PERFORMANCE");
+        // ==========================================
+        // SECTION 2: KAMERA & SUDUT PANDANG (FOV)
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "🎥 KAMERA & SUDUT PANDANG (FOV)");
 
-        // 2.1 Max FPS
-        addFeatureLabel(activity, contentLayout, "Target Frame Rate (FPS Unlocker):");
+        sFovIndicator = new TextView(activity);
+        sFovIndicator.setText("Sudut Pandang: Default Bawaan Game");
+        sFovIndicator.setTextColor(Color.parseColor("#38BDF8"));
+        sFovIndicator.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        sFovIndicator.setTypeface(Typeface.DEFAULT_BOLD);
+        contentLayout.addView(sFovIndicator);
+
+        // Row 1: Reset Default & Steppers [-] [+]
+        LinearLayout fovStepRow = new LinearLayout(activity);
+        fovStepRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, fovStepRow, "🔄 RESET BAWAAN", "#0284C7", () -> applyFov(0, "Default Bawaan Game"));
+        addOptionButton(activity, fovStepRow, "➖ Turunkan 2°", "#1E293B", () -> adjustFovStep(-2));
+        addOptionButton(activity, fovStepRow, "➕ Naikkan 2°", "#1E293B", () -> adjustFovStep(2));
+        contentLayout.addView(fovStepRow);
+
+        // Row 2: Preset Sudut Lapangan Realistis Game Bola
+        LinearLayout fovPresetsRow = new LinearLayout(activity);
+        fovPresetsRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, fovPresetsRow, "50° (Dinamis)", "#334155", () -> applyFov(50, "50° Dinamis Dekat"));
+        addOptionButton(activity, fovPresetsRow, "60° (Broadcast)", "#334155", () -> applyFov(60, "60° Siaran TV"));
+        addOptionButton(activity, fovPresetsRow, "68° (Stadium)", "#334155", () -> applyFov(68, "68° Stadium Luas"));
+        addOptionButton(activity, fovPresetsRow, "76° (Drone)", "#334155", () -> applyFov(76, "76° Taktikal Drone"));
+        contentLayout.addView(fovPresetsRow);
+
+        // Row 3: 3D Free-Roam Camera
+        LinearLayout freeCamRow = new LinearLayout(activity);
+        freeCamRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, freeCamRow, "🚁 TOGGLE KAMERA BEBAS (FREE-ROAM 3D)", "#7C3AED", () -> {
+            executeCommand("ToggleDebugCamera");
+            showToast("🚁 ToggleDebugCamera Dipicu");
+        });
+        contentLayout.addView(freeCamRow);
+
+        // ==========================================
+        // SECTION 3: MATCH & ENGINE EXPLOITS
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "⚡ MATCH & ENGINE EXPLOITS");
+
+        LinearLayout exploitRow1 = new LinearLayout(activity);
+        exploitRow1.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, exploitRow1, "❄️ BEKUKAN LAWAN (PlayersOnly)", "#059669", () -> {
+            executeCommand("PlayersOnly");
+            showToast("❄️ Perintah PlayersOnly Dipicu!");
+        });
+        addOptionButton(activity, exploitRow1, "⏸️ JEDA MATCH (FreezeFrame)", "#D97706", () -> {
+            executeCommand("FreezeFrame");
+            showToast("⏸️ FreezeFrame Dipicu!");
+        });
+        contentLayout.addView(exploitRow1);
+
+        // FPS Unlocker
+        addFeatureLabel(activity, contentLayout, "Target Frame Rate (t.MaxFPS):");
         LinearLayout fpsRow = new LinearLayout(activity);
         fpsRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, fpsRow, "30 FPS", "#1E293B", () -> executeCommand("t.MaxFPS 30"));
-        addOptionButton(activity, fpsRow, "60 FPS", "#334155", () -> executeCommand("t.MaxFPS 60"));
+        addOptionButton(activity, fpsRow, "60 FPS", "#1E293B", () -> executeCommand("t.MaxFPS 60"));
         addOptionButton(activity, fpsRow, "90 FPS", "#1E293B", () -> executeCommand("t.MaxFPS 90"));
-        addOptionButton(activity, fpsRow, "120 FPS / Max", "#047857", () -> executeCommand("t.MaxFPS 120"));
+        addOptionButton(activity, fpsRow, "120 FPS", "#047857", () -> executeCommand("t.MaxFPS 120"));
+        addOptionButton(activity, fpsRow, "Unlimited (0)", "#4338CA", () -> executeCommand("t.MaxFPS 0"));
         contentLayout.addView(fpsRow);
 
-        // 2.2 Resolution Scaling (Screen Percentage)
-        addFeatureLabel(activity, contentLayout, "Resolution Scale (Screen Percentage):");
-        LinearLayout resRow = new LinearLayout(activity);
-        resRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, resRow, "100% (Default)", "#334155", () -> executeCommand("r.ScreenPercentage 100"));
-        addOptionButton(activity, resRow, "125% (HD)", "#1E293B", () -> executeCommand("r.ScreenPercentage 125"));
-        addOptionButton(activity, resRow, "150% (Ultra)", "#4338CA", () -> executeCommand("r.ScreenPercentage 150"));
-        contentLayout.addView(resRow);
-
-        // 2.3 FPS & Engine Stats Overlay
-        LinearLayout statsRow = new LinearLayout(activity);
-        statsRow.setOrientation(LinearLayout.HORIZONTAL);
-        statsRow.setPadding(0, dpToPx(activity, 4), 0, dpToPx(activity, 4));
-        addOptionButton(activity, statsRow, "📊 Toggle In-Game FPS Stats", "#1E293B", () -> executeCommand("stat fps"));
-        addOptionButton(activity, statsRow, "⏱️ Toggle Frame Timers", "#1E293B", () -> executeCommand("stat unit"));
-        contentLayout.addView(statsRow);
-
-        // SECTION 3: LICENSE STATUS & INTEGRITY
-        addSectionHeader(activity, contentLayout, "🛡️ SECURITY & LICENSE STATUS");
-        addStatusBadge(activity, contentLayout, "✅ Google Play License: PROTECTED (Status: LICENSED)");
-        addStatusBadge(activity, contentLayout, "✅ Morphe UE4 Console Engine: CONNECTED");
-
-        // SECTION 4: CUSTOM CONSOLE COMMAND TERMINAL
-        addSectionHeader(activity, contentLayout, "⌨️ CUSTOM UE4 CONSOLE COMMAND");
+        // ==========================================
+        // SECTION 4: KONSOL PERINTAH UE4 KUSTOM
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "⌨️ KONSOL PERINTAH UE4 KUSTOM");
         final LinearLayout cmdRow = new LinearLayout(activity);
         cmdRow.setOrientation(LinearLayout.HORIZONTAL);
         cmdRow.setGravity(Gravity.CENTER_VERTICAL);
@@ -388,11 +464,11 @@ public class EfbOverlayManager {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
         );
-        cmdRowParams.setMargins(0, dpToPx(activity, 4), 0, dpToPx(activity, 8));
+        cmdRowParams.setMargins(0, dpToPx(activity, 4), 0, dpToPx(activity, 6));
         cmdRow.setLayoutParams(cmdRowParams);
 
         final EditText cmdInput = new EditText(activity);
-        cmdInput.setHint("e.g. slomo 1.8 or r.TonemapperFilm 0");
+        cmdInput.setHint("contoh: fov 62 atau t.MaxFPS 120");
         cmdInput.setHintTextColor(Color.parseColor("#64748B"));
         cmdInput.setTextColor(Color.WHITE);
         cmdInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
@@ -414,7 +490,7 @@ public class EfbOverlayManager {
         cmdRow.addView(cmdInput);
 
         Button runBtn = new Button(activity);
-        runBtn.setText("EXECUTE");
+        runBtn.setText("RUN");
         runBtn.setTextColor(Color.WHITE);
         runBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         runBtn.setTypeface(Typeface.DEFAULT_BOLD);
@@ -422,7 +498,7 @@ public class EfbOverlayManager {
         runBg.setColor(Color.parseColor("#0284C7"));
         runBg.setCornerRadius(dpToPx(activity, 8));
         runBtn.setBackground(runBg);
-        runBtn.setPadding(dpToPx(activity, 12), dpToPx(activity, 6), dpToPx(activity, 12), dpToPx(activity, 6));
+        runBtn.setPadding(dpToPx(activity, 14), dpToPx(activity, 6), dpToPx(activity, 14), dpToPx(activity, 6));
         runBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -436,11 +512,15 @@ public class EfbOverlayManager {
         cmdRow.addView(runBtn);
         contentLayout.addView(cmdRow);
 
+        // Status Lisensi
+        addSectionHeader(activity, contentLayout, "🛡️ STATUS LISENSI");
+        addStatusBadge(activity, contentLayout, "✅ Google Play License: PROTECTED (Status: LICENSED)");
+        addStatusBadge(activity, contentLayout, "✅ Morphe UE4 Bridge: TERHUBUNG");
+
         scrollView.addView(contentLayout);
         card.addView(scrollView);
         backdrop.addView(card);
 
-        // Click outside closes modal
         backdrop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -449,6 +529,139 @@ public class EfbOverlayManager {
         });
 
         return backdrop;
+    }
+
+    private static void applyFov(int fov, String label) {
+        sCurrentFov = fov;
+        executeCommand("fov " + fov);
+        if (sFovIndicator != null) {
+            sFovIndicator.setText("Sudut Pandang: " + (fov == 0 ? "Default Bawaan Game" : fov + "° (" + label + ")"));
+        }
+        showToast("🎥 Kamera disetel ke: " + (fov == 0 ? "Default Bawaan" : fov + "°"));
+    }
+
+    private static void adjustFovStep(int delta) {
+        if (sCurrentFov == 0) sCurrentFov = 60; // base from broadcast
+        sCurrentFov = Math.max(30, Math.min(110, sCurrentFov + delta));
+        applyFov(sCurrentFov, sCurrentFov + "° Custom");
+    }
+
+    // ==========================================
+    // AFK MATCH GRINDER LOGIC
+    // ==========================================
+    private static void toggleAfkGrinder() {
+        sAfkRunning = !sAfkRunning;
+        if (sAfkRunning) {
+            sAfkCycle = 0;
+            sAfkHandler.post(sAfkRunnable);
+            showToast("🟢 AFK Match Grinder AKTIF!\nBot akan mengulang match & melewati cutscene secara otomatis.");
+        } else {
+            sAfkHandler.removeCallbacks(sAfkRunnable);
+            showToast("🔴 AFK Match Grinder DIHENTIKAN.");
+        }
+        updateAfkBadge();
+        if (sActivity != null) {
+            updateAfkButtonVisual(sActivity);
+        }
+    }
+
+    private static void updateAfkBadge() {
+        if (sFloatingAfkBadge != null) {
+            sFloatingAfkBadge.setVisibility(sAfkRunning ? View.VISIBLE : View.GONE);
+        }
+        if (sMenuAfkStatus != null) {
+            sMenuAfkStatus.setText(sAfkRunning ? "Status: 🟢 AKTIF (Sedang melakukan auto-looping match)" : "Status: NONAKTIF (Tap Mulai untuk auto-loop match event)");
+            sMenuAfkStatus.setTextColor(sAfkRunning ? Color.parseColor("#10B981") : Color.parseColor("#94A3B8"));
+        }
+    }
+
+    private static void updateAfkButtonVisual(Context context) {
+        if (sMenuAfkBtn == null) return;
+        GradientDrawable bg = new GradientDrawable();
+        bg.setShape(GradientDrawable.RECTANGLE);
+        bg.setCornerRadius(dpToPx(context, 8));
+        if (sAfkRunning) {
+            sMenuAfkBtn.setText("🔴 HENTIKAN AFK MATCH GRINDER");
+            bg.setColor(Color.parseColor("#DC2626")); // Red
+        } else {
+            sMenuAfkBtn.setText("🟢 MULAI AFK MATCH GRINDER");
+            bg.setColor(Color.parseColor("#059669")); // Green
+        }
+        sMenuAfkBtn.setBackground(bg);
+    }
+
+    private static final Runnable sAfkRunnable = new Runnable() {
+        @Override
+        public void run() {
+            if (!sAfkRunning || sActivity == null || sActivity.isFinishing()) {
+                sAfkRunning = false;
+                updateAfkBadge();
+                return;
+            }
+
+            try {
+                DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
+                int w = dm.widthPixels;
+                int h = dm.heightPixels;
+
+                // Cycle through key event match navigation coordinates:
+                // Cycle 0: Bottom-Right button (Next, Lanjut, Laga Berikutnya, Selesai)
+                // Cycle 1: Bottom-Center button (OK, Klaim Hadiah, Konfirmasi Dialog)
+                // Cycle 2: Center of Screen (Skip Replay, Lewati Selebrasi, Tap to Continue)
+                float tapX, tapY;
+                int step = sAfkCycle % 3;
+                if (step == 0) {
+                    tapX = w * 0.88f; // Bottom-Right
+                    tapY = h * 0.88f;
+                } else if (step == 1) {
+                    tapX = w * 0.50f; // Bottom-Center
+                    tapY = h * 0.80f;
+                } else {
+                    tapX = w * 0.50f; // Center
+                    tapY = h * 0.50f;
+                }
+                sAfkCycle++;
+
+                dispatchSimulatedTouch(tapX, tapY);
+            } catch (Throwable t) {
+                try {
+                    PikoUtils.logger(TAG + ": AFK Grinder touch exception: " + t.getMessage());
+                } catch (Throwable ignored) {}
+            }
+
+            // Schedule next simulated tap in 1.5 seconds
+            sAfkHandler.postDelayed(this, 1500);
+        }
+    };
+
+    /**
+     * Injects touch events directly to the window's DecorView.
+     * Requires ZERO permissions, NO root, and works in-process!
+     */
+    private static void dispatchSimulatedTouch(final float x, final float y) {
+        if (sActivity == null) return;
+        final ViewGroup decorView = (ViewGroup) sActivity.getWindow().getDecorView();
+        if (decorView == null) return;
+
+        long downTime = SystemClock.uptimeMillis();
+        long eventTime = downTime + 40;
+
+        final MotionEvent down = MotionEvent.obtain(downTime, downTime, MotionEvent.ACTION_DOWN, x, y, 0);
+        final MotionEvent up = MotionEvent.obtain(downTime, eventTime, MotionEvent.ACTION_UP, x, y, 0);
+
+        decorView.dispatchTouchEvent(down);
+        sMainHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    decorView.dispatchTouchEvent(up);
+                } catch (Throwable ignored) {
+                } finally {
+                    down.recycle();
+                    up.recycle();
+                }
+            }
+        }, 40);
     }
 
     private static void addSectionHeader(Context context, LinearLayout parent, String title) {
@@ -521,7 +734,7 @@ public class EfbOverlayManager {
         tv.setPadding(dpToPx(context, 8), dpToPx(context, 4), dpToPx(context, 8), dpToPx(context, 4));
 
         GradientDrawable bg = new GradientDrawable();
-        bg.setColor(Color.parseColor("#1010B981")); // 10% emerald
+        bg.setColor(Color.parseColor("#1010B981"));
         bg.setCornerRadius(dpToPx(context, 6));
         bg.setStroke(dpToPx(context, 1), Color.parseColor("#2010B981"));
         tv.setBackground(bg);
@@ -541,12 +754,9 @@ public class EfbOverlayManager {
         sMenuModal.setVisibility(isVisible ? View.GONE : View.VISIBLE);
     }
 
-    /**
-     * Executes Unreal Engine 4 Console Commands via GameActivity reflection.
-     */
     public static void executeCommand(final String cmd) {
         if (sActivity == null) {
-            showToast("Error: Game Activity not ready");
+            showToast("Error: Game Activity belum siap");
             return;
         }
 
@@ -555,12 +765,10 @@ public class EfbOverlayManager {
             public void run() {
                 boolean executed = false;
                 try {
-                    // 1. Direct call to nativeConsoleCommand on GameActivity instance
                     Method m = sActivity.getClass().getMethod("nativeConsoleCommand", String.class);
                     m.invoke(sActivity, cmd);
                     executed = true;
                 } catch (Throwable t1) {
-                    // 2. Fallback: retrieve GameActivity._activity static field
                     try {
                         Field f = sActivity.getClass().getField("_activity");
                         Object act = f.get(null);
@@ -571,7 +779,7 @@ public class EfbOverlayManager {
                         }
                     } catch (Throwable t2) {
                         try {
-                            PikoUtils.logger(TAG + ": Command execution failed: " + t2.getMessage());
+                            PikoUtils.logger(TAG + ": Eksekusi perintah gagal: " + t2.getMessage());
                         } catch (Throwable ignored) {}
                     }
                 }
@@ -579,23 +787,13 @@ public class EfbOverlayManager {
                 if (executed) {
                     showToast("⚡ UE4 Applied: " + cmd);
                     try {
-                        PikoUtils.logger(TAG + ": UE4 Executed command: " + cmd);
+                        PikoUtils.logger(TAG + ": UE4 command executed: " + cmd);
                     } catch (Throwable ignored) {}
                 } else {
-                    showToast("⚠️ Could not reach UE4 console");
+                    showToast("⚠️ Tidak dapat menjangkau konsol UE4");
                 }
             }
         });
-    }
-
-    /**
-     * Adjusts player scale / height in-game.
-     */
-    public static void executePlayerScale(final float scale) {
-        // Send UE4 actor scale adjustments
-        executeCommand("SetActorScale3D " + scale);
-        executeCommand("SetWorldScale3D " + scale);
-        showToast("⚽ Player Scale set to " + scale + "x");
     }
 
     private static void showToast(final String text) {
