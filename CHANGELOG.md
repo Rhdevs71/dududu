@@ -1,3 +1,10 @@
+## [1.12.2](https://github.com/Rhdevs71/dududu/compare/v1.12.1...v1.12.2) (2026-09-18)
+
+### 🐛 Bug Fixes
+
+* **instagram:** resolve broadcast channel ghost DM re-join bug and hook modern bio repository ([4b2b6c9](https://github.com/Rhdevs71/dududu/commit/4b2b6c92f61434eacc6d60d65a8aa4403914f2e8))
+* **instagram:** use custom lambda in SaveBioRepositoryFingerprint ([a360eca](https://github.com/Rhdevs71/dududu/commit/a360eca5020ceec9b691aed77bd659c1f58f8ec9))
+
 ## [1.12.1](https://github.com/Rhdevs71/dududu/compare/v1.12.0...v1.12.1) (2026-09-16)
 
 ### 🐛 Bug Fixes
