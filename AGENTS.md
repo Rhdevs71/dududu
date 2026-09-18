@@ -807,3 +807,25 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
   - Instagram: `instagram_v1.8.0_signed.apk` (152.1 MB, Scheme v2 & v3 valid).
   - Spotify: `spotify_v1.8.0_signed.apk` (76.0 MB, Scheme v2 & v3 valid).
 
+#### 9. Ekstensi & Modul Bytecode eFootball Mobile Android (Rilis v1.14.0 - Terkini)
+* **Target Game**: `C:\Users\Rhdevs\Downloads\efb.apkm` (`jp.konami.pesam`, eFootball v11.0.1 / PES Mobile, UE4 Shipping Build arm64-v8a).
+* **Komponen Ekstensi (`extensions/shared/library/.../efootball/EfbOverlayManager.java`)**:
+  - **AFK Smart Match Grinder**:
+    - Zero-permission & in-process touch injection menggunakan `activity.getWindow().getDecorView().dispatchTouchEvent(down/up)`.
+    - Siklus otomatis tap cerdas tiap 1.5 detik: area kanan-bawah (`0.88w, 0.88h`) untuk tombol Lanjut/Next, area tengah-bawah (`0.50w, 0.80h`) untuk tombol OK/Klaim Hadiah, dan area tengah (`0.50w, 0.50h`) untuk skip replay dan selebrasi gol.
+    - Lencana status melayang (`🟢 AFK GRINDER: AKTIF`) di bagian atas layar dengan fitur 1-tap toggle untuk berhenti seketika.
+  - **Kalibrasi Kamera & Reset Game Default (`fov 0`)**:
+    - Tombol reset native `fov 0` untuk mengembalikan kamera ke standar bawaan Konami.
+    - Preset realistis sudut siaran: `50° (Dinamis)`, `60° (Broadcast TV)`, `68° (Stadium Luas)`, `76° (Drone Taktikal)`.
+    - Stepper bertahap `[-] 2°` dan `[+] 2°` untuk kustomisasi sudut FOV secara presisi.
+    - Mode kamera bebas 3D stadium (`ToggleDebugCamera`).
+  - **UE4 Engine Exploits**:
+    - `PlayersOnly`: Membekukan AI dan lawan pada pertandingan acara/offline.
+    - `FreezeFrame`: Instant pause rendering frame.
+    - `t.MaxFPS`: FPS Unlocker (60, 90, 120, 0 / Unlimited).
+* **Komponen Bytecode Patches (`patches/.../efootball`)**:
+  - `GooglePlayLicenseGuardPatch.kt`: Mencegat Google Play Licensing Service (`ILicensingService` & `LicenseChecker`) untuk selalu merespons `allow(256)`, menjaga integritas aplikasi tanpa lisensi Store.
+  - `OverlayMenuPatch.kt`: Menginjeksi inisialisasi menu mengambang `EfbOverlayManager` pada `UE4SplashActivity->onResume()` tanpa dangling branch label (0 Dalvik VerifyError).
+* **Hasil Distribusi APK Rilis v1.14.0 (Signed Resmi Android SDK 35 `apksigner`)**:
+  - File Output: `C:\Users\Rhdevs\Downloads\efootball_v11.0.1_piko_mod.apk` (848,809,112 bytes).
+  - Skema Tanda Tangan: Scheme v2 (true), Scheme v3 (true).
