@@ -76,12 +76,11 @@ internal object SetBiographyRequestBuilderFingerprint : Fingerprint(
 
 internal object SaveBioRepositoryFingerprint : Fingerprint(
     strings = listOf("Request was cancelled or failed", "request_cancelled"),
-    parameters = listOf(
-        "Ljava/lang/String;",
-        "Ljava/lang/String;",
-        "Ljava/lang/String;",
-        null,
-    ),
+    custom = { methodDef, _ ->
+        methodDef.parameters.size == 4 &&
+            methodDef.parameters[0].type == "Ljava/lang/String;" &&
+            methodDef.parameters[1].type == "Ljava/lang/String;"
+    },
 )
 
 @Suppress("unused")
