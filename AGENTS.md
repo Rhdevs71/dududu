@@ -510,6 +510,23 @@
         3. Menambahkan dukungan *inline font styling tags* di `BioFontTransformer.java`: pengguna kini dapat mengetikkan tag font langsung di awal bio (contoh: `[editor] Teks Bio`, `[serif] Teks Bio`, `[signature] Teks Bio`, `[deco] Teks Bio`, `[bold] Teks Bio`), memudahkan pengguna memilih gaya font apa pun secara langsung dari keyboard tanpa tergantung pada UI picker Instagram.
     - *Status*: Rilis GitHub **`v1.12.2`** (`patches-1.12.2.mpp`, 7,143,135 bytes) sukses dipublish via GitHub Actions CI Run #35322077656.
 
+30. **Tahap 30: Perbaikan Tuntas Bug Bio Font ("Cuma 1 Jenis Doang") via Register Parameter Font p3 & Penguatan Deteksi DM Saluran (Rilis v1.15.1 - Terkini)**
+    - *Perbaikan Font Bio Instagram*:
+      - *Masalah*: Font bio hanya menghasilkan 1 jenis gaya font saja (Sans Bold) meskipun pengguna memilih jenis font lain (Editor, Signature, Serif, Deco) di bio editor.
+      - *Akar Masalah*: Pada method `EditProfileBioRepository->A02(rawText, token, fontStyle, continuation)`, parameter `p2` adalah string token autentikasi Meta, BUKAN nama font. Parameter font sebenarnya berada di `p3` (register `v17` di Smali). Karena hook sebelumnya membaca `p2`, `BioFontTransformer` tidak pernah mencocokkan nama font yang valid dan selalu jatuh ke fallback `toSansBold()`.
+      - *Solusi Bytecode Smali*:
+        - Menggunakan register aman `v0` dan `v1` via `move-object/from16` untuk membaca `p1` (bio text) dan `p3` (font style) tanpa melanggar batasan 4-bit instruksi 35c `invoke-static`.
+        - Memanggil `BioFontTransformer.transformBio(p1, p3)` lalu menyimpan hasil kembali ke `p1`.
+        - Memanggil `BioFontTransformer.sanitizeFontParam(p3)` yang mengembalikan `"classic"` lalu menyimpan hasil kembali ke `p3` agar permintaan mutasi GraphQL lolos verifikasi server Meta tanpa penolakan paywall.
+        - Menambahkan logging komprehensif `PikoLog.d("BioFontTransformer", ...)` ke `/sdcard/Download/Piko/piko_debug.log`.
+    - *Penguatan Deteksi Saluran Siaran / Broadcast Channels*:
+      - *Masalah*: Banner dialog *"Lain kali | Gabung"* masih sesekali muncul kembali dan saluran siaran hilang saat keluar dari inbox DM.
+      - *Solusi*:
+        - Memperluas deteksi numerik `threadId` dari `^[0-9]{15,20}$` menjadi `^[0-9]{8,45}$` serta kata kunci saluran (`channel`, `broadcast`, `saluran`, `siaran`).
+        - Mendukung deteksi tipe `Long` ID (`> 10000000L`) dan objek `LX/01AX`.
+        - Menambahkan heuristik non-1-on-1: setiap thread tanpa karakter underscore (`_`) dan panjang string >= 6 dikenali sebagai saluran/grup non-personal sehingga diizinkan menyinkronkan status seen.
+        - Memperbarui `Block.java` agar `Pref.hideSuggestedContent()` dievaluasi dinamis dan memblokir netego saluran yang disarankan (`suggested_channels`, `channels_netego`, `suggested_broadcast_channels`).
+
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)
 
 File log berada di penyimpanan internal perangkat:
@@ -819,13 +836,31 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
     - Preset realistis sudut siaran: `50° (Dinamis)`, `60° (Broadcast TV)`, `68° (Stadium Luas)`, `76° (Drone Taktikal)`.
     - Stepper bertahap `[-] 2°` dan `[+] 2°` untuk kustomisasi sudut FOV secara presisi.
     - Mode kamera bebas 3D stadium (`ToggleDebugCamera`).
-  - **UE4 Engine Exploits**:
-    - `PlayersOnly`: Membekukan AI dan lawan pada pertandingan acara/offline.
-    - `FreezeFrame`: Instant pause rendering frame.
+  - **1-Tap Smart Skill-Moves Draggable Overlay (`sFloatingSkillPad`)**:
+    - Widget mengambang independen di luar menu modal berisi 3 tombol trik macro: `⚡ DT` (Double Touch / La Croqueta: analog flick + dash), `🚀 SHOT` (Stunning Power Shot), dan `🎯 FEINT` (Fake Shot / Tipuan Tembak).
+    - Draggable di layar pertandingan dengan pembatas layar (*screen bounds clamp*) agar dapat ditempatkan persis di dekat jempol pengguna.
+    - Toggle aktivasi di menu mod: `⚡ SMART SKILL-MOVES PAD: [ON/OFF]`.
+  - **Perbaikan Input Sentuhan AFK Grinder**:
+    - Mengintegrasikan flag `InputDevice.SOURCE_TOUCHSCREEN`, `TOOL_TYPE_FINGER`, dan `pressure = 1.0f` pada pembentukan MotionEvent sehingga direspons penuh oleh Unreal Engine 4 (`AInputEvent_getSource`).
+    - Mendispatch sentuhan ke `activity.dispatchTouchEvent` dan `decorView.dispatchTouchEvent`.
+  - **Grafis Ultra HD & Anti-Blur (Super-Sampling 2K / 4K)**:
+    - Opsi `r.ScreenPercentage 100`, `125`, dan `150` untuk mengeliminasi downsampling buram bawaan Konami.
+    - Opsi Anti-Aliasing TAA (`r.PostProcessAAQuality 4`) untuk garis lapangan dan helai rumput tajam.
+  - **Pure TV Broadcast Mode (`ShowHUD`)**:
+    - Perintah native UE4 `ShowHUD` untuk menyembunyikan seluruh UI game (radar, nama pemain, stamina bar, tombol virtual) mengubah layar pertandingan menjadi siaran TV sepak bola murni tanpa gangguan.
+  - **Eliminasi Fitur Tidak Efektif**:
+    - Menghapus tuntas tombol `PlayersOnly` dan `FreezeFrame` yang sebelumnya membekukan pemain sendiri.
+  - **Kalibrasi Kamera & Reset Game Default (`fov 0`)**:
+    - Tombol reset native `fov 0` untuk mengembalikan kamera ke standar bawaan Konami.
+    - Preset realistis sudut siaran: `50° (Dinamis)`, `60° (Broadcast TV)`, `68° (Stadium Luas)`, `76° (Drone Taktikal)`.
+    - Stepper bertahap `[-] 2°` dan `[+] 2°` untuk kustomisasi sudut FOV secara presisi.
+    - Mode kamera bebas 3D stadium (`ToggleDebugCamera`).
+  - **Performa & FPS Unlocker**:
+    - `r.VSync 0` (Zero Touch Delay) dan `r.MobileShadowQuality 0` (No Shadow / Dingin).
     - `t.MaxFPS`: FPS Unlocker (60, 90, 120, 0 / Unlimited).
 * **Komponen Bytecode Patches (`patches/.../efootball`)**:
   - `GooglePlayLicenseGuardPatch.kt`: Mencegat Google Play Licensing Service (`ILicensingService` & `LicenseChecker`) untuk selalu merespons `allow(256)`, menjaga integritas aplikasi tanpa lisensi Store.
   - `OverlayMenuPatch.kt`: Menginjeksi inisialisasi menu mengambang `EfbOverlayManager` pada `UE4SplashActivity->onResume()` tanpa dangling branch label (0 Dalvik VerifyError).
-* **Hasil Distribusi APK Rilis v1.14.0 (Signed Resmi Android SDK 35 `apksigner`)**:
-  - File Output: `C:\Users\Rhdevs\Downloads\efootball_v11.0.1_piko_mod.apk` (848,809,112 bytes).
+* **Hasil Distribusi APK Rilis v1.15.0 (Signed Resmi Android SDK 35 `apksigner`)**:
+  - File Output: `C:\Users\Rhdevs\Downloads\efootball_v11.0.1_piko_mod.apk` (~848 MB).
   - Skema Tanda Tangan: Scheme v2 (true), Scheme v3 (true).

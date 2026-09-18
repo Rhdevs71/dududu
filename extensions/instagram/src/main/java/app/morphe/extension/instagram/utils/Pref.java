@@ -146,12 +146,15 @@ public class Pref {
 
     public static boolean isBroadcastChannel(Object session, Object dummyOrKey, String threadId) {
         try {
-            if (threadId != null) {
-                if (threadId.contains("channel") || threadId.contains("broadcast")) {
+            if (threadId != null && !threadId.isEmpty()) {
+                String tLower = threadId.toLowerCase();
+                if (tLower.contains("channel") || tLower.contains("broadcast") || tLower.contains("saluran") || tLower.contains("siaran")) {
+                    PikoLog.d("Pref", "Detected broadcast channel via threadId keyword: " + threadId);
                     return true;
                 }
                 // Meta broadcast channels are single large numeric IDs without '_' (1-on-1 DMs always contain '_')
-                if (!threadId.contains("_") && threadId.matches("^[0-9]{15,20}$")) {
+                if (!threadId.contains("_") && threadId.matches("^[0-9]{8,45}$")) {
+                    PikoLog.d("Pref", "Detected broadcast channel via numeric threadId: " + threadId);
                     return true;
                 }
             }
@@ -160,34 +163,67 @@ public class Pref {
                 return true;
             }
             String str = dummyOrKey.toString();
-            if (str.contains("Channel") || str.contains("Broadcast") || str.contains("broadcast")) {
+            String strLower = str.toLowerCase();
+            if (strLower.contains("channel") || strLower.contains("broadcast") || strLower.contains("saluran") || strLower.contains("siaran")) {
+                PikoLog.d("Pref", "Detected broadcast channel via dummyOrKey.toString(): " + str);
                 return true;
             }
             Class<?> clazz = dummyOrKey.getClass();
-            String className = clazz.getName();
-            if (className.contains("Channel") || className.contains("Broadcast")) {
+            String className = clazz.getName().toLowerCase();
+            if (className.contains("channel") || className.contains("broadcast") || className.contains("saluran")) {
+                PikoLog.d("Pref", "Detected broadcast channel via class name: " + clazz.getName());
                 return true;
             }
+
             for (java.lang.reflect.Field f : clazz.getDeclaredFields()) {
                 f.setAccessible(true);
                 Object val = f.get(dummyOrKey);
                 if (val instanceof String) {
                     String sVal = (String) val;
-                    if (sVal.contains("channel") || sVal.contains("broadcast")) {
+                    if (sVal.isEmpty()) continue;
+                    String sLower = sVal.toLowerCase();
+                    if (sLower.contains("channel") || sLower.contains("broadcast") || sLower.contains("saluran") || sLower.contains("siaran")) {
+                        PikoLog.d("Pref", "Detected broadcast channel via field '" + f.getName() + "' string: " + sVal);
                         return true;
                     }
-                    if (!sVal.contains("_") && sVal.matches("^[0-9]{15,20}$")) {
+                    // If thread ID does not contain '_' and is numeric (8-45 digits), it is a broadcast channel / non-1-on-1 thread
+                    if (!sVal.contains("_") && sVal.matches("^[0-9]{8,45}$")) {
+                        PikoLog.d("Pref", "Detected broadcast channel via field '" + f.getName() + "' numeric ID: " + sVal);
+                        return true;
+                    }
+                } else if (val instanceof Long) {
+                    long lVal = ((Long) val).longValue();
+                    // Broadcast channel IDs and thread timestamps are large positive longs
+                    if (lVal > 10000000L) {
+                        PikoLog.d("Pref", "Detected broadcast channel via field '" + f.getName() + "' Long: " + lVal);
                         return true;
                     }
                 } else if (val instanceof Integer) {
                     int type = ((Integer) val).intValue();
                     // 29 = Broadcast Channel, 32 = Social Channel, 33 = Subscriber Channel
                     if (type == 29 || type == 32 || type == 33 || type >= 28) {
+                        PikoLog.d("Pref", "Detected broadcast channel via field '" + f.getName() + "' type: " + type);
                         return true;
                     }
                 } else if (val instanceof java.util.List) {
                     java.util.List list = (java.util.List) val;
+                    // Broadcast channels have empty recipient lists (members are subscribers)
                     if (list.isEmpty()) {
+                        PikoLog.d("Pref", "Detected broadcast channel via empty recipients in field '" + f.getName() + "'");
+                        return true;
+                    }
+                }
+            }
+
+            // General heuristic: If dummyOrKey is LX/01AX (or similar key object) and its primary string field does not contain '_',
+            // it cannot be a 1-on-1 DM (which ALWAYS contains '_' between two user IDs).
+            for (java.lang.reflect.Field f : clazz.getDeclaredFields()) {
+                f.setAccessible(true);
+                Object val = f.get(dummyOrKey);
+                if (val instanceof String) {
+                    String sVal = (String) val;
+                    if (!sVal.isEmpty() && !sVal.contains("_") && sVal.length() >= 6) {
+                        PikoLog.d("Pref", "Non 1-on-1 thread without underscore detected in field '" + f.getName() + "': " + sVal + " -> allowing seen");
                         return true;
                     }
                 }

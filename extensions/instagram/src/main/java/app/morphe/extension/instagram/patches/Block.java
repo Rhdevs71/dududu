@@ -20,18 +20,26 @@ import app.morphe.extension.instagram.settings.SettingsStatus;
 import app.morphe.extension.shared.Utils;
 
 public class Block {
-    private static boolean DISABLE_SUGGESTED_CONTENT;
-    private static List<String> SUGGESTED_CONTENT_KEY = Arrays.asList("clips_netego", "stories_netego", "in_feed_survey", "bloks_netego", "suggested_igd_channels", "suggested_top_accounts", "suggested_users");
-
-    static {
-        DISABLE_SUGGESTED_CONTENT = Pref.hideSuggestedContent() && SettingsStatus.hideSuggestedContent;
-    }
+    private static List<String> SUGGESTED_CONTENT_KEY = Arrays.asList(
+        "clips_netego",
+        "stories_netego",
+        "in_feed_survey",
+        "bloks_netego",
+        "suggested_igd_channels",
+        "suggested_channels",
+        "channels_netego",
+        "channel_netego",
+        "suggested_broadcast_channels",
+        "suggested_top_accounts",
+        "suggested_users"
+    );
 
     // Returns an invalid string, such that json parsing fails for the key.
     public static String replaceJsonParserKey(String key) {
         boolean condition = false;
 
-        if (DISABLE_SUGGESTED_CONTENT) {
+        boolean disableSuggested = Pref.hideSuggestedContent() && SettingsStatus.hideSuggestedContent;
+        if (disableSuggested && key != null) {
             if (SUGGESTED_CONTENT_KEY.contains(key)) condition = true;
         }
 

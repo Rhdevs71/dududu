@@ -12,6 +12,7 @@ public class BioFontTransformer {
     private static final String TAG = "BioFontTransformer";
 
     public static String transformBio(String rawText, String fontStyle) {
+        PikoLog.d(TAG, "transformBio input: fontStyle='" + fontStyle + "', rawText='" + rawText + "'");
         if (rawText == null || rawText.isEmpty()) {
             return rawText;
         }
@@ -35,41 +36,43 @@ public class BioFontTransformer {
         }
 
         if (style.isEmpty() || style.equals("classic") || style.equals("default")) {
+            PikoLog.d(TAG, "Bio font style is classic/empty, returning original text");
             return rawText;
         }
 
         PikoLog.d(TAG, "Transforming bio with style: " + style + ", text: " + textToTransform);
 
+        String result;
         // 1. Official Instagram Bio Fonts (from LX/0XNI & LX/01QA)
         if (style.equals("editor") || style.contains("editor")) {
-            return toMonospace(textToTransform);
+            result = toMonospace(textToTransform);
         } else if (style.equals("signature") || style.contains("signature")) {
-            return toScriptBold(textToTransform);
+            result = toScriptBold(textToTransform);
         } else if (style.equals("serif") || style.contains("serif")) {
-            return toSerifBold(textToTransform);
+            result = toSerifBold(textToTransform);
         } else if (style.equals("deco") || style.contains("deco")) {
-            return toDoubleStruck(textToTransform);
-        }
-
-        // 2. Custom & Extended Styles
-        if (style.contains("bold") || style.contains("modern")) {
-            return toSansBold(textToTransform);
+            result = toDoubleStruck(textToTransform);
+        } else if (style.contains("bold") || style.contains("modern")) { // 2. Custom & Extended Styles
+            result = toSansBold(textToTransform);
         } else if (style.contains("italic") || style.contains("slant")) {
-            return toSansItalic(textToTransform);
+            result = toSansItalic(textToTransform);
         } else if (style.contains("script") || style.contains("cursive") || style.contains("handwriting")) {
-            return toScriptBold(textToTransform);
+            result = toScriptBold(textToTransform);
         } else if (style.contains("typewriter") || style.contains("mono")) {
-            return toMonospace(textToTransform);
+            result = toMonospace(textToTransform);
         } else if (style.contains("gothic") || style.contains("fraktur")) {
-            return toFrakturBold(textToTransform);
+            result = toFrakturBold(textToTransform);
         } else if (style.contains("outline") || style.contains("double")) {
-            return toDoubleStruck(textToTransform);
+            result = toDoubleStruck(textToTransform);
         } else if (style.contains("small_caps") || style.contains("caps")) {
-            return toSmallCaps(textToTransform);
+            result = toSmallCaps(textToTransform);
+        } else {
+            // Fallback default for unknown non-classic style: Sans Bold
+            result = toSansBold(textToTransform);
         }
 
-        // Fallback default for unknown non-classic style: Sans Bold
-        return toSansBold(textToTransform);
+        PikoLog.d(TAG, "transformBio result: '" + result + "'");
+        return result;
     }
 
     private static boolean isRecognizedStyle(String tag) {
@@ -81,8 +84,8 @@ public class BioFontTransformer {
     }
 
     public static String sanitizeFontParam(String fontStyle) {
-        // Always pass "classic" or empty to the server so server entitlement check passes (HTTP 200 OK)
-        PikoLog.d(TAG, "Sanitizing font parameter to 'classic' to bypass server paywall");
+        // Always pass "classic" to the server so server entitlement check passes (HTTP 200 OK)
+        PikoLog.d(TAG, "Sanitizing font parameter from '" + fontStyle + "' to 'classic' to bypass server paywall");
         return "classic";
     }
 
