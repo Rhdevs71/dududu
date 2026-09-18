@@ -74,6 +74,16 @@ internal object SetBiographyRequestBuilderFingerprint : Fingerprint(
     ),
 )
 
+internal object SaveBioRepositoryFingerprint : Fingerprint(
+    strings = listOf("Request was cancelled or failed", "request_cancelled"),
+    parameters = listOf(
+        "Ljava/lang/String;",
+        "Ljava/lang/String;",
+        "Ljava/lang/String;",
+        null,
+    ),
+)
+
 @Suppress("unused")
 val unlockPlusBenefitsPatch =
     bytecodePatch(
@@ -208,5 +218,18 @@ val unlockPlusBenefitsPatch =
                     """.trimIndent(),
                 )
             }
+
+            SaveBioRepositoryFingerprint.methodOrNull?.apply {
+                addInstructions(
+                    0,
+                    """
+                    invoke-static {p1, p2}, $PATCHES_DESCRIPTOR/userprofile/BioFontTransformer;->transformBio(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+                    move-result-object p1
+                    invoke-static {p2}, $PATCHES_DESCRIPTOR/userprofile/BioFontTransformer;->sanitizeFontParam(Ljava/lang/String;)Ljava/lang/String;
+                    move-result-object p2
+                    """.trimIndent(),
+                )
+            }
         }
     }
+

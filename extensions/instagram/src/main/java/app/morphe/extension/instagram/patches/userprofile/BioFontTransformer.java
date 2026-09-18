@@ -15,43 +15,69 @@ public class BioFontTransformer {
         if (rawText == null || rawText.isEmpty()) {
             return rawText;
         }
-        if (fontStyle == null || fontStyle.isEmpty() || fontStyle.equalsIgnoreCase("classic") || fontStyle.equalsIgnoreCase("default")) {
+
+        String style = (fontStyle != null) ? fontStyle.toLowerCase().trim() : "";
+        String textToTransform = rawText;
+
+        // Fallback: If style is empty/classic/default, check for inline style tags e.g. [editor], [serif], [deco], [signature], [bold]
+        if (style.isEmpty() || style.equals("classic") || style.equals("default")) {
+            String trimmed = rawText.trim();
+            if (trimmed.startsWith("[") && trimmed.contains("]")) {
+                int endTag = trimmed.indexOf(']');
+                String possibleTag = trimmed.substring(1, endTag).toLowerCase().trim();
+                String content = trimmed.substring(endTag + 1).trim();
+                if (!content.isEmpty() && isRecognizedStyle(possibleTag)) {
+                    style = possibleTag;
+                    textToTransform = content;
+                    PikoLog.d(TAG, "Detected inline bio font tag: [" + style + "]");
+                }
+            }
+        }
+
+        if (style.isEmpty() || style.equals("classic") || style.equals("default")) {
             return rawText;
         }
 
-        PikoLog.d(TAG, "Transforming bio with style: " + fontStyle + ", length: " + rawText.length());
-        String style = fontStyle.toLowerCase().trim();
+        PikoLog.d(TAG, "Transforming bio with style: " + style + ", text: " + textToTransform);
 
         // 1. Official Instagram Bio Fonts (from LX/0XNI & LX/01QA)
         if (style.equals("editor") || style.contains("editor")) {
-            return toMonospace(rawText);
+            return toMonospace(textToTransform);
         } else if (style.equals("signature") || style.contains("signature")) {
-            return toScriptBold(rawText);
+            return toScriptBold(textToTransform);
         } else if (style.equals("serif") || style.contains("serif")) {
-            return toSerifBold(rawText);
+            return toSerifBold(textToTransform);
         } else if (style.equals("deco") || style.contains("deco")) {
-            return toDoubleStruck(rawText);
+            return toDoubleStruck(textToTransform);
         }
 
         // 2. Custom & Extended Styles
         if (style.contains("bold") || style.contains("modern")) {
-            return toSansBold(rawText);
+            return toSansBold(textToTransform);
         } else if (style.contains("italic") || style.contains("slant")) {
-            return toSansItalic(rawText);
+            return toSansItalic(textToTransform);
         } else if (style.contains("script") || style.contains("cursive") || style.contains("handwriting")) {
-            return toScriptBold(rawText);
+            return toScriptBold(textToTransform);
         } else if (style.contains("typewriter") || style.contains("mono")) {
-            return toMonospace(rawText);
+            return toMonospace(textToTransform);
         } else if (style.contains("gothic") || style.contains("fraktur")) {
-            return toFrakturBold(rawText);
+            return toFrakturBold(textToTransform);
         } else if (style.contains("outline") || style.contains("double")) {
-            return toDoubleStruck(rawText);
+            return toDoubleStruck(textToTransform);
         } else if (style.contains("small_caps") || style.contains("caps")) {
-            return toSmallCaps(rawText);
+            return toSmallCaps(textToTransform);
         }
 
         // Fallback default for unknown non-classic style: Sans Bold
-        return toSansBold(rawText);
+        return toSansBold(textToTransform);
+    }
+
+    private static boolean isRecognizedStyle(String tag) {
+        if (tag == null || tag.isEmpty()) return false;
+        String t = tag.toLowerCase();
+        return t.equals("editor") || t.equals("signature") || t.equals("serif") || t.equals("deco") ||
+               t.contains("bold") || t.contains("italic") || t.contains("script") || t.contains("mono") ||
+               t.contains("gothic") || t.contains("outline") || t.contains("caps");
     }
 
     public static String sanitizeFontParam(String fontStyle) {

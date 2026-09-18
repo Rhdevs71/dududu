@@ -146,8 +146,21 @@ public class Pref {
 
     public static boolean isBroadcastChannel(Object session, Object dummyOrKey, String threadId) {
         try {
+            if (threadId != null) {
+                if (threadId.contains("channel") || threadId.contains("broadcast")) {
+                    return true;
+                }
+                // Meta broadcast channels are single large numeric IDs without '_' (1-on-1 DMs always contain '_')
+                if (!threadId.contains("_") && threadId.matches("^[0-9]{15,20}$")) {
+                    return true;
+                }
+            }
             if (dummyOrKey == null) {
                 // If directThreadKey is null, it could be broadcast channel or manual seen call
+                return true;
+            }
+            String str = dummyOrKey.toString();
+            if (str.contains("Channel") || str.contains("Broadcast") || str.contains("broadcast")) {
                 return true;
             }
             Class<?> clazz = dummyOrKey.getClass();
@@ -158,15 +171,23 @@ public class Pref {
             for (java.lang.reflect.Field f : clazz.getDeclaredFields()) {
                 f.setAccessible(true);
                 Object val = f.get(dummyOrKey);
-                if (val instanceof java.util.List) {
-                    java.util.List list = (java.util.List) val;
-                    if (list.isEmpty()) {
+                if (val instanceof String) {
+                    String sVal = (String) val;
+                    if (sVal.contains("channel") || sVal.contains("broadcast")) {
+                        return true;
+                    }
+                    if (!sVal.contains("_") && sVal.matches("^[0-9]{15,20}$")) {
                         return true;
                     }
                 } else if (val instanceof Integer) {
                     int type = ((Integer) val).intValue();
                     // 29 = Broadcast Channel, 32 = Social Channel, 33 = Subscriber Channel
                     if (type == 29 || type == 32 || type == 33 || type >= 28) {
+                        return true;
+                    }
+                } else if (val instanceof java.util.List) {
+                    java.util.List list = (java.util.List) val;
+                    if (list.isEmpty()) {
                         return true;
                     }
                 }
