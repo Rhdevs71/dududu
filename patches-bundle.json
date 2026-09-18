@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-18T08:00:28",
-  "description": "## [1.12.2](https://github.com/Rhdevs71/dududu/compare/v1.12.1...v1.12.2) (2026-09-18)\n\n### 🐛 Bug Fixes\n\n* **instagram:** resolve broadcast channel ghost DM re-join bug and hook modern bio repository ([4b2b6c9](https://github.com/Rhdevs71/dududu/commit/4b2b6c92f61434eacc6d60d65a8aa4403914f2e8))\n* **instagram:** use custom lambda in SaveBioRepositoryFingerprint ([a360eca](https://github.com/Rhdevs71/dududu/commit/a360eca5020ceec9b691aed77bd659c1f58f8ec9))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.12.2/patches-1.12.2.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.12.2/patches-1.12.2.mpp.asc",
-  "version": "1.12.2"
+  "created_at": "2026-09-18T08:18:26",
+  "description": "## [1.12.3](https://github.com/Rhdevs71/dududu/compare/v1.12.2...v1.12.3) (2026-09-18)\n\n### 🐛 Bug Fixes\n\n* **instagram:** use invoke-static/range in SaveBioRepositoryFingerprint for high register v16 ([6eaa75f](https://github.com/Rhdevs71/dududu/commit/6eaa75f2cb1c2d1d2dda84c0bd0e54e1f38d0750))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.12.3/patches-1.12.3.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.12.3/patches-1.12.3.mpp.asc",
+  "version": "1.12.3"
 }

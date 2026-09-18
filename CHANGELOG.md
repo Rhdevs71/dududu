@@ -1,3 +1,9 @@
+## [1.12.3](https://github.com/Rhdevs71/dududu/compare/v1.12.2...v1.12.3) (2026-09-18)
+
+### 🐛 Bug Fixes
+
+* **instagram:** use invoke-static/range in SaveBioRepositoryFingerprint for high register v16 ([6eaa75f](https://github.com/Rhdevs71/dududu/commit/6eaa75f2cb1c2d1d2dda84c0bd0e54e1f38d0750))
+
 ## [1.12.2](https://github.com/Rhdevs71/dududu/compare/v1.12.1...v1.12.2) (2026-09-18)
 
 ### 🐛 Bug Fixes
