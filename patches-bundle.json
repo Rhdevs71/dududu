@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-19T22:09:04",
-  "description": "## [1.16.0](https://github.com/Rhdevs71/dududu/compare/v1.15.1...v1.16.0) (2026-09-19)\n\n### ✨ New Features\n\n* **dmsplus:** add force in-app subscription, bypass license & root detection, allow screenshot, and adblock patches ([a24e3c6](https://github.com/Rhdevs71/dududu/commit/a24e3c65394c83e78c7dfab765320dbdbca9818b))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.16.0/patches-1.16.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.16.0/patches-1.16.0.mpp.asc",
-  "version": "1.16.0"
+  "created_at": "2026-09-19T22:17:11",
+  "description": "## [1.16.1](https://github.com/Rhdevs71/dududu/compare/v1.16.0...v1.16.1) (2026-09-19)\n\n### 🐛 Bug Fixes\n\n* **dmsplus:** resolve 16-bit register limits in adblock and simplify root detection lookup ([2ad3bb9](https://github.com/Rhdevs71/dududu/commit/2ad3bb961c5c7bb7646fea58c2dcaaf536a511e8))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.16.1/patches-1.16.1.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.16.1/patches-1.16.1.mpp.asc",
+  "version": "1.16.1"
 }

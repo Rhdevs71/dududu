@@ -1,3 +1,9 @@
+## [1.16.1](https://github.com/Rhdevs71/dududu/compare/v1.16.0...v1.16.1) (2026-09-19)
+
+### 🐛 Bug Fixes
+
+* **dmsplus:** resolve 16-bit register limits in adblock and simplify root detection lookup ([2ad3bb9](https://github.com/Rhdevs71/dududu/commit/2ad3bb961c5c7bb7646fea58c2dcaaf536a511e8))
+
 ## [1.16.0](https://github.com/Rhdevs71/dududu/compare/v1.15.1...v1.16.0) (2026-09-19)
 
 ### ✨ New Features
