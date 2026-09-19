@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.16.1](https://github.com/Rhdevs71/dududu/releases/tag/v1.16.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;168 patches total
+> **[v1.17.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.17.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;168 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -248,7 +248,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 | [Block Mobile Ads](#block-mobile-ads) | Blocks Google Mobile Ads and silences native ad factories in DMS+ video and feeds. |  |
 | [Bypass Play Protect & Pairip License Check](#bypass-play-protect-pairip-license-check) | Meniadakan verifikasi Google Play Protect / Pairip licensing untuk mencegah penutupan paksa aplikasi atau dialog error lisensi. |  |
 | [Bypass Root & Jailbreak Detection](#bypass-root-jailbreak-detection) | Bypasses DMS+ internal root, su binary, and Magisk detection to allow running on rooted devices and custom ROMs. |  |
-| [Force In-App Subscription Menu](#force-in-app-subscription-menu) | Mengarahkan tautan langganan web eksternal langsung ke layar pembelian In-App Purchase internal Flutter (/link/dashboard/subscribe). |  |
+| [Force In-App Subscription Menu](#force-in-app-subscription-menu) | Menyediakan akses langsung ke menu paket langganan internal Flutter (/link/dashboard/subscribe) via Launcher App Shortcut, Status Bar Quick Menu, serta mencegat redirect web eksternal/webview. |  |
 
 </details>
 

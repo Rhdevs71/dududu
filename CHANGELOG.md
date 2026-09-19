@@ -1,3 +1,9 @@
+## [1.17.0](https://github.com/Rhdevs71/dududu/compare/v1.16.1...v1.17.0) (2026-09-19)
+
+### ✨ New Features
+
+* **dmsplus:** add launcher shortcut, status bar quick menu, and dual url redirection for in-app subscription ([7e69ce6](https://github.com/Rhdevs71/dududu/commit/7e69ce675f27e9f27306a2fcdd152325d07fe930))
+
 ## [1.16.1](https://github.com/Rhdevs71/dududu/compare/v1.16.0...v1.16.1) (2026-09-19)
 
 ### 🐛 Bug Fixes
