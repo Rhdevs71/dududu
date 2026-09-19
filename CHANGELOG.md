@@ -1,3 +1,9 @@
+## [1.16.0](https://github.com/Rhdevs71/dududu/compare/v1.15.1...v1.16.0) (2026-09-19)
+
+### ✨ New Features
+
+* **dmsplus:** add force in-app subscription, bypass license & root detection, allow screenshot, and adblock patches ([a24e3c6](https://github.com/Rhdevs71/dududu/commit/a24e3c65394c83e78c7dfab765320dbdbca9818b))
+
 ## [1.15.1](https://github.com/Rhdevs71/dududu/compare/v1.15.0...v1.15.1) (2026-09-18)
 
 ### 🐛 Bug Fixes

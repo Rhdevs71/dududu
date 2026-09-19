@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.15.1",
+  "version": "1.16.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -68,6 +68,37 @@
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Allow Screenshot & Screen Recording",
+      "description": "Menghapus proteksi FLAG_SECURE (layar hitam) agar tangkapan layar dan perekaman layar dapat dilakukan bebas di seluruh konten.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.cinematichororuniverse.dmsplus",
+          "name": "DMS+",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#8B0000",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "4.11.10",
+              "versionCodes": {
+                "ARM64_V8A": 159,
+                "ARMEABI_V7A": 159,
+                "X86_64": 159,
+                "X86": 159
               },
               "isExperimental": false,
               "minSdk": null,
@@ -249,6 +280,37 @@
       "options": []
     },
     {
+      "name": "Block Mobile Ads",
+      "description": "Blocks Google Mobile Ads and silences native ad factories in DMS+ video and feeds.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.cinematichororuniverse.dmsplus",
+          "name": "DMS+",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#8B0000",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "4.11.10",
+              "versionCodes": {
+                "ARM64_V8A": 159,
+                "ARMEABI_V7A": 159,
+                "X86_64": 159,
+                "X86": 159
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Block redirecting to X Lite",
       "description": "Blocks redirecting to the new X Android UI on launch",
       "default": true,
@@ -326,6 +388,68 @@
             {
               "version": "12.19.1-release.0",
               "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Bypass Play Protect & Pairip License Check",
+      "description": "Meniadakan verifikasi Google Play Protect / Pairip licensing untuk mencegah penutupan paksa aplikasi atau dialog error lisensi.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.cinematichororuniverse.dmsplus",
+          "name": "DMS+",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#8B0000",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "4.11.10",
+              "versionCodes": {
+                "ARM64_V8A": 159,
+                "ARMEABI_V7A": 159,
+                "X86_64": 159,
+                "X86": 159
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Bypass Root & Jailbreak Detection",
+      "description": "Bypasses DMS+ internal root, su binary, and Magisk detection to allow running on rooted devices and custom ROMs.",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.cinematichororuniverse.dmsplus",
+          "name": "DMS+",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#8B0000",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "4.11.10",
+              "versionCodes": {
+                "ARM64_V8A": 159,
+                "ARMEABI_V7A": 159,
+                "X86_64": 159,
+                "X86": 159
+              },
               "isExperimental": false,
               "minSdk": null,
               "description": null
@@ -2496,6 +2620,37 @@
               "version": "439.0.0.37.89",
               "versionCodes": {
                 "ARM64_V8A": 384510827
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Force In-App Subscription Menu",
+      "description": "Mengarahkan tautan langganan web eksternal langsung ke layar pembelian In-App Purchase internal Flutter (/link/dashboard/subscribe).",
+      "default": true,
+      "dependencies": [],
+      "compatiblePackages": [
+        {
+          "packageName": "com.cinematichororuniverse.dmsplus",
+          "name": "DMS+",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#8B0000",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "4.11.10",
+              "versionCodes": {
+                "ARM64_V8A": 159,
+                "ARMEABI_V7A": 159,
+                "X86_64": 159,
+                "X86": 159
               },
               "isExperimental": false,
               "minSdk": null,
