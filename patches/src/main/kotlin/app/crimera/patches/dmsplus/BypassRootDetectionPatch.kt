@@ -15,32 +15,27 @@ val bypassRootDetectionPatch =
         compatibleWith(DMSPLUS_COMPATIBILITY)
 
         execute {
-            // Find root check method via fingerprint or fallback to constant
-            val targetMethod =
-                try {
-                    RootCheckFingerprint.method
-                } catch (e: Exception) {
-                    val rootClass = mutableClassDefBy(ROOT_CHECK_CLASS)
-                    rootClass.methods.first { it.returnType == "Ljava/util/Map;" }
+            try {
+                val rootClass = mutableClassDefBy(ROOT_CHECK_CLASS)
+                rootClass.methods.firstOrNull { it.returnType == "Ljava/util/Map;" }?.apply {
+                    addInstructions(
+                        0,
+                        """
+                        new-instance v0, Ljava/util/HashMap;
+                        invoke-direct {v0}, Ljava/util/HashMap;-><init>()V
+                        const-string v1, "rooted"
+                        sget-object v2, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
+                        invoke-virtual {v0, v1, v2}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+                        const-string v1, "reasons"
+                        invoke-static {}, Ljava/util/Collections;->emptyList()Ljava/util/List;
+                        move-result-object v2
+                        invoke-virtual {v0, v1, v2}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
+                        return-object v0
+                        """.trimIndent(),
+                    )
                 }
-
-            val targetClass = mutableClassDefBy(targetMethod.definingClass)
-            targetClass.methods.first { it.name == targetMethod.name && it.returnType == targetMethod.returnType }.apply {
-                addInstructions(
-                    0,
-                    """
-                    new-instance v0, Ljava/util/HashMap;
-                    invoke-direct {v0}, Ljava/util/HashMap;-><init>()V
-                    const-string v1, "rooted"
-                    sget-object v2, Ljava/lang/Boolean;->FALSE:Ljava/lang/Boolean;
-                    invoke-virtual {v0, v1, v2}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-                    const-string v1, "reasons"
-                    invoke-static {}, Ljava/util/Collections;->emptyList()Ljava/util/List;
-                    move-result-object v2
-                    invoke-virtual {v0, v1, v2}, Ljava/util/HashMap;->put(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;
-                    return-object v0
-                    """.trimIndent(),
-                )
+            } catch (e: Exception) {
+                println("[BypassRootDetectionPatch] Warning: Gagal hook root checker: ${e.message}")
             }
         }
     }
