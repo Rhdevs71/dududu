@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-21T21:07:05",
-  "description": "## [1.20.0](https://github.com/Rhdevs71/dududu/compare/v1.19.0...v1.20.0) (2026-09-21)\n\n### ✨ New Features\n\n* **efootball:** upgrade AFK grinder to context-aware screen detector with live text reading HUD and remove deprecated Spotify module ([1881e6d](https://github.com/Rhdevs71/dududu/commit/1881e6dce04e2103e94055bde3f93720c8cb60cc))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.20.0/patches-1.20.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.20.0/patches-1.20.0.mpp.asc",
-  "version": "1.20.0"
+  "created_at": "2026-09-21T21:48:45",
+  "description": "## [1.21.0](https://github.com/Rhdevs71/dududu/compare/v1.20.0...v1.21.0) (2026-09-21)\n\n### ✨ New Features\n\n* **efootball:** streamline mod menu, fix AFK Grinder UI navigation, and add instant rewarded ad bypass ([95e258c](https://github.com/Rhdevs71/dududu/commit/95e258c9ec7313b6bd431836685c9c7f3ff773e1))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.21.0/patches-1.21.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.21.0/patches-1.21.0.mpp.asc",
+  "version": "1.21.0"
 }

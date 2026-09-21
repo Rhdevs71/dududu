@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.20.0",
+  "version": "1.21.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -3742,6 +3742,34 @@
       "dependencies": [
         "BytecodePatch"
       ],
+      "compatiblePackages": [
+        {
+          "packageName": "jp.konami.pesam",
+          "name": "eFootball",
+          "description": null,
+          "apkFileType": "APKM",
+          "appIconColor": "#002B7F",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "11.0.1",
+              "versionCodes": {
+                "ARM64_V8A": 311000101
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Instant Rewarded Ad Claimer",
+      "description": "Bypasses 30-second video advertisements in eFootball, immediately granting daily GP, Exp, and item rewards.",
+      "default": true,
+      "dependencies": [],
       "compatiblePackages": [
         {
           "packageName": "jp.konami.pesam",

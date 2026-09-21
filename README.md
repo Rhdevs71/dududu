@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.20.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.20.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;161 patches total
+> **[v1.21.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.21.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;162 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -328,7 +328,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 </details>
 
 <details>
-<summary>📦 eFootball&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<summary>📦 eFootball&nbsp;&nbsp;•&nbsp;&nbsp;3 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -340,6 +340,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 |----------|----------------|-----------|
 | [Google Play License Guard](#google-play-license-guard) | Guards and maintains Google Play License verification and OBB delivery for modified eFootball installs. |  |
 | [In-Game Mod Menu Overlay](#in-game-mod-menu-overlay) | Adds draggable in-game mod menu overlay with match speed, camera drone FOV, player scale, and graphics controls. |  |
+| [Instant Rewarded Ad Claimer](#instant-rewarded-ad-claimer) | Bypasses 30-second video advertisements in eFootball, immediately granting daily GP, Exp, and item rewards. |  |
 
 </details>
 

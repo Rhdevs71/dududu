@@ -1,3 +1,9 @@
+## [1.21.0](https://github.com/Rhdevs71/dududu/compare/v1.20.0...v1.21.0) (2026-09-21)
+
+### ✨ New Features
+
+* **efootball:** streamline mod menu, fix AFK Grinder UI navigation, and add instant rewarded ad bypass ([95e258c](https://github.com/Rhdevs71/dududu/commit/95e258c9ec7313b6bd431836685c9c7f3ff773e1))
+
 ## [1.20.0](https://github.com/Rhdevs71/dududu/compare/v1.19.0...v1.20.0) (2026-09-21)
 
 ### ✨ New Features
