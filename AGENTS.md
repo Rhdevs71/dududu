@@ -889,3 +889,31 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
       - Pilihan mode grinding baru: Acara Tur (VS AI), Laga Simulasi (Pelatih AI), dan Acara Tantangan.
       - Sintesis input alami (`SOURCE_TOUCHSCREEN`) dengan jitter spasial acak (±1.2%) dan variasi durasi sentuh realistis (40-70ms) untuk mencegah deteksi bot Konami.
       - Kompilasi `:patches:compileKotlin` sukses 100% (0 error) dan di-push ke `Rhdevs71/dududu` (commit `1881e6d`).
+
+32. **Tahap 32: Pembersihan Bloat Menu eFootball, Perbaikan Navigasi Presisi Smart AFK Grinder, & Fitur Baru Instant Rewarded Ad Claimer (Piko v4.1 - Terkini)**
+    - *Pembersihan Bloat & Gimmick Menu (`EfbOverlayManager.java`)*:
+      - Menghapus konsol perintah terminal UE4 (`EditText` & `RUN` button), tombol FPS target (60/90/120/unlimited), opsi performa semu (`r.VSync 0`, `r.MobileShadowQuality 0`), dan super-sampling semu (`r.ScreenPercentage 125/150`, TAA).
+      - Menata ulang menu mod menjadi 5 seksi ramping dan berfungsi nyata:
+        1. `🤖 SMART AFK MATCH GRINDER`
+        2. `🎁 BYPASS TONTON IKLAN (INSTANT AD REWARD)`
+        3. `🎥 KAMERA & SUDUT PANDANG (FOV)`
+        4. `⚡ SMART SKILL-MOVES PAD`
+        5. `🛡️ STATUS SISTEM`
+    - *Perbaikan Navigasi Presisi Smart AFK Grinder (Berdasarkan Analisis Foto Pengguna)*:
+      - *Masalah*: Bot macet di layar Acara Tur dengan teks HUD keliru `Menu: Laga Berlangsung (Pitch Aktif)` dan mengetuk layar tengah terus-menerus.
+      - *Penyebab*: Latar belakang 3D stadion menu memicu hitungan warna hijau (`greenCount > 40`), mendahului pengecekan tombol navigasi. Selain itu koordinat lama `(0.88w, 0.88h)` mendarat di atas bilah tombol navigasi.
+      - *Solusi*:
+        1. Memprioritaskan deteksi elemen menu navigasi: tombol aksi kanan bawah (`0.85w, 0.93h`), ikon Home `🏠` kanan atas (`0.90w, 0.06h`), dan tombol `< Kembali` kiri bawah (`0.12w, 0.93h`).
+        2. Jika salah satu elemen menu terdeteksi, bot membatalkan kesimpulan laga lapangan dan langsung mengetuk tombol aksi presisi **`(w * 0.85f, h * 0.93f)`** (`Ke Laga >`, `Mulai Laga >`, `Mulai Babak Kedua >`, `Lanjut >`).
+        3. Siklus fallback adaptive diprioritaskan mengetuk `(w * 0.85f, h * 0.93f)` sehingga bot tidak pernah terjebak di layar menu.
+    - *Fitur Baru: Instant Rewarded Ad Claimer (`BypassRewardedAdPatch.kt` & `EfbOverlayManager.java`)*:
+      - Target Konami AdMob: `Ljp/konami/AdMobReward;` di `classes3.dex`.
+      - Mem-patch `IsEarnedReward()Z` agar selalu return `true`.
+      - Mem-patch `IsShowEnd()I` agar selalu return `1`.
+      - Meng-hook `Show(Context)V` dan `ShowFunc(Context)V` untuk seketika menyetel `s_isEarnedReward = true` dan `s_isCMP_Show_End = true` lalu langsung `return-void` tanpa memanggil video Google AdMob.
+      - Menambahkan tombol 1-tap **"⚡ KLAIM REWARD IKLAN SEKARANG"** di menu mod eFootball.
+    - *Uji Kompilasi & Git Release*:
+      - `:patches:compileKotlin` sukses (`BUILD SUCCESSFUL in 2m 27s`).
+      - `:extensions:shared:compileReleaseJavaWithJavac` sukses (`BUILD SUCCESSFUL in 44s`).
+      - Di-push ke GitHub remote `Rhdevs71/dududu` (`main`, commit `95e258c`).
+
