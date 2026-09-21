@@ -45,15 +45,11 @@ import app.morphe.extension.crimera.PikoUtils;
 /**
  * In-game Overlay Mod Menu for eFootball Mobile (PES Android).
  * Features:
- * 1. 1-Tap Smart Skill-Moves Draggable Overlay (Double Touch, Stunning Shot, Fake Shot)
- * 2. Intelligent Context-Aware AFK Match Grinder with Real-Time Screen & Menu Recognition
- * 3. Live Text Reading HUD (Displays current detected menu, next planned action, and stats)
- * 4. Ultra HD Graphic Enhancer & Anti-Blur Super-Sampling (125%, 150%, TAA)
- * 5. Pure TV Broadcast Mode (ShowHUD toggle)
- * 6. Precision Camera FOV with Default Reset (fov 0), Broadcast, Stadium, and Stepper [-]/[+]
- * 7. 3D Free-Roam Camera (ToggleDebugCamera)
- * 8. Anti-Lag / Zero Touch Latency (r.VSync 0, r.MobileShadowQuality 0) & FPS Unlocker
- * 9. Interactive UE4 Console Terminal
+ * 1. Intelligent Context-Aware AFK Match Grinder with Precision UI & Menu Recognition
+ * 2. Instant Rewarded Ad Claimer (Bypass Tonton Iklan)
+ * 3. 1-Tap Smart Skill-Moves Draggable Overlay (Double Touch, Stunning Shot, Fake Shot)
+ * 4. Precision Camera FOV with Default Reset (fov 0), Broadcast, Stadium, and Stepper [-]/[+]
+ * 5. 3D Free-Roam Camera (ToggleDebugCamera)
  */
 @SuppressWarnings("unused")
 public class EfbOverlayManager {
@@ -73,11 +69,11 @@ public class EfbOverlayManager {
     // Smart AFK Grinder State & Components
     public enum ScreenState {
         UNKNOWN("Memindai Layar...", "#94A3B8"),
-        EVENT_TOUR_MENU("Menu Acara Tur (Pilih Laga)", "#38BDF8"),
-        MATCH_PREPARATION("Persiapan Tim & Laga", "#FBBF24"),
+        EVENT_TOUR_MENU("Menu Acara / Persiapan Laga", "#38BDF8"),
+        MATCH_PREPARATION("Pilih Tim / Mulai Laga", "#FBBF24"),
         IN_MATCH_PLAYING("Laga Berlangsung (Pitch Aktif)", "#10B981"),
-        HALF_TIME_WHISTLE("Jeda Babak Pertama (Half-Time)", "#F59E0B"),
-        FULL_TIME_RESULT("Peluit Akhir Selesai (Full-Time)", "#3B82F6"),
+        HALF_TIME_WHISTLE("Jeda Babak (Half-Time)", "#F59E0B"),
+        FULL_TIME_RESULT("Laga Selesai (Full-Time)", "#3B82F6"),
         PLAYER_RATINGS_STATS("Hasil & Statistik Laga", "#8B5CF6"),
         EVENT_POINTS_REWARD("Poin Acara & Klaim Hadiah", "#EC4899"),
         POPUP_CONTRACT_RENEWAL("Peringatan Kontrak Pemain", "#EF4444"),
@@ -608,7 +604,7 @@ public class EfbOverlayManager {
         titleLayout.addView(titleView);
 
         TextView subtitleView = new TextView(activity);
-        subtitleView.setText("Piko v4.0 • Smart Context-Aware Grinder & Ultra HD");
+        subtitleView.setText("Piko • Smart AFK Grinder & Instant Ad Claimer");
         subtitleView.setTextColor(Color.parseColor("#94A3B8"));
         subtitleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         titleLayout.addView(subtitleView);
@@ -747,7 +743,76 @@ public class EfbOverlayManager {
         contentLayout.addView(optionsRow);
 
         // ==========================================
-        // SECTION 2: 1-TAP SMART SKILL-MOVES MACRO
+        // SECTION 2: BYPASS TONTON IKLAN (INSTANT REWARD)
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "🎁 BYPASS TONTON IKLAN (INSTANT AD REWARD)");
+
+        TextView adInfo = new TextView(activity);
+        adInfo.setText("Iklan video 30 detik dilewati otomatis! Saat tombol 'Tonton Iklan' ditekan di game, hadiah (GP, Exp, Item) langsung cair seketika.");
+        adInfo.setTextColor(Color.parseColor("#94A3B8"));
+        adInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        contentLayout.addView(adInfo);
+
+        Button claimAdBtn = new Button(activity);
+        claimAdBtn.setText("⚡ KLAIM REWARD IKLAN SEKARANG");
+        claimAdBtn.setTextColor(Color.WHITE);
+        claimAdBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        claimAdBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        GradientDrawable claimBg = new GradientDrawable();
+        claimBg.setColor(Color.parseColor("#7C3AED")); // Purple glow
+        claimBg.setCornerRadius(dpToPx(activity, 8));
+        claimAdBtn.setBackground(claimBg);
+        LinearLayout.LayoutParams claimBtnParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                dpToPx(activity, 42)
+        );
+        claimBtnParams.setMargins(0, dpToPx(activity, 6), 0, dpToPx(activity, 8));
+        claimAdBtn.setLayoutParams(claimBtnParams);
+        claimAdBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                claimAdRewardInstantly(activity);
+            }
+        });
+        contentLayout.addView(claimAdBtn);
+
+        // ==========================================
+        // SECTION 3: KAMERA & SUDUT PANDANG (FOV)
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "🎥 KAMERA & SUDUT PANDANG (FOV)");
+
+        sFovIndicator = new TextView(activity);
+        sFovIndicator.setText("Sudut Pandang: Default Bawaan Game");
+        sFovIndicator.setTextColor(Color.parseColor("#38BDF8"));
+        sFovIndicator.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        sFovIndicator.setTypeface(Typeface.DEFAULT_BOLD);
+        contentLayout.addView(sFovIndicator);
+
+        LinearLayout fovStepRow = new LinearLayout(activity);
+        fovStepRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, fovStepRow, "🔄 RESET BAWAAN", "#0284C7", () -> applyFov(0, "Default Bawaan Game"));
+        addOptionButton(activity, fovStepRow, "➖ Turunkan 2°", "#1E293B", () -> adjustFovStep(-2));
+        addOptionButton(activity, fovStepRow, "➕ Naikkan 2°", "#1E293B", () -> adjustFovStep(2));
+        contentLayout.addView(fovStepRow);
+
+        LinearLayout fovPresetsRow = new LinearLayout(activity);
+        fovPresetsRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, fovPresetsRow, "50° (Dinamis)", "#334155", () -> applyFov(50, "50° Dinamis Dekat"));
+        addOptionButton(activity, fovPresetsRow, "60° (Broadcast)", "#334155", () -> applyFov(60, "60° Siaran TV"));
+        addOptionButton(activity, fovPresetsRow, "68° (Stadium)", "#334155", () -> applyFov(68, "68° Stadium Luas"));
+        addOptionButton(activity, fovPresetsRow, "76° (Drone)", "#334155", () -> applyFov(76, "76° Taktikal Drone"));
+        contentLayout.addView(fovPresetsRow);
+
+        LinearLayout freeCamRow = new LinearLayout(activity);
+        freeCamRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, freeCamRow, "🚁 TOGGLE KAMERA BEBAS (FREE-ROAM 3D)", "#7C3AED", () -> {
+            executeCommand("ToggleDebugCamera");
+            showToast("🚁 ToggleDebugCamera Dipicu");
+        });
+        contentLayout.addView(freeCamRow);
+
+        // ==========================================
+        // SECTION 4: SMART SKILL-MOVES PAD
         // ==========================================
         addSectionHeader(activity, contentLayout, "⚡ SMART SKILL-MOVES PAD (TOMBOL KONTROL)");
 
@@ -786,154 +851,12 @@ public class EfbOverlayManager {
         contentLayout.addView(skillTestRow);
 
         // ==========================================
-        // SECTION 3: GRAFIS ULTRA HD & ANTI-BLUR
+        // SECTION 5: STATUS SISTEM
         // ==========================================
-        addSectionHeader(activity, contentLayout, "🌟 GRAFIS ULTRA HD & ANTI-BLUR (SUPER-SAMPLING)");
-        addFeatureLabel(activity, contentLayout, "Super-Sampling Render Scale (Hilangkan Buram):");
-
-        LinearLayout uhdRow1 = new LinearLayout(activity);
-        uhdRow1.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, uhdRow1, "Full HD (100%)", "#1E293B", () -> applySuperSampling(100, "Native Full HD"));
-        addOptionButton(activity, uhdRow1, "Crisp 2K (125%)", "#0284C7", () -> applySuperSampling(125, "Crisp 2K"));
-        addOptionButton(activity, uhdRow1, "Extreme 4K (150%)", "#7C3AED", () -> applySuperSampling(150, "Extreme 4K"));
-        contentLayout.addView(uhdRow1);
-
-        LinearLayout uhdRow2 = new LinearLayout(activity);
-        uhdRow2.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, uhdRow2, "✨ Anti-Aliasing TAA", "#059669", () -> {
-            executeCommand("r.PostProcessAAQuality 4");
-            showToast("✨ TAA Anti-Aliasing Diaktifkan (Garis Rumput Mulus)");
-        });
-        addOptionButton(activity, uhdRow2, "📺 Siaran Murni (ShowHUD)", "#4338CA", () -> {
-            executeCommand("ShowHUD");
-            showToast("📺 ShowHUD Dipicu (Sembunyikan/Tampilkan UI Game)");
-        });
-        contentLayout.addView(uhdRow2);
-
-        // ==========================================
-        // SECTION 4: KAMERA & SUDUT PANDANG (FOV)
-        // ==========================================
-        addSectionHeader(activity, contentLayout, "🎥 KAMERA & SUDUT PANDANG (FOV)");
-
-        sFovIndicator = new TextView(activity);
-        sFovIndicator.setText("Sudut Pandang: Default Bawaan Game");
-        sFovIndicator.setTextColor(Color.parseColor("#38BDF8"));
-        sFovIndicator.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        sFovIndicator.setTypeface(Typeface.DEFAULT_BOLD);
-        contentLayout.addView(sFovIndicator);
-
-        LinearLayout fovStepRow = new LinearLayout(activity);
-        fovStepRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, fovStepRow, "🔄 RESET BAWAAN", "#0284C7", () -> applyFov(0, "Default Bawaan Game"));
-        addOptionButton(activity, fovStepRow, "➖ Turunkan 2°", "#1E293B", () -> adjustFovStep(-2));
-        addOptionButton(activity, fovStepRow, "➕ Naikkan 2°", "#1E293B", () -> adjustFovStep(2));
-        contentLayout.addView(fovStepRow);
-
-        LinearLayout fovPresetsRow = new LinearLayout(activity);
-        fovPresetsRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, fovPresetsRow, "50° (Dinamis)", "#334155", () -> applyFov(50, "50° Dinamis Dekat"));
-        addOptionButton(activity, fovPresetsRow, "60° (Broadcast)", "#334155", () -> applyFov(60, "60° Siaran TV"));
-        addOptionButton(activity, fovPresetsRow, "68° (Stadium)", "#334155", () -> applyFov(68, "68° Stadium Luas"));
-        addOptionButton(activity, fovPresetsRow, "76° (Drone)", "#334155", () -> applyFov(76, "76° Taktikal Drone"));
-        contentLayout.addView(fovPresetsRow);
-
-        LinearLayout freeCamRow = new LinearLayout(activity);
-        freeCamRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, freeCamRow, "🚁 TOGGLE KAMERA BEBAS (FREE-ROAM 3D)", "#7C3AED", () -> {
-            executeCommand("ToggleDebugCamera");
-            showToast("🚁 ToggleDebugCamera Dipicu");
-        });
-        contentLayout.addView(freeCamRow);
-
-        // ==========================================
-        // SECTION 5: PERFORMA & ZERO INPUT DELAY
-        // ==========================================
-        addSectionHeader(activity, contentLayout, "⚡ PERFORMA & ZERO INPUT DELAY");
-
-        LinearLayout perfRow = new LinearLayout(activity);
-        perfRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, perfRow, "⚡ Nol Latensi (VSync 0)", "#059669", () -> {
-            executeCommand("r.VSync 0");
-            showToast("⚡ VSync 0: Input Sentuh Responsif Maksimal");
-        });
-        addOptionButton(activity, perfRow, "🛡️ No Shadow (Anti-Lag)", "#D97706", () -> {
-            executeCommand("r.MobileShadowQuality 0");
-            showToast("🛡️ Shadow Off: Performa Dingin & Stabil");
-        });
-        contentLayout.addView(perfRow);
-
-        addFeatureLabel(activity, contentLayout, "Target Frame Rate (t.MaxFPS):");
-        LinearLayout fpsRow = new LinearLayout(activity);
-        fpsRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, fpsRow, "60 FPS", "#1E293B", () -> executeCommand("t.MaxFPS 60"));
-        addOptionButton(activity, fpsRow, "90 FPS", "#1E293B", () -> executeCommand("t.MaxFPS 90"));
-        addOptionButton(activity, fpsRow, "120 FPS", "#047857", () -> executeCommand("t.MaxFPS 120"));
-        addOptionButton(activity, fpsRow, "Unlimited (0)", "#4338CA", () -> executeCommand("t.MaxFPS 0"));
-        contentLayout.addView(fpsRow);
-
-        // ==========================================
-        // SECTION 6: KONSOL PERINTAH UE4
-        // ==========================================
-        addSectionHeader(activity, contentLayout, "⌨️ KONSOL PERINTAH UE4 KUSTOM");
-        final LinearLayout cmdRow = new LinearLayout(activity);
-        cmdRow.setOrientation(LinearLayout.HORIZONTAL);
-        cmdRow.setGravity(Gravity.CENTER_VERTICAL);
-        LinearLayout.LayoutParams cmdRowParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        cmdRowParams.setMargins(0, dpToPx(activity, 4), 0, dpToPx(activity, 6));
-        cmdRow.setLayoutParams(cmdRowParams);
-
-        final EditText cmdInput = new EditText(activity);
-        cmdInput.setHint("contoh: r.ScreenPercentage 130");
-        cmdInput.setHintTextColor(Color.parseColor("#64748B"));
-        cmdInput.setTextColor(Color.WHITE);
-        cmdInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        cmdInput.setSingleLine(true);
-        GradientDrawable inputBg = new GradientDrawable();
-        inputBg.setColor(Color.parseColor("#1E293B"));
-        inputBg.setCornerRadius(dpToPx(activity, 8));
-        inputBg.setStroke(dpToPx(activity, 1), Color.parseColor("#334155"));
-        cmdInput.setBackground(inputBg);
-        cmdInput.setPadding(dpToPx(activity, 10), dpToPx(activity, 8), dpToPx(activity, 10), dpToPx(activity, 8));
-
-        LinearLayout.LayoutParams inputParams = new LinearLayout.LayoutParams(
-                0,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                1.0f
-        );
-        inputParams.setMarginEnd(dpToPx(activity, 8));
-        cmdInput.setLayoutParams(inputParams);
-        cmdRow.addView(cmdInput);
-
-        Button runBtn = new Button(activity);
-        runBtn.setText("RUN");
-        runBtn.setTextColor(Color.WHITE);
-        runBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        runBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        GradientDrawable runBg = new GradientDrawable();
-        runBg.setColor(Color.parseColor("#0284C7"));
-        runBg.setCornerRadius(dpToPx(activity, 8));
-        runBtn.setBackground(runBg);
-        runBtn.setPadding(dpToPx(activity, 14), dpToPx(activity, 6), dpToPx(activity, 14), dpToPx(activity, 6));
-        runBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String cmd = cmdInput.getText().toString().trim();
-                if (!cmd.isEmpty()) {
-                    executeCommand(cmd);
-                    cmdInput.setText("");
-                }
-            }
-        });
-        cmdRow.addView(runBtn);
-        contentLayout.addView(cmdRow);
-
-        // Status Lisensi
         addSectionHeader(activity, contentLayout, "🛡️ STATUS SISTEM");
         addStatusBadge(activity, contentLayout, "✅ Google Play License: PROTECTED (Status: LICENSED)");
-        addStatusBadge(activity, contentLayout, "✅ Context-Aware Screen Detector: AKTIF");
+        addStatusBadge(activity, contentLayout, "✅ Instant Ad Reward Bypass: AKTIF (AdMob Bypassed)");
+        addStatusBadge(activity, contentLayout, "✅ Precision Context-Aware AFK: READY");
 
         scrollView.addView(contentLayout);
         card.addView(scrollView);
@@ -949,6 +872,30 @@ public class EfbOverlayManager {
         return backdrop;
     }
 
+    /**
+     * Instantly claims rewarded ad rewards by invoking Konami's AdMobReward controller.
+     */
+    public static void claimAdRewardInstantly(final Context context) {
+        if (context == null) return;
+        try {
+            Class<?> adMobClass = Class.forName("jp.konami.AdMobReward");
+            Method showMethod = adMobClass.getDeclaredMethod("Show", Context.class);
+            showMethod.setAccessible(true);
+            showMethod.invoke(null, context);
+            showToast("🎁 Reward Iklan Berhasil Diklaim!\n(GP / Exp / Item langsung masuk ke akun Anda)");
+        } catch (Throwable t) {
+            try {
+                Class<?> adMobClass = Class.forName("jp.konami.AdMobReward");
+                Method showFunc = adMobClass.getDeclaredMethod("ShowFunc", Context.class);
+                showFunc.setAccessible(true);
+                showFunc.invoke(null, context);
+                showToast("🎁 Reward Iklan Berhasil Dipicu!");
+            } catch (Throwable t2) {
+                showToast("Info: Buka menu tonton iklan di game, reward otomatis cair saat tombol ditekan!");
+            }
+        }
+    }
+
     private static void applyFov(int fov, String label) {
         sCurrentFov = fov;
         executeCommand("fov " + fov);
@@ -962,12 +909,6 @@ public class EfbOverlayManager {
         if (sCurrentFov == 0) sCurrentFov = 60;
         sCurrentFov = Math.max(30, Math.min(110, sCurrentFov + delta));
         applyFov(sCurrentFov, sCurrentFov + "° Custom");
-    }
-
-    private static void applySuperSampling(int percentage, String label) {
-        executeCommand("r.ScreenPercentage " + percentage);
-        executeCommand("r.PostProcessAAQuality 4");
-        showToast("🌟 Super-Sampling Disetel: " + label);
     }
 
     // ==========================================
@@ -1202,7 +1143,41 @@ public class EfbOverlayManager {
             int tw = thumb.getWidth();
             int th = thumb.getHeight();
 
-            // 1. Check pitch green pixels (in-game match)
+            // 1. Check bottom-right action button area (x: 0.78..0.92, y: 0.90..0.96)
+            // In eFootball: 'Ke Laga >', 'Mulai Laga >', 'Lanjut >'
+            boolean isBlueActionBtn = false;
+            boolean isGoldActionBtn = false;
+            int actionY = (int) (th * 0.93f);
+            for (int xPct = 78; xPct <= 92; xPct += 4) {
+                int px = (int) (tw * (xPct / 100.0f));
+                if (px < tw && actionY < th) {
+                    int p = thumb.getPixel(px, actionY);
+                    int pr = Color.red(p);
+                    int pg = Color.green(p);
+                    int pb = Color.blue(p);
+                    if (pb > 150 && pr < 120) {
+                        isBlueActionBtn = true;
+                    }
+                    if (pr > 170 && pg > 130 && pb < 100) {
+                        isGoldActionBtn = true;
+                    }
+                }
+            }
+            boolean hasActionBtn = isBlueActionBtn || isGoldActionBtn;
+
+            // 2. Check top-right Home icon (x: 0.90, y: 0.06)
+            int homePixel = thumb.getPixel((int) (tw * 0.90f), (int) (th * 0.06f));
+            boolean isHomeIconPresent = (Color.blue(homePixel) > 130 && Color.red(homePixel) < 110);
+
+            // 3. Check bottom-left Kembali button (x: 0.12, y: 0.93)
+            int backPixel = thumb.getPixel((int) (tw * 0.12f), (int) (th * 0.93f));
+            boolean isKembaliPresent = (Color.blue(backPixel) > 130 && Color.red(backPixel) < 110);
+
+            // 4. Check dark scrim dialog (Perbarui Kontrak / Koneksi)
+            int cornerPixel = thumb.getPixel(5, 5);
+            boolean isDarkScrim = (Color.red(cornerPixel) < 35 && Color.green(cornerPixel) < 35 && Color.blue(cornerPixel) < 35);
+
+            // 5. Sample pitch grass green pixels in center
             int greenCount = 0;
             for (int x = tw / 4; x < (tw * 3) / 4; x += 4) {
                 for (int y = th / 4; y < (th * 3) / 4; y += 4) {
@@ -1216,38 +1191,13 @@ public class EfbOverlayManager {
                 }
             }
 
-            // 2. Check bottom-right action button area
-            int brPixel = thumb.getPixel((int)(tw * 0.90f), (int)(th * 0.88f));
-            int brR = Color.red(brPixel);
-            int brG = Color.green(brPixel);
-            int brB = Color.blue(brPixel);
+            boolean isMenuScreen = hasActionBtn || isHomeIconPresent || isKembaliPresent;
 
-            boolean isGoldButton = (brR > 180 && brG > 140 && brB < 80); // e.g. "Ke Laga", "Mulai Laga"
-            boolean isBlueButton = (brB > 160 && brR < 100); // e.g. "Lanjut", "OK"
-
-            // 3. Check center dialog box
-            int centerPixel = thumb.getPixel(tw / 2, th / 2);
-            int cR = Color.red(centerPixel);
-            int cG = Color.green(centerPixel);
-            int cB = Color.blue(centerPixel);
-
-            int cornerPixel = thumb.getPixel(10, 10);
-            boolean isDarkScrim = (Color.red(cornerPixel) < 30 && Color.green(cornerPixel) < 30 && Color.blue(cornerPixel) < 30);
-
-            // Classification Logic
-            if (greenCount > 40) {
-                // Pitch is clearly visible -> IN-MATCH PLAYING
-                // Periodic tap center to skip replays & cutscenes smoothly
-                dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.50f);
-                listener.onCompleted(ScreenState.IN_MATCH_PLAYING, "Melewati cutscene/replay laga...", 2500);
-                return;
-            }
-
-            if (isDarkScrim && (isGoldButton || isBlueButton)) {
-                // Modal dialog or Contract Renewal
+            // Decision Branch 1: Modal dialog / Contract expired popup
+            if (isDarkScrim && !isMenuScreen) {
                 if (sAutoRenewContract) {
-                    dispatchSimulatedTouchWithJitter(w * 0.65f, h * 0.62f); // Dialog Confirm / Perbarui
-                    listener.onCompleted(ScreenState.POPUP_CONTRACT_RENEWAL, "Menekan 'Perbarui Kontrak' / Konfirmasi...", 1800);
+                    dispatchSimulatedTouchWithJitter(w * 0.65f, h * 0.62f);
+                    listener.onCompleted(ScreenState.POPUP_CONTRACT_RENEWAL, "Menekan 'Perbarui Kontrak' / Konfirmasi dialog...", 1800);
                 } else {
                     dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.70f);
                     listener.onCompleted(ScreenState.POPUP_GENERIC_DIALOG, "Menutup dialog konfirmasi...", 1800);
@@ -1255,23 +1205,21 @@ public class EfbOverlayManager {
                 return;
             }
 
-            if (isGoldButton) {
-                // Main Event or Match Preparation screen
-                dispatchSimulatedTouchWithJitter(w * 0.88f, h * 0.88f);
-                listener.onCompleted(ScreenState.MATCH_PREPARATION, "Menekan tombol utama 'Mulai Laga' / 'Ke Laga'...", 2000);
+            // Decision Branch 2: MENU SCREEN (Event Tour, Match Preparation, Full-Time, Halftime)
+            // Even if the 3D stadium renders grass in background, if menu buttons are visible, it is a MENU!
+            if (hasActionBtn || isMenuScreen) {
+                dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
+
+                if (isGoldActionBtn) {
+                    listener.onCompleted(ScreenState.MATCH_PREPARATION, "Menekan 'Mulai Laga' (Kanan Bawah)...", 2000);
+                } else {
+                    listener.onCompleted(ScreenState.EVENT_TOUR_MENU, "Menekan 'Ke Laga' / 'Lanjut' (Kanan Bawah)...", 2000);
+                }
                 return;
             }
 
-            if (isBlueButton) {
-                // Results, Half-Time, or Full-Time Next button
-                dispatchSimulatedTouchWithJitter(w * 0.88f, h * 0.88f);
-                sCompletedMatches++;
-                listener.onCompleted(ScreenState.FULL_TIME_RESULT, "Menekan tombol 'Lanjut' hasil pertandingan...", 1800);
-                return;
-            }
-
-            // Check Bottom-Center Claim Rewards
-            int bcPixel = thumb.getPixel(tw / 2, (int)(th * 0.82f));
+            // Decision Branch 3: Bottom-Center Claim Rewards
+            int bcPixel = thumb.getPixel(tw / 2, (int) (th * 0.82f));
             if (Color.blue(bcPixel) > 140 || (Color.red(bcPixel) > 180 && Color.green(bcPixel) > 140)) {
                 if (sAutoClaimRewards) {
                     dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.80f);
@@ -1280,7 +1228,14 @@ public class EfbOverlayManager {
                 }
             }
 
-            // Fallback for general menu transit
+            // Decision Branch 4: Live match on pitch (no menu buttons, grass dominates)
+            if (greenCount > 50) {
+                dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.50f);
+                listener.onCompleted(ScreenState.IN_MATCH_PLAYING, "Melewati cutscene / memantau laga...", 3500);
+                return;
+            }
+
+            // Fallback for transition
             fallbackHeuristicInspection(w, h, listener);
 
         } catch (Throwable t) {
@@ -1294,24 +1249,25 @@ public class EfbOverlayManager {
 
     /**
      * Fallback adaptive sequential cycle with jitter when direct pixel buffer is unavailable.
+     * Strictly prioritizes the primary action button at (0.85w, 0.93h) so menus never get stuck!
      */
     private static int sFallbackStep = 0;
     private static void fallbackHeuristicInspection(int w, int h, OnInspectionCompletedListener listener) {
-        int step = sFallbackStep % 3;
+        int step = sFallbackStep % 4;
         sFallbackStep++;
 
-        if (step == 0) {
-            // Action button (Next / Ke Laga / Lanjut)
-            dispatchSimulatedTouchWithJitter(w * 0.88f, h * 0.88f);
-            listener.onCompleted(ScreenState.EVENT_TOUR_MENU, "Menekan tombol 'Lanjut' / 'Ke Laga' (Kanan Bawah)", 1800);
+        if (step == 0 || step == 2) {
+            // Action button (Ke Laga / Mulai Laga / Lanjut) at bottom right
+            dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
+            listener.onCompleted(ScreenState.EVENT_TOUR_MENU, "Menekan tombol 'Ke Laga' / 'Lanjut' (Kanan Bawah)", 2000);
         } else if (step == 1) {
-            // Center dialog OK / Claim
-            dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.80f);
-            listener.onCompleted(ScreenState.POPUP_GENERIC_DIALOG, "Menekan tombol 'OK' / 'Klaim' (Tengah Bawah)", 1800);
+            // Dialog confirmation / Contract renewal at center right
+            dispatchSimulatedTouchWithJitter(w * 0.65f, h * 0.62f);
+            listener.onCompleted(ScreenState.POPUP_CONTRACT_RENEWAL, "Menekan dialog konfirmasi / perpanjang kontrak", 1800);
         } else {
-            // Center skip cutscene
+            // Skip replay / cutscene tap center
             dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.50f);
-            listener.onCompleted(ScreenState.IN_MATCH_PLAYING, "Melewati cutscene / tap layar tengah", 1800);
+            listener.onCompleted(ScreenState.IN_MATCH_PLAYING, "Melewati cutscene laga / tap layar", 2500);
         }
     }
 

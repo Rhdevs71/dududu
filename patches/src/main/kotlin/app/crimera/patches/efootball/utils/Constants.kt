@@ -36,4 +36,6 @@ object Constants {
     const val LICENSE_VALIDATOR_CLASS = "Lcom/google/android/vending/licensing/LicenseValidator;"
     const val DOWNLOADER_ACTIVITY_CLASS = "Ljp/konami/pesam/DownloaderActivity;"
     const val EFB_OVERLAY_MANAGER_CLASS = "Lapp/morphe/extension/crimera/efootball/EfbOverlayManager;"
+    const val ADMOB_REWARD_CLASS = "Ljp/konami/AdMobReward;"
 }
+
