@@ -1,9 +1,9 @@
 <div align="center">
 
-<img src="https://socialify.git.ci/crimera/piko/image?forks=1&language=1&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto" alt="piko" width="640" height="320" />
+<img src="https://socialify.git.ci/Rhdevs71/dududu/image?forks=1&language=1&name=1&owner=1&pattern=Circuit%20Board&stargazers=1&theme=Auto" alt="piko" width="640" height="320" />
 
 <h1>
-    Morphe patches focused on Twitter/X & Instagram<br>
+    Morphe patches focused on Twitter/X, Instagram, WhatsApp & eFootball Mobile<br>
     <a href="https://t.me/pikopatches">
         <img src="https://img.shields.io/badge/Telegram-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram"/>
     </a>
@@ -353,7 +353,7 @@ To build Piko Patches, follow the [Morphe documentation](https://github.com/Morp
 ## ✨ Stargazers over time
 
 <p align="center">
-    <img src="https://starchart.cc/crimera/piko.svg?variant=light" alt="piko" width="640" height="320" />
+    <img src="https://starchart.cc/Rhdevs71/dududu.svg?variant=light" alt="piko" width="640" height="320" />
 </p>
 
 ## License
