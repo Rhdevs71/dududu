@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.18.0",
+  "version": "1.19.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -2693,6 +2693,36 @@
       "options": []
     },
     {
+      "name": "Freeze Last Seen",
+      "description": "Prevents sending your active presence status to Meta servers, keeping your last seen timestamp frozen in time while using the app.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.whatsapp",
+          "name": "WhatsApp",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#25D366",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "2.26.35.71",
+              "versionCodes": {
+                "ARM64_V8A": 263571000
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
       "name": "Friendship status indicator",
       "description": "Adds a follows you back status label on the profile page andshows a detailed friendship status breakdown on click",
       "default": true,
@@ -3006,6 +3036,36 @@
             {
               "version": "12.19.1-release.0",
               "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Hide Typing & Recording Status",
+      "description": "Prevents broadcasting typing and audio recording indicators to chat recipients.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.whatsapp",
+          "name": "WhatsApp",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#25D366",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "2.26.35.71",
+              "versionCodes": {
+                "ARM64_V8A": 263571000
+              },
               "isExperimental": false,
               "minSdk": null,
               "description": null

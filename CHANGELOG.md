@@ -1,3 +1,9 @@
+## [1.19.0](https://github.com/Rhdevs71/dududu/compare/v1.18.0...v1.19.0) (2026-09-21)
+
+### ✨ New Features
+
+* **whatsapp:** add Freeze Last Seen and Hide Typing Status privacy patches ([22eae5d](https://github.com/Rhdevs71/dududu/commit/22eae5d9a8c4e1afe81a9c90a663f43a96712a52))
+
 ## [1.18.0](https://github.com/Rhdevs71/dududu/compare/v1.17.0...v1.18.0) (2026-09-21)
 
 ### ✨ New Features

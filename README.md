@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.18.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.18.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;168 patches total
+> **[v1.19.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.19.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;170 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -274,7 +274,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 </details>
 
 <details>
-<summary>📦 WhatsApp&nbsp;&nbsp;•&nbsp;&nbsp;6 patches</summary>
+<summary>📦 WhatsApp&nbsp;&nbsp;•&nbsp;&nbsp;8 patches</summary>
 <br>
 
 **🎯 Supported versions:**
@@ -287,7 +287,9 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 | [Anti-Revoke Messages](#anti-revoke-messages) | Prevents senders from deleting messages for you in chats and groups. Revoked messages remain visible and are tagged with a deleted icon. |  |
 | [Anti-View Once](#anti-view-once) | Allows viewing view-once photos and videos indefinitely and enables saving them. |  |
 | [Clone](#clone) | Changes the package name and app name for WhatsApp. This allows you to install the patched WhatsApp alongside the original WhatsApp app.<br>Default cloned package: com.whatsapp.pikoo | • Package name<br>• App name |
+| [Freeze Last Seen](#freeze-last-seen) | Prevents sending your active presence status to Meta servers, keeping your last seen timestamp frozen in time while using the app. |  |
 | [Hide Read Receipts (Blue Ticks)](#hide-read-receipts-blue-ticks) | Prevents sending read receipts (blue ticks) when viewing messages. Optionally sends blue ticks only when you reply. |  |
+| [Hide Typing & Recording Status](#hide-typing-recording-status) | Prevents broadcasting typing and audio recording indicators to chat recipients. |  |
 | [Status & Media Downloader](#status-media-downloader) | Adds the capability to download status photos/videos and media directly to storage (/sdcard/Download/Piko/WhatsApp/). |  |
 | [Unlock WhatsApp Plus (Nova)](#unlock-whatsapp-plus-nova) | Unlocks official Meta Nova / WhatsApp Plus features including Custom App Themes, Custom App Icons, Pinned Chats Limit increase, and exclusive stickers. |  |
 
