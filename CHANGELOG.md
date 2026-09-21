@@ -1,3 +1,9 @@
+## [1.18.0](https://github.com/Rhdevs71/dududu/compare/v1.17.0...v1.18.0) (2026-09-21)
+
+### ✨ New Features
+
+* **dmsplus:** fix S+ purchase freeze, launcher shortcut icon, and status bar notification ([dcfbb05](https://github.com/Rhdevs71/dududu/commit/dcfbb05e35d02d19ec3c794d50f74255e3e888c2))
+
 ## [1.17.0](https://github.com/Rhdevs71/dududu/compare/v1.16.1...v1.17.0) (2026-09-19)
 
 ### ✨ New Features

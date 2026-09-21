@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.17.0",
+  "version": "1.18.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -2632,9 +2632,11 @@
     },
     {
       "name": "Force In-App Subscription Menu",
-      "description": "Menyediakan akses langsung ke menu paket langganan internal Flutter (/link/dashboard/subscribe) via Launcher App Shortcut, Status Bar Quick Menu, serta mencegat redirect web eksternal/webview.",
+      "description": "Menyediakan akses langsung ke menu paket langganan internal Flutter (/link/dashboard/subscribe) via Launcher App Shortcut, Status Bar Quick Menu, membuka gateway pembayaran resmi saat paket diklik, serta mencegat redirect web eksternal/webview.",
       "default": true,
-      "dependencies": [],
+      "dependencies": [
+        "ResourcePatch"
+      ],
       "compatiblePackages": [
         {
           "packageName": "com.cinematichororuniverse.dmsplus",
