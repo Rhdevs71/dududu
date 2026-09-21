@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.19.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.19.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;170 patches total
+> **[v1.20.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.20.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;161 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -342,8 +342,6 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 | [In-Game Mod Menu Overlay](#in-game-mod-menu-overlay) | Adds draggable in-game mod menu overlay with match speed, camera drone FOV, player scale, and graphics controls. |  |
 
 </details>
-
-
 
 <!-- PATCHES_END -->
 

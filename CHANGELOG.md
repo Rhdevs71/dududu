@@ -1,3 +1,9 @@
+## [1.20.0](https://github.com/Rhdevs71/dududu/compare/v1.19.0...v1.20.0) (2026-09-21)
+
+### ✨ New Features
+
+* **efootball:** upgrade AFK grinder to context-aware screen detector with live text reading HUD and remove deprecated Spotify module ([1881e6d](https://github.com/Rhdevs71/dududu/commit/1881e6dce04e2103e94055bde3f93720c8cb60cc))
+
 ## [1.19.0](https://github.com/Rhdevs71/dududu/compare/v1.18.0...v1.19.0) (2026-09-21)
 
 ### ✨ New Features

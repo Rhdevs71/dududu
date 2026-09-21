@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-21T13:56:47",
-  "description": "## [1.19.0](https://github.com/Rhdevs71/dududu/compare/v1.18.0...v1.19.0) (2026-09-21)\n\n### ✨ New Features\n\n* **whatsapp:** add Freeze Last Seen and Hide Typing Status privacy patches ([22eae5d](https://github.com/Rhdevs71/dududu/commit/22eae5d9a8c4e1afe81a9c90a663f43a96712a52))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.19.0/patches-1.19.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.19.0/patches-1.19.0.mpp.asc",
-  "version": "1.19.0"
+  "created_at": "2026-09-21T21:07:05",
+  "description": "## [1.20.0](https://github.com/Rhdevs71/dududu/compare/v1.19.0...v1.20.0) (2026-09-21)\n\n### ✨ New Features\n\n* **efootball:** upgrade AFK grinder to context-aware screen detector with live text reading HUD and remove deprecated Spotify module ([1881e6d](https://github.com/Rhdevs71/dududu/commit/1881e6dce04e2103e94055bde3f93720c8cb60cc))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.20.0/patches-1.20.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.20.0/patches-1.20.0.mpp.asc",
+  "version": "1.20.0"
 }
