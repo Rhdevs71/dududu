@@ -1,22 +1,54 @@
 package app.crimera.patches.dmsplus
 
 import app.crimera.patches.dmsplus.Constants.DMSPLUS_COMPATIBILITY
+import app.crimera.patches.dmsplus.Constants.IN_APP_PURCHASE_HANDLER_CLASS
 import app.crimera.patches.dmsplus.Constants.MAIN_ACTIVITY_CLASS
 import app.crimera.patches.dmsplus.Constants.URL_LAUNCHER_CLASS
 import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
+import app.morphe.patcher.patch.resourcePatch
+import org.w3c.dom.Element
 
 @Suppress("unused")
 val forceInAppSubscriptionPatch =
     bytecodePatch(
         name = "Force In-App Subscription Menu",
-        description = "Menyediakan akses langsung ke menu paket langganan internal Flutter (/link/dashboard/subscribe) via Launcher App Shortcut, Status Bar Quick Menu, serta mencegat redirect web eksternal/webview.",
+        description = "Menyediakan akses langsung ke menu paket langganan internal Flutter (/link/dashboard/subscribe) via Launcher App Shortcut, Status Bar Quick Menu, membuka gateway pembayaran resmi saat paket diklik, serta mencegat redirect web eksternal/webview.",
         default = true,
     ) {
         compatibleWith(DMSPLUS_COMPATIBILITY)
 
+        // 1. Sisipkan izin POST_NOTIFICATIONS ke AndroidManifest.xml agar Android 13-15 mengizinkan notifikasi
+        dependsOn(
+            resourcePatch {
+                execute {
+                    try {
+                        document("AndroidManifest.xml").use { document ->
+                            val manifest = document.documentElement
+                            val usesPermissions = manifest.getElementsByTagName("uses-permission")
+                            var hasNotification = false
+                            for (i in 0 until usesPermissions.length) {
+                                val item = usesPermissions.item(i) as? Element
+                                if (item?.getAttribute("android:name") == "android.permission.POST_NOTIFICATIONS") {
+                                    hasNotification = true
+                                    break
+                                }
+                            }
+                            if (!hasNotification) {
+                                val perm = document.createElement("uses-permission")
+                                perm.setAttribute("android:name", "android.permission.POST_NOTIFICATIONS")
+                                manifest.appendChild(perm)
+                            }
+                        }
+                    } catch (e: Exception) {
+                        println("[ForceInAppSubscriptionPatch] Warning: Gagal modifikasi AndroidManifest.xml: ${e.message}")
+                    }
+                }
+            },
+        )
+
         execute {
-            // 1. Injeksi Launcher Shortcut, Quick Status Bar Notification, & Info Toast pada MainActivity
+            // 2. Injeksi Launcher Shortcut, Quick Status Bar Notification, & Info Toast pada MainActivity
             try {
                 val mainActivityClass = mutableClassDefBy(MAIN_ACTIVITY_CLASS)
                 mainActivityClass.methods
@@ -27,7 +59,7 @@ val forceInAppSubscriptionPatch =
                             """
                             :try_start_sub_menu
                             sget v0, Landroid/os/Build${'$'}VERSION;->SDK_INT:I
-                            const/16 v1, 0x19
+                            const/16 v1, 0x19 # Android 7.1+
                             if-lt v0, v1, :cond_skip_sub_menu
 
                             # A. Tambahkan Dynamic Launcher Shortcut ("👑 Beli Paket Langganan")
@@ -58,6 +90,16 @@ val forceInAppSubscriptionPatch =
                             move-result-object v2
                             invoke-virtual {v2, v1}, Landroid/content/pm/ShortcutInfo${'$'}Builder;->setIntent(Landroid/content/Intent;)Landroid/content/pm/ShortcutInfo${'$'}Builder;
                             move-result-object v2
+
+                            # Wajib: Tetapkan Icon Shortcut agar launcher Android 8-15 menampilkannya
+                            invoke-virtual {p0}, Landroid/content/Context;->getApplicationInfo()Landroid/content/pm/ApplicationInfo;
+                            move-result-object v3
+                            iget v3, v3, Landroid/content/pm/ApplicationInfo;->icon:I
+                            invoke-static {p0, v3}, Landroid/graphics/drawable/Icon;->createWithResource(Landroid/content/Context;I)Landroid/graphics/drawable/Icon;
+                            move-result-object v3
+                            invoke-virtual {v2, v3}, Landroid/content/pm/ShortcutInfo${'$'}Builder;->setIcon(Landroid/graphics/drawable/Icon;)Landroid/content/pm/ShortcutInfo${'$'}Builder;
+                            move-result-object v2
+
                             invoke-virtual {v2}, Landroid/content/pm/ShortcutInfo${'$'}Builder;->build()Landroid/content/pm/ShortcutInfo;
                             move-result-object v1
 
@@ -73,6 +115,20 @@ val forceInAppSubscriptionPatch =
                             check-cast v0, Landroid/app/NotificationManager;
                             if-eqz v0, :cond_show_toast
 
+                            # Wajib: Buat NotificationChannel untuk Android 8.0+ / Android 13-15
+                            sget v1, Landroid/os/Build${'$'}VERSION;->SDK_INT:I
+                            const/16 v2, 0x1a
+                            if-lt v1, v2, :cond_skip_channel
+                            new-instance v1, Landroid/app/NotificationChannel;
+                            const-string v2, "dms_notification_channel"
+                            const-string v3, "Menu Langganan DMS+"
+                            const/4 v4, 0x3 # IMPORTANCE_DEFAULT
+                            invoke-direct {v1, v2, v3, v4}, Landroid/app/NotificationChannel;-><init>(Ljava/lang/String;Ljava/lang/CharSequence;I)V
+                            const-string v2, "Akses cepat menu langganan DMS+"
+                            invoke-virtual {v1, v2}, Landroid/app/NotificationChannel;->setDescription(Ljava/lang/String;)V
+                            invoke-virtual {v0, v1}, Landroid/app/NotificationManager;->createNotificationChannel(Landroid/app/NotificationChannel;)V
+                            :cond_skip_channel
+
                             new-instance v1, Landroid/content/Intent;
                             const-string v2, "android.intent.action.VIEW"
                             invoke-direct {v1, v2}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
@@ -83,7 +139,7 @@ val forceInAppSubscriptionPatch =
                             const-string v2, "com.cinematichororuniverse.dmsplus"
                             invoke-virtual {v1, v2}, Landroid/content/Intent;->setPackage(Ljava/lang/String;)Landroid/content/Intent;
                             const/16 v2, 0x101
-                            const/high16 v3, 0x4000000
+                            const/high16 v3, 0x4000000 # FLAG_IMMUTABLE
                             invoke-static {p0, v2, v1, v3}, Landroid/app/PendingIntent;->getActivity(Landroid/content/Context;ILandroid/content/Intent;I)Landroid/app/PendingIntent;
                             move-result-object v1
 
@@ -114,7 +170,7 @@ val forceInAppSubscriptionPatch =
 
                             # C. Tampilkan Toast Panduan Singkat
                             :cond_show_toast
-                            const-string v0, "👑 Menu Langganan: Buka Notifikasi atau Tekan Lama Ikon DMS+ di Beranda!"
+                            const-string v0, "👑 Menu Langganan: Tekan lama ikon DMS+ di Beranda atau ketuk Notifikasi!"
                             const/4 v1, 0x1
                             invoke-static {p0, v0, v1}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
                             move-result-object v0
@@ -132,7 +188,78 @@ val forceInAppSubscriptionPatch =
                 println("[ForceInAppSubscriptionPatch] Warning: Gagal hook MainActivity: ${e.message}")
             }
 
-            // 2. Mencegat launchUrl (Browser Eksternal) dan mengalihkannya ke rute internal DMS+
+            // 3. Mencegat launchBillingFlow saat pengguna mengetuk paket apa pun di tab S+
+            // Mengatasi freeze loading spinner 'Mohon tunggu...' dan langsung membuka gateway pembayaran dmsplus.id
+            try {
+                val iapHandlerClass = mutableClassDefBy(IN_APP_PURCHASE_HANDLER_CLASS)
+                iapHandlerClass.methods
+                    .firstOrNull { it.name == "launchBillingFlow" && it.parameterTypes.size == 1 }
+                    ?.let { method ->
+                        // Parameters in smali: p0 = this (MethodCallHandlerImpl), p1 = params (PlatformBillingFlowParams)
+                        method.addInstructions(
+                            0,
+                            """
+                            :try_start_launch_flow
+                            # A. Buka browser langsung ke portal langganan resmi DMS+
+                            new-instance v0, Landroid/content/Intent;
+                            const-string v1, "android.intent.action.VIEW"
+                            invoke-direct {v0, v1}, Landroid/content/Intent;-><init>(Ljava/lang/String;)V
+                            const-string v1, "https://dmsplus.id/dashboard/subscribe"
+                            invoke-static {v1}, Landroid/net/Uri;->parse(Ljava/lang/String;)Landroid/net/Uri;
+                            move-result-object v1
+                            invoke-virtual {v0, v1}, Landroid/content/Intent;->setData(Landroid/net/Uri;)Landroid/content/Intent;
+                            const/high16 v1, 0x10000000 # FLAG_ACTIVITY_NEW_TASK
+                            invoke-virtual {v0, v1}, Landroid/content/Intent;->addFlags(I)Landroid/content/Intent;
+
+                            iget-object v1, p0, Lio/flutter/plugins/inapppurchase/MethodCallHandlerImpl;->applicationContext:Landroid/content/Context;
+                            if-eqz v1, :cond_notify_cancel
+                            invoke-virtual {v1, v0}, Landroid/content/Context;->startActivity(Landroid/content/Intent;)V
+
+                            const-string v0, "👑 Membuka portal pembayaran resmi DMS+ (QRIS, VA, E-Wallet)..."
+                            const/4 v2, 0x1
+                            invoke-static {v1, v0, v2}, Landroid/widget/Toast;->makeText(Landroid/content/Context;Ljava/lang/CharSequence;I)Landroid/widget/Toast;
+                            move-result-object v0
+                            invoke-virtual {v0}, Landroid/widget/Toast;->show()V
+
+                            # B. Beritahu Flutter bahwa proses selesai/dibatalkan agar loading dialog 'Mohon tunggu...' seketika ditutup
+                            :cond_notify_cancel
+                            iget-object v0, p0, Lio/flutter/plugins/inapppurchase/MethodCallHandlerImpl;->callbackApi:Lio/flutter/plugins/inapppurchase/InAppPurchaseCallbackApi;
+                            if-eqz v0, :cond_return_result
+
+                            new-instance v1, Lio/flutter/plugins/inapppurchase/PlatformBillingResult;
+                            sget-object v2, Lio/flutter/plugins/inapppurchase/PlatformBillingResponse;->USER_CANCELED:Lio/flutter/plugins/inapppurchase/PlatformBillingResponse;
+                            const-string v3, "Redirected to web subscription"
+                            const-wide/16 v4, 0x0
+                            invoke-direct {v1, v2, v3, v4, v5}, Lio/flutter/plugins/inapppurchase/PlatformBillingResult;-><init>(Lio/flutter/plugins/inapppurchase/PlatformBillingResponse;Ljava/lang/String;J)V
+
+                            new-instance v2, Lio/flutter/plugins/inapppurchase/PlatformPurchasesResponse;
+                            invoke-static {}, Ljava/util/Collections;->emptyList()Ljava/util/List;
+                            move-result-object v3
+                            invoke-direct {v2, v1, v3}, Lio/flutter/plugins/inapppurchase/PlatformPurchasesResponse;-><init>(Lio/flutter/plugins/inapppurchase/PlatformBillingResult;Ljava/util/List;)V
+
+                            const/4 v1, 0x0
+                            invoke-virtual {v0, v2, v1}, Lio/flutter/plugins/inapppurchase/InAppPurchaseCallbackApi;->onPurchasesUpdated(Lio/flutter/plugins/inapppurchase/PlatformPurchasesResponse;Lkotlin/jvm/functions/Function1;)V
+
+                            :cond_return_result
+                            new-instance v0, Lio/flutter/plugins/inapppurchase/PlatformBillingResult;
+                            sget-object v1, Lio/flutter/plugins/inapppurchase/PlatformBillingResponse;->USER_CANCELED:Lio/flutter/plugins/inapppurchase/PlatformBillingResponse;
+                            const-string v2, "Redirected to web subscription"
+                            const-wide/16 v3, 0x0
+                            invoke-direct {v0, v1, v2, v3, v4}, Lio/flutter/plugins/inapppurchase/PlatformBillingResult;-><init>(Lio/flutter/plugins/inapppurchase/PlatformBillingResponse;Ljava/lang/String;J)V
+                            return-object v0
+
+                            :try_end_launch_flow
+                            .catch Ljava/lang/Throwable; {:try_start_launch_flow .. :try_end_launch_flow} :catch_launch_flow
+
+                            :catch_launch_flow
+                            """.trimIndent(),
+                        )
+                    }
+            } catch (e: Exception) {
+                println("[ForceInAppSubscriptionPatch] Warning: Gagal hook MethodCallHandlerImpl: ${e.message}")
+            }
+
+            // 4. Mencegat launchUrl (Browser Eksternal) dan mengalihkannya ke rute internal DMS+
             try {
                 val launcherClass = mutableClassDefBy(URL_LAUNCHER_CLASS)
                 launcherClass.methods
@@ -190,7 +317,7 @@ val forceInAppSubscriptionPatch =
                         )
                     }
 
-                // 3. Mencegat openUrlInApp (In-App WebView & CustomTabs)
+                // 5. Mencegat openUrlInApp (In-App WebView & CustomTabs)
                 launcherClass.methods
                     .firstOrNull { it.name == "openUrlInApp" && it.parameterTypes.size == 4 }
                     ?.let { method ->

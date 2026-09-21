@@ -21,4 +21,5 @@ object Constants {
     const val SCREEN_PROTECTOR_CLASS = "Lg4/a;"
     const val URL_LAUNCHER_CLASS = "Lio/flutter/plugins/urllauncher/UrlLauncher;"
     const val MAIN_ACTIVITY_CLASS = "Lcom/cinematichororuniverse/dmsplus/MainActivity;"
+    const val IN_APP_PURCHASE_HANDLER_CLASS = "Lio/flutter/plugins/inapppurchase/MethodCallHandlerImpl;"
 }
