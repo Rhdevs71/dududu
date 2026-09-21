@@ -1,3 +1,9 @@
+## [1.22.0](https://github.com/Rhdevs71/dududu/compare/v1.21.0...v1.22.0) (2026-09-21)
+
+### ✨ New Features
+
+* **efootball:** implement 8-stage deterministic AFK grinder, 3 rewarded ad types bypass, and clean git tracking ([29edf83](https://github.com/Rhdevs71/dududu/commit/29edf831774fa5667cb2cd3f385ef721b29f3839))
+
 ## [1.21.0](https://github.com/Rhdevs71/dududu/compare/v1.20.0...v1.21.0) (2026-09-21)
 
 ### ✨ New Features

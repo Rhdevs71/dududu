@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-21T21:48:45",
-  "description": "## [1.21.0](https://github.com/Rhdevs71/dududu/compare/v1.20.0...v1.21.0) (2026-09-21)\n\n### ✨ New Features\n\n* **efootball:** streamline mod menu, fix AFK Grinder UI navigation, and add instant rewarded ad bypass ([95e258c](https://github.com/Rhdevs71/dududu/commit/95e258c9ec7313b6bd431836685c9c7f3ff773e1))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.21.0/patches-1.21.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.21.0/patches-1.21.0.mpp.asc",
-  "version": "1.21.0"
+  "created_at": "2026-09-21T22:26:01",
+  "description": "## [1.22.0](https://github.com/Rhdevs71/dududu/compare/v1.21.0...v1.22.0) (2026-09-21)\n\n### ✨ New Features\n\n* **efootball:** implement 8-stage deterministic AFK grinder, 3 rewarded ad types bypass, and clean git tracking ([29edf83](https://github.com/Rhdevs71/dududu/commit/29edf831774fa5667cb2cd3f385ef721b29f3839))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.22.0/patches-1.22.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.22.0/patches-1.22.0.mpp.asc",
+  "version": "1.22.0"
 }
