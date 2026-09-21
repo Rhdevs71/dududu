@@ -864,3 +864,28 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
 * **Hasil Distribusi APK Rilis v1.15.0 (Signed Resmi Android SDK 35 `apksigner`)**:
   - File Output: `C:\Users\Rhdevs\Downloads\efootball_v11.0.1_piko_mod.apk` (~848 MB).
   - Skema Tanda Tangan: Scheme v2 (true), Scheme v3 (true).
+
+31. **Tahap 31: Perbaikan WhatsApp Developer Diagnostics (Rhpatch), Penghapusan Modul Spotify (Morphe), dan Re-Engineering Cerdas AFK Match Grinder eFootball (Piko v4.0 - Terkini)**
+    - *Perbaikan WhatsApp Developer Diagnostics di Rhpatch (`DebugFeature.kt` & `fragment_general.xml`)*:
+      - Menghapus emoji/logo ganda (`🛠️` dan icon redundant), menyederhanakan judul menu menjadi teks bersih: `"WhatsApp Dev Diagnostics"`.
+      - Menambahkan switch preferensi `pref_wa_developer_mode` di `fragment_general.xml` (default: `false`), sehingga menu diagnostik internal Meta hanya muncul jika diaktifkan secara sadar oleh pengguna melalui menu pengaturan Rhpatch.
+      - Berhasil dikompilasi dengan OpenJDK 11 (`BUILD SUCCESSFUL in 2m 5s`) dan di-push ke `Rhdevs71/apahayo` (commit `aa9ab5c`).
+    - *Penghapusan Modul Spotify dari Morphe (`extensions/spotify` & `patches/.../spotify`)*:
+      - Menghapus seluruh folder ekstensi dan patch Spotify di `piko-main` atas permintaan pengguna karena tidak berfungsi optimal, memangkas 24 file serta membersihkan referensi pada `README.md`.
+    - *Re-Engineering Cerdas AFK Match Grinder eFootball (`EfbOverlayManager.java`)*:
+      - Mengganti sistem blind looping 3 titik dengan **State Machine Deteksi Layar Real-Time**:
+        1. `EVENT_TOUR_MENU`: Menekan tombol 'Lanjut' / 'Ke Laga' (kanan bawah).
+        2. `MATCH_PREPARATION`: Menekan 'Mulai Laga' (kanan bawah).
+        3. `IN_MATCH_PLAYING`: Deteksi dominansi rumput lapangan; melewati cutscene/selebrasi secara halus tanpa mengganggu permainan.
+        4. `HALF_TIME_WHISTLE`: Menekan 'Mulai Babak Kedua' (kanan bawah).
+        5. `FULL_TIME_RESULT` & `PLAYER_RATINGS_STATS`: Menekan 'Lanjut' hasil pertandingan dan menambah counter laga.
+        6. `EVENT_POINTS_REWARD`: Otomatis mengklaim poin acara dan hadiah (tengah bawah).
+        7. `POPUP_CONTRACT_RENEWAL` & `POPUP_GENERIC_DIALOG`: Otomatis memperbarui kontrak pemain agar grinding tidak terhenti di tengah sesi.
+      - **Live Text Reading Status HUD**: Panel mengambang transparan di bagian atas layar yang membaca konteks menu secara langsung:
+        - `📍 Menu Terdeteksi`: Nama layar aktif dengan kode warna status.
+        - `⚡ Aksi Terjadwal`: Teks aksi yang sedang/akan dilakukan bot.
+        - `📊 Statistik Sesi`: Jumlah laga selesai, target laga, dan timer durasi sesi.
+        - Kontrol Cepat: Tombol [⏸️ Jeda], [▶️ Lanjut], dan [✕ Stop] langsung dari layar game.
+      - Pilihan mode grinding baru: Acara Tur (VS AI), Laga Simulasi (Pelatih AI), dan Acara Tantangan.
+      - Sintesis input alami (`SOURCE_TOUCHSCREEN`) dengan jitter spasial acak (±1.2%) dan variasi durasi sentuh realistis (40-70ms) untuk mencegah deteksi bot Konami.
+      - Kompilasi `:patches:compileKotlin` sukses 100% (0 error) dan di-push ke `Rhdevs71/dududu` (commit `1881e6d`).
