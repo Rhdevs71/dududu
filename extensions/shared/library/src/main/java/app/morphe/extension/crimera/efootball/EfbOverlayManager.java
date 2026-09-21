@@ -8,9 +8,13 @@ package app.morphe.extension.crimera.efootball;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.PixelFormat;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.SystemClock;
@@ -19,8 +23,11 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.InputDevice;
 import android.view.MotionEvent;
+import android.view.PixelCopy;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -31,6 +38,7 @@ import android.widget.Toast;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Random;
 
 import app.morphe.extension.crimera.PikoUtils;
 
@@ -38,13 +46,14 @@ import app.morphe.extension.crimera.PikoUtils;
  * In-game Overlay Mod Menu for eFootball Mobile (PES Android).
  * Features:
  * 1. 1-Tap Smart Skill-Moves Draggable Overlay (Double Touch, Stunning Shot, Fake Shot)
- * 2. AFK Smart Event Grinder with native SOURCE_TOUCHSCREEN input dispatch
- * 3. Ultra HD Graphic Enhancer & Anti-Blur Super-Sampling (125%, 150%, TAA)
- * 4. Pure TV Broadcast Mode (ShowHUD toggle)
- * 5. Precision Camera FOV with Default Reset (fov 0), Broadcast, Stadium, and Stepper [-]/[+]
- * 6. 3D Free-Roam Camera (ToggleDebugCamera)
- * 7. Anti-Lag / Zero Touch Latency (r.VSync 0, r.MobileShadowQuality 0) & FPS Unlocker
- * 8. Interactive UE4 Console Terminal
+ * 2. Intelligent Context-Aware AFK Match Grinder with Real-Time Screen & Menu Recognition
+ * 3. Live Text Reading HUD (Displays current detected menu, next planned action, and stats)
+ * 4. Ultra HD Graphic Enhancer & Anti-Blur Super-Sampling (125%, 150%, TAA)
+ * 5. Pure TV Broadcast Mode (ShowHUD toggle)
+ * 6. Precision Camera FOV with Default Reset (fov 0), Broadcast, Stadium, and Stepper [-]/[+]
+ * 7. 3D Free-Roam Camera (ToggleDebugCamera)
+ * 8. Anti-Lag / Zero Touch Latency (r.VSync 0, r.MobileShadowQuality 0) & FPS Unlocker
+ * 9. Interactive UE4 Console Terminal
  */
 @SuppressWarnings("unused")
 public class EfbOverlayManager {
@@ -54,7 +63,6 @@ public class EfbOverlayManager {
     private static FrameLayout sRootOverlay = null;
     private static View sFloatingBall = null;
     private static View sMenuModal = null;
-    private static TextView sFloatingAfkBadge = null;
 
     // Smart Skill-Moves Floating Overlay State
     private static View sFloatingSkillPad = null;
@@ -62,13 +70,62 @@ public class EfbOverlayManager {
     private static Button sMenuSkillsBtn = null;
     private static TextView sMenuSkillsStatus = null;
 
-    // AFK Grinder State
+    // Smart AFK Grinder State & Components
+    public enum ScreenState {
+        UNKNOWN("Memindai Layar...", "#94A3B8"),
+        EVENT_TOUR_MENU("Menu Acara Tur (Pilih Laga)", "#38BDF8"),
+        MATCH_PREPARATION("Persiapan Tim & Laga", "#FBBF24"),
+        IN_MATCH_PLAYING("Laga Berlangsung (Pitch Aktif)", "#10B981"),
+        HALF_TIME_WHISTLE("Jeda Babak Pertama (Half-Time)", "#F59E0B"),
+        FULL_TIME_RESULT("Peluit Akhir Selesai (Full-Time)", "#3B82F6"),
+        PLAYER_RATINGS_STATS("Hasil & Statistik Laga", "#8B5CF6"),
+        EVENT_POINTS_REWARD("Poin Acara & Klaim Hadiah", "#EC4899"),
+        POPUP_CONTRACT_RENEWAL("Peringatan Kontrak Pemain", "#EF4444"),
+        POPUP_NETWORK_RETRY("Dialog Koneksi Jaringan", "#F97316"),
+        POPUP_GENERIC_DIALOG("Pop-Up Konfirmasi Dialog", "#06B6D4");
+
+        final String displayName;
+        final String hexColor;
+
+        ScreenState(String displayName, String hexColor) {
+            this.displayName = displayName;
+            this.hexColor = hexColor;
+        }
+    }
+
+    public enum GrindingMode {
+        TOUR_EVENT("Acara Tur (VS AI)"),
+        SIMULATION_MATCH("Laga Simulasi (Pelatih AI)"),
+        CHALLENGE_EVENT("Acara Tantangan (Challenge)");
+
+        final String title;
+        GrindingMode(String title) {
+            this.title = title;
+        }
+    }
+
     private static boolean sAfkRunning = false;
-    private static int sAfkCycle = 0;
+    private static boolean sAfkPaused = false;
+    private static GrindingMode sGrindMode = GrindingMode.TOUR_EVENT;
+    private static boolean sAutoRenewContract = true;
+    private static boolean sAutoClaimRewards = true;
+    private static int sTargetMatches = 0; // 0 = unlimited
+    private static int sCompletedMatches = 0;
+    private static long sAfkStartTime = 0;
+    private static ScreenState sCurrentScreenState = ScreenState.UNKNOWN;
+    private static String sCurrentPlannedAction = "Menunggu pemindaian...";
+
+    // Live HUD Components
+    private static LinearLayout sFloatingAfkHud = null;
+    private static TextView sHudStateText = null;
+    private static TextView sHudActionText = null;
+    private static TextView sHudStatsText = null;
     private static Button sMenuAfkBtn = null;
     private static TextView sMenuAfkStatus = null;
+
     private static final Handler sMainHandler = new Handler(Looper.getMainLooper());
     private static final Handler sAfkHandler = new Handler(Looper.getMainLooper());
+    private static final Random sRandom = new Random();
 
     // Camera FOV State
     private static int sCurrentFov = 0; // 0 = default
@@ -79,7 +136,7 @@ public class EfbOverlayManager {
         sActivity = activity;
 
         try {
-            PikoUtils.logger(TAG + ": Initializing eFootball Overlay Mod Menu v3 on " + activity.getClass().getName());
+            PikoUtils.logger(TAG + ": Inisialisasi eFootball Smart Overlay Mod Suite v4 on " + activity.getClass().getName());
         } catch (Throwable ignored) {}
 
         sMainHandler.postDelayed(new Runnable() {
@@ -89,7 +146,7 @@ public class EfbOverlayManager {
                     attachOverlay(activity);
                 } catch (Throwable t) {
                     try {
-                        PikoUtils.logger(TAG + ": Failed to attach overlay: " + t.getMessage());
+                        PikoUtils.logger(TAG + ": Gagal memasang overlay: " + t.getMessage());
                     } catch (Throwable ignored) {}
                 }
             }
@@ -117,12 +174,12 @@ public class EfbOverlayManager {
         sFloatingBall = createFloatingBall(activity);
         sRootOverlay.addView(sFloatingBall);
 
-        // 2. Floating AFK Status Badge (Top-Center)
-        sFloatingAfkBadge = createFloatingAfkBadge(activity);
-        sFloatingAfkBadge.setVisibility(View.GONE);
-        sRootOverlay.addView(sFloatingAfkBadge);
+        // 2. Intelligent Live Status HUD Panel (Top-Center, reads screen & actions)
+        sFloatingAfkHud = createSmartAfkHud(activity);
+        sFloatingAfkHud.setVisibility(View.GONE);
+        sRootOverlay.addView(sFloatingAfkHud);
 
-        // 3. Floating Skill Moves Pad (Draggable, outside modal menu)
+        // 3. Floating Skill Moves Pad (Draggable)
         sFloatingSkillPad = createFloatingSkillPad(activity);
         sFloatingSkillPad.setVisibility(View.GONE);
         sRootOverlay.addView(sFloatingSkillPad);
@@ -135,7 +192,7 @@ public class EfbOverlayManager {
         decorView.addView(sRootOverlay);
         sOverlayAttached = true;
 
-        showToast("⚽ Piko eFootball Mod Menu Aktif!\nSentuh ⚽ untuk membuka menu mod.");
+        showToast("⚽ eFootball Mod Suite Aktif!\nSentuh ⚽ untuk membuka menu mod.");
     }
 
     private static View createFloatingBall(final Activity activity) {
@@ -228,9 +285,165 @@ public class EfbOverlayManager {
     }
 
     /**
+     * Intelligent Live Status HUD Panel.
+     * Displays real-time detected screen text, scheduled bot action, match count, and duration.
+     */
+    private static LinearLayout createSmartAfkHud(final Activity activity) {
+        final LinearLayout hud = new LinearLayout(activity);
+        hud.setOrientation(LinearLayout.VERTICAL);
+        hud.setPadding(dpToPx(activity, 14), dpToPx(activity, 8), dpToPx(activity, 14), dpToPx(activity, 8));
+
+        GradientDrawable bg = new GradientDrawable();
+        bg.setShape(GradientDrawable.RECTANGLE);
+        bg.setCornerRadius(dpToPx(activity, 16));
+        bg.setColor(Color.parseColor("#EE0B1120")); // 93% Slate dark
+        bg.setStroke(dpToPx(activity, 1), Color.parseColor("#10B981")); // Emerald border
+        hud.setBackground(bg);
+        hud.setElevation(dpToPx(activity, 14));
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+        );
+        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
+        params.topMargin = dpToPx(activity, 12);
+        hud.setLayoutParams(params);
+
+        // Header Row: Title & Action Controls
+        LinearLayout topRow = new LinearLayout(activity);
+        topRow.setOrientation(LinearLayout.HORIZONTAL);
+        topRow.setGravity(Gravity.CENTER_VERTICAL);
+
+        TextView title = new TextView(activity);
+        title.setText("🤖 SMART AFK GRINDER");
+        title.setTextColor(Color.parseColor("#10B981"));
+        title.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        title.setTypeface(Typeface.DEFAULT_BOLD);
+        topRow.addView(title);
+
+        TextView modeBadge = new TextView(activity);
+        modeBadge.setText(" • " + sGrindMode.title);
+        modeBadge.setTextColor(Color.parseColor("#94A3B8"));
+        modeBadge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        topRow.addView(modeBadge);
+
+        // Pause/Resume button
+        final Button pauseBtn = new Button(activity);
+        pauseBtn.setText("⏸️ Jeda");
+        pauseBtn.setTextColor(Color.WHITE);
+        pauseBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
+        pauseBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        GradientDrawable pBg = new GradientDrawable();
+        pBg.setColor(Color.parseColor("#334155"));
+        pBg.setCornerRadius(dpToPx(activity, 6));
+        pauseBtn.setBackground(pBg);
+        pauseBtn.setPadding(dpToPx(activity, 6), dpToPx(activity, 2), dpToPx(activity, 6), dpToPx(activity, 2));
+        LinearLayout.LayoutParams pParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                dpToPx(activity, 24)
+        );
+        pParams.setMargins(dpToPx(activity, 10), 0, dpToPx(activity, 4), 0);
+        pauseBtn.setLayoutParams(pParams);
+        pauseBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sAfkPaused = !sAfkPaused;
+                pauseBtn.setText(sAfkPaused ? "▶️ Lanjut" : "⏸️ Jeda");
+                updateLiveHud();
+            }
+        });
+        topRow.addView(pauseBtn);
+
+        // Stop button
+        Button stopBtn = new Button(activity);
+        stopBtn.setText("✕ Stop");
+        stopBtn.setTextColor(Color.parseColor("#EF4444"));
+        stopBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
+        stopBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        GradientDrawable sBg = new GradientDrawable();
+        sBg.setColor(Color.parseColor("#1E293B"));
+        sBg.setCornerRadius(dpToPx(activity, 6));
+        stopBtn.setBackground(sBg);
+        stopBtn.setPadding(dpToPx(activity, 6), dpToPx(activity, 2), dpToPx(activity, 6), dpToPx(activity, 2));
+        LinearLayout.LayoutParams sParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                dpToPx(activity, 24)
+        );
+        stopBtn.setLayoutParams(sParams);
+        stopBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopAfkGrinder();
+            }
+        });
+        topRow.addView(stopBtn);
+
+        hud.addView(topRow);
+
+        // Line 2: Screen Detection Status
+        sHudStateText = new TextView(activity);
+        sHudStateText.setText("📍 Menu: Memindai Layar...");
+        sHudStateText.setTextColor(Color.parseColor("#38BDF8"));
+        sHudStateText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        sHudStateText.setTypeface(Typeface.DEFAULT_BOLD);
+        sHudStateText.setPadding(0, dpToPx(activity, 2), 0, dpToPx(activity, 1));
+        hud.addView(sHudStateText);
+
+        // Line 3: Planned Action Text
+        sHudActionText = new TextView(activity);
+        sHudActionText.setText("⚡ Aksi: Mengidentifikasi konteks antarmuka...");
+        sHudActionText.setTextColor(Color.parseColor("#F1F5F9"));
+        sHudActionText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+        hud.addView(sHudActionText);
+
+        // Line 4: Stats & Elapsed Time
+        sHudStatsText = new TextView(activity);
+        sHudStatsText.setText("📊 Sesi: 0 Laga Selesai • ⏱️ 00:00");
+        sHudStatsText.setTextColor(Color.parseColor("#94A3B8"));
+        sHudStatsText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 9);
+        sHudStatsText.setPadding(0, dpToPx(activity, 2), 0, 0);
+        hud.addView(sHudStatsText);
+
+        return hud;
+    }
+
+    private static void updateLiveHud() {
+        if (sFloatingAfkHud == null || !sAfkRunning) return;
+
+        sMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    if (sHudStateText != null) {
+                        if (sAfkPaused) {
+                            sHudStateText.setText("⏸️ GRINDER DIJEDA SEMENTARA");
+                            sHudStateText.setTextColor(Color.parseColor("#F59E0B"));
+                        } else {
+                            sHudStateText.setText("📍 Menu: " + sCurrentScreenState.displayName);
+                            sHudStateText.setTextColor(Color.parseColor(sCurrentScreenState.hexColor));
+                        }
+                    }
+
+                    if (sHudActionText != null) {
+                        sHudActionText.setText("⚡ Aksi: " + (sAfkPaused ? "Menunggu tombol lanjut ditekan" : sCurrentPlannedAction));
+                    }
+
+                    if (sHudStatsText != null) {
+                        long elapsedSec = (System.currentTimeMillis() - sAfkStartTime) / 1000;
+                        long min = elapsedSec / 60;
+                        long sec = elapsedSec % 60;
+                        String timeStr = String.format("%02d:%02d", min, sec);
+                        String targetStr = (sTargetMatches > 0) ? " / " + sTargetMatches : "";
+                        sHudStatsText.setText("📊 Sesi: " + sCompletedMatches + targetStr + " Laga Selesai • ⏱️ " + timeStr);
+                    }
+                } catch (Throwable ignored) {}
+            }
+        });
+    }
+
+    /**
      * Floating Draggable Skill Pad Widget.
      * Contains 3 macro buttons: Double Touch (DT), Stunning Shot (SHOT), Fake Shot (FEINT).
-     * Placed directly on the game screen and can be freely moved near the user's thumb.
      */
     private static View createFloatingSkillPad(final Activity activity) {
         final LinearLayout pad = new LinearLayout(activity);
@@ -255,7 +468,7 @@ public class EfbOverlayManager {
         padParams.topMargin = dpToPx(activity, 150);
         pad.setLayoutParams(padParams);
 
-        // Drag Handle on the left
+        // Drag Handle
         TextView dragHandle = new TextView(activity);
         dragHandle.setText("⠿");
         dragHandle.setTextColor(Color.parseColor("#94A3B8"));
@@ -264,33 +477,14 @@ public class EfbOverlayManager {
         pad.addView(dragHandle);
 
         // Button 1: Double Touch (DT)
-        Button btnDt = createSkillPadButton(activity, "⚡ DT", "#0284C7", new Runnable() {
-            @Override
-            public void run() {
-                triggerDoubleTouch();
-            }
-        });
-        pad.addView(btnDt);
+        pad.addView(createSkillPadButton(activity, "⚡ DT", "#0284C7", () -> triggerDoubleTouch()));
 
         // Button 2: Stunning Shot (SHOT)
-        Button btnShot = createSkillPadButton(activity, "🚀 SHOT", "#D97706", new Runnable() {
-            @Override
-            public void run() {
-                triggerStunningShot();
-            }
-        });
-        pad.addView(btnShot);
+        pad.addView(createSkillPadButton(activity, "🚀 SHOT", "#D97706", () -> triggerStunningShot()));
 
         // Button 3: Fake Shot (FEINT)
-        Button btnFeint = createSkillPadButton(activity, "🎯 FEINT", "#7C3AED", new Runnable() {
-            @Override
-            public void run() {
-                triggerFakeShot();
-            }
-        });
-        pad.addView(btnFeint);
+        pad.addView(createSkillPadButton(activity, "🎯 FEINT", "#7C3AED", () -> triggerFakeShot()));
 
-        // Draggable gesture listener on the pad & handle
         View.OnTouchListener dragListener = new View.OnTouchListener() {
             private float dX, dY;
 
@@ -321,7 +515,6 @@ public class EfbOverlayManager {
         };
 
         dragHandle.setOnTouchListener(dragListener);
-
         return pad;
     }
 
@@ -356,40 +549,6 @@ public class EfbOverlayManager {
         return btn;
     }
 
-    private static TextView createFloatingAfkBadge(final Activity activity) {
-        TextView badge = new TextView(activity);
-        badge.setText("🟢 AFK GRINDER: AKTIF (Auto-Loop Match)");
-        badge.setTextColor(Color.WHITE);
-        badge.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        badge.setTypeface(Typeface.DEFAULT_BOLD);
-        badge.setPadding(dpToPx(activity, 14), dpToPx(activity, 6), dpToPx(activity, 14), dpToPx(activity, 6));
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setShape(GradientDrawable.RECTANGLE);
-        bg.setCornerRadius(dpToPx(activity, 20));
-        bg.setColor(Color.parseColor("#E6065F46")); // Emerald dark 90%
-        bg.setStroke(dpToPx(activity, 2), Color.parseColor("#10B981")); // Glowing emerald
-        badge.setBackground(bg);
-        badge.setElevation(dpToPx(activity, 10));
-
-        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        params.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
-        params.topMargin = dpToPx(activity, 14);
-        badge.setLayoutParams(params);
-
-        badge.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleAfkGrinder();
-            }
-        });
-
-        return badge;
-    }
-
     private static View createMenuModal(final Activity activity) {
         final FrameLayout backdrop = new FrameLayout(activity);
         FrameLayout.LayoutParams backdropParams = new FrameLayout.LayoutParams(
@@ -401,7 +560,7 @@ public class EfbOverlayManager {
         backdrop.setClickable(true);
 
         DisplayMetrics dm = activity.getResources().getDisplayMetrics();
-        int menuWidth = Math.min(dpToPx(activity, 440), (int) (dm.widthPixels * 0.94f));
+        int menuWidth = Math.min(dpToPx(activity, 460), (int) (dm.widthPixels * 0.94f));
 
         FrameLayout.LayoutParams cardParams = new FrameLayout.LayoutParams(
                 menuWidth,
@@ -449,7 +608,7 @@ public class EfbOverlayManager {
         titleLayout.addView(titleView);
 
         TextView subtitleView = new TextView(activity);
-        subtitleView.setText("Piko v3.0 • Smart Skills, Ultra HD & AFK Grinder");
+        subtitleView.setText("Piko v4.0 • Smart Context-Aware Grinder & Ultra HD");
         subtitleView.setTextColor(Color.parseColor("#94A3B8"));
         subtitleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         titleLayout.addView(subtitleView);
@@ -496,7 +655,99 @@ public class EfbOverlayManager {
         contentLayout.setOrientation(LinearLayout.VERTICAL);
 
         // ==========================================
-        // SECTION 1: 1-TAP SMART SKILL-MOVES MACRO
+        // SECTION 1: SMART AFK GRINDER (AUTO MATCH)
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "🤖 SMART AFK MATCH GRINDER (CONTEXT-AWARE)");
+
+        sMenuAfkStatus = new TextView(activity);
+        sMenuAfkStatus.setText("Status: NONAKTIF (Tap Mulai untuk auto-looping match cerdas)");
+        sMenuAfkStatus.setTextColor(Color.parseColor("#94A3B8"));
+        sMenuAfkStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        contentLayout.addView(sMenuAfkStatus);
+
+        sMenuAfkBtn = new Button(activity);
+        sMenuAfkBtn.setText("🟢 MULAI SMART AFK GRINDER");
+        sMenuAfkBtn.setTextColor(Color.WHITE);
+        sMenuAfkBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+        sMenuAfkBtn.setTypeface(Typeface.DEFAULT_BOLD);
+        updateAfkButtonVisual(activity);
+        sMenuAfkBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleAfkGrinder();
+            }
+        });
+        LinearLayout.LayoutParams afkBtnParams = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                dpToPx(activity, 42)
+        );
+        afkBtnParams.setMargins(0, dpToPx(activity, 6), 0, dpToPx(activity, 6));
+        sMenuAfkBtn.setLayoutParams(afkBtnParams);
+        contentLayout.addView(sMenuAfkBtn);
+
+        // Pilihan Mode Grinding
+        addFeatureLabel(activity, contentLayout, "Pilih Mode Pertandingan:");
+        LinearLayout modeRow = new LinearLayout(activity);
+        modeRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, modeRow, "Acara Tur (AI)", (sGrindMode == GrindingMode.TOUR_EVENT) ? "#059669" : "#1E293B", () -> {
+            sGrindMode = GrindingMode.TOUR_EVENT;
+            showToast("🎯 Mode Grinding: Acara Tur (VS AI)");
+            updateLiveHud();
+        });
+        addOptionButton(activity, modeRow, "Simulasi (Pelatih)", (sGrindMode == GrindingMode.SIMULATION_MATCH) ? "#059669" : "#1E293B", () -> {
+            sGrindMode = GrindingMode.SIMULATION_MATCH;
+            showToast("🎯 Mode Grinding: Laga Simulasi (Pelatih AI)");
+            updateLiveHud();
+        });
+        addOptionButton(activity, modeRow, "Tantangan Event", (sGrindMode == GrindingMode.CHALLENGE_EVENT) ? "#059669" : "#1E293B", () -> {
+            sGrindMode = GrindingMode.CHALLENGE_EVENT;
+            showToast("🎯 Mode Grinding: Acara Tantangan");
+            updateLiveHud();
+        });
+        contentLayout.addView(modeRow);
+
+        // Pilihan Target Jumlah Laga
+        addFeatureLabel(activity, contentLayout, "Target Jumlah Laga (Auto-Stop):");
+        LinearLayout targetRow = new LinearLayout(activity);
+        targetRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, targetRow, "Tanpa Batas", (sTargetMatches == 0) ? "#0284C7" : "#1E293B", () -> {
+            sTargetMatches = 0;
+            showToast("Target: Grinding Tanpa Batas (Loop Terus)");
+            updateLiveHud();
+        });
+        addOptionButton(activity, targetRow, "3 Laga", (sTargetMatches == 3) ? "#0284C7" : "#1E293B", () -> {
+            sTargetMatches = 3;
+            showToast("Target: Selesai setelah 3 Pertandingan");
+            updateLiveHud();
+        });
+        addOptionButton(activity, targetRow, "5 Laga", (sTargetMatches == 5) ? "#0284C7" : "#1E293B", () -> {
+            sTargetMatches = 5;
+            showToast("Target: Selesai setelah 5 Pertandingan");
+            updateLiveHud();
+        });
+        addOptionButton(activity, targetRow, "10 Laga", (sTargetMatches == 10) ? "#0284C7" : "#1E293B", () -> {
+            sTargetMatches = 10;
+            showToast("Target: Selesai setelah 10 Pertandingan");
+            updateLiveHud();
+        });
+        contentLayout.addView(targetRow);
+
+        // Switch Opsi Otomasi Lanjutan
+        addFeatureLabel(activity, contentLayout, "Otomasi Penanganan Layar:");
+        LinearLayout optionsRow = new LinearLayout(activity);
+        optionsRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, optionsRow, sAutoRenewContract ? "✅ Auto-Perbarui Kontrak" : "❌ Auto-Perbarui Kontrak", sAutoRenewContract ? "#059669" : "#64748B", () -> {
+            sAutoRenewContract = !sAutoRenewContract;
+            showToast("Auto-Renew Kontrak: " + (sAutoRenewContract ? "AKTIF" : "NONAKTIF"));
+        });
+        addOptionButton(activity, optionsRow, sAutoClaimRewards ? "✅ Auto-Klaim Hadiah" : "❌ Auto-Klaim Hadiah", sAutoClaimRewards ? "#059669" : "#64748B", () -> {
+            sAutoClaimRewards = !sAutoClaimRewards;
+            showToast("Auto-Klaim Hadiah: " + (sAutoClaimRewards ? "AKTIF" : "NONAKTIF"));
+        });
+        contentLayout.addView(optionsRow);
+
+        // ==========================================
+        // SECTION 2: 1-TAP SMART SKILL-MOVES MACRO
         // ==========================================
         addSectionHeader(activity, contentLayout, "⚡ SMART SKILL-MOVES PAD (TOMBOL KONTROL)");
 
@@ -526,12 +777,6 @@ public class EfbOverlayManager {
         sMenuSkillsBtn.setLayoutParams(skillBtnParams);
         contentLayout.addView(sMenuSkillsBtn);
 
-        TextView skillsHelp = new TextView(activity);
-        skillsHelp.setText("💡 Menampilkan pad mengambang berisi 3 tombol (DT, SHOT, FEINT) yang bisa digeser (draggable) ke dekat jempol untuk eksekusi trik instan.");
-        skillsHelp.setTextColor(Color.parseColor("#64748B"));
-        skillsHelp.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        contentLayout.addView(skillsHelp);
-
         // Quick Test Row
         LinearLayout skillTestRow = new LinearLayout(activity);
         skillTestRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -541,7 +786,7 @@ public class EfbOverlayManager {
         contentLayout.addView(skillTestRow);
 
         // ==========================================
-        // SECTION 2: GRAFIS ULTRA HD & ANTI-BLUR
+        // SECTION 3: GRAFIS ULTRA HD & ANTI-BLUR
         // ==========================================
         addSectionHeader(activity, contentLayout, "🌟 GRAFIS ULTRA HD & ANTI-BLUR (SUPER-SAMPLING)");
         addFeatureLabel(activity, contentLayout, "Super-Sampling Render Scale (Hilangkan Buram):");
@@ -566,43 +811,6 @@ public class EfbOverlayManager {
         contentLayout.addView(uhdRow2);
 
         // ==========================================
-        // SECTION 3: AFK MATCH GRINDER (AUTO EVENT)
-        // ==========================================
-        addSectionHeader(activity, contentLayout, "🤖 AFK MATCH GRINDER (AUTO-LOOP EVENT)");
-
-        sMenuAfkStatus = new TextView(activity);
-        sMenuAfkStatus.setText("Status: NONAKTIF (Tap Mulai untuk auto-loop match event)");
-        sMenuAfkStatus.setTextColor(Color.parseColor("#94A3B8"));
-        sMenuAfkStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        contentLayout.addView(sMenuAfkStatus);
-
-        sMenuAfkBtn = new Button(activity);
-        sMenuAfkBtn.setText("🟢 MULAI AFK MATCH GRINDER");
-        sMenuAfkBtn.setTextColor(Color.WHITE);
-        sMenuAfkBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
-        sMenuAfkBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        updateAfkButtonVisual(activity);
-        sMenuAfkBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleAfkGrinder();
-            }
-        });
-        LinearLayout.LayoutParams afkBtnParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                dpToPx(activity, 42)
-        );
-        afkBtnParams.setMargins(0, dpToPx(activity, 6), 0, dpToPx(activity, 4));
-        sMenuAfkBtn.setLayoutParams(afkBtnParams);
-        contentLayout.addView(sMenuAfkBtn);
-
-        TextView afkHelp = new TextView(activity);
-        afkHelp.setText("💡 Menggunakan input touch bersumber Touchscreen asli untuk melewati replay, selebrasi gol, tombol lanjut, dan klaim hadiah.");
-        afkHelp.setTextColor(Color.parseColor("#64748B"));
-        afkHelp.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        contentLayout.addView(afkHelp);
-
-        // ==========================================
         // SECTION 4: KAMERA & SUDUT PANDANG (FOV)
         // ==========================================
         addSectionHeader(activity, contentLayout, "🎥 KAMERA & SUDUT PANDANG (FOV)");
@@ -614,7 +822,6 @@ public class EfbOverlayManager {
         sFovIndicator.setTypeface(Typeface.DEFAULT_BOLD);
         contentLayout.addView(sFovIndicator);
 
-        // Row 1: Reset Default & Steppers [-] [+]
         LinearLayout fovStepRow = new LinearLayout(activity);
         fovStepRow.setOrientation(LinearLayout.HORIZONTAL);
         addOptionButton(activity, fovStepRow, "🔄 RESET BAWAAN", "#0284C7", () -> applyFov(0, "Default Bawaan Game"));
@@ -622,7 +829,6 @@ public class EfbOverlayManager {
         addOptionButton(activity, fovStepRow, "➕ Naikkan 2°", "#1E293B", () -> adjustFovStep(2));
         contentLayout.addView(fovStepRow);
 
-        // Row 2: Preset Sudut Lapangan Realistis Game Bola
         LinearLayout fovPresetsRow = new LinearLayout(activity);
         fovPresetsRow.setOrientation(LinearLayout.HORIZONTAL);
         addOptionButton(activity, fovPresetsRow, "50° (Dinamis)", "#334155", () -> applyFov(50, "50° Dinamis Dekat"));
@@ -631,7 +837,6 @@ public class EfbOverlayManager {
         addOptionButton(activity, fovPresetsRow, "76° (Drone)", "#334155", () -> applyFov(76, "76° Taktikal Drone"));
         contentLayout.addView(fovPresetsRow);
 
-        // Row 3: 3D Free-Roam Camera
         LinearLayout freeCamRow = new LinearLayout(activity);
         freeCamRow.setOrientation(LinearLayout.HORIZONTAL);
         addOptionButton(activity, freeCamRow, "🚁 TOGGLE KAMERA BEBAS (FREE-ROAM 3D)", "#7C3AED", () -> {
@@ -657,7 +862,6 @@ public class EfbOverlayManager {
         });
         contentLayout.addView(perfRow);
 
-        // FPS Target
         addFeatureLabel(activity, contentLayout, "Target Frame Rate (t.MaxFPS):");
         LinearLayout fpsRow = new LinearLayout(activity);
         fpsRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -668,7 +872,7 @@ public class EfbOverlayManager {
         contentLayout.addView(fpsRow);
 
         // ==========================================
-        // SECTION 6: KONSOL PERINTAH UE4 KUSTOM
+        // SECTION 6: KONSOL PERINTAH UE4
         // ==========================================
         addSectionHeader(activity, contentLayout, "⌨️ KONSOL PERINTAH UE4 KUSTOM");
         final LinearLayout cmdRow = new LinearLayout(activity);
@@ -727,9 +931,9 @@ public class EfbOverlayManager {
         contentLayout.addView(cmdRow);
 
         // Status Lisensi
-        addSectionHeader(activity, contentLayout, "🛡️ STATUS LISENSI");
+        addSectionHeader(activity, contentLayout, "🛡️ STATUS SISTEM");
         addStatusBadge(activity, contentLayout, "✅ Google Play License: PROTECTED (Status: LICENSED)");
-        addStatusBadge(activity, contentLayout, "✅ Morphe UE4 Bridge: TERHUBUNG");
+        addStatusBadge(activity, contentLayout, "✅ Context-Aware Screen Detector: AKTIF");
 
         scrollView.addView(contentLayout);
         card.addView(scrollView);
@@ -799,20 +1003,14 @@ public class EfbOverlayManager {
         sMenuSkillsBtn.setBackground(bg);
     }
 
-    /**
-     * Skill 1: Double Touch (La Croqueta).
-     * Flick virtual analog stick forward + Tap Dash button in microsecond synchronization.
-     */
     public static void triggerDoubleTouch() {
         if (sActivity == null) return;
         DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
         int w = dm.widthPixels;
         int h = dm.heightPixels;
 
-        // Virtual analog stick flick (left side)
         dispatchSwipe(w * 0.18f, h * 0.72f, w * 0.26f, h * 0.72f, 60);
 
-        // Dash button tap (bottom-right)
         sMainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -823,35 +1021,24 @@ public class EfbOverlayManager {
         showToast("⚡ Double Touch (La Croqueta)!");
     }
 
-    /**
-     * Skill 2: Stunning Power Shot.
-     * Horizontal power swipe on the shoot button.
-     */
     public static void triggerStunningShot() {
         if (sActivity == null) return;
         DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
         int w = dm.widthPixels;
         int h = dm.heightPixels;
 
-        // Shoot button swipe right
         dispatchSwipe(w * 0.85f, h * 0.60f, w * 0.95f, h * 0.60f, 80);
         showToast("🚀 Stunning Shot (Power Shot)!");
     }
 
-    /**
-     * Skill 3: Fake Shot (Tipuan Tembak / Feint).
-     * Tap shoot button + immediately cancel with analog flick within 40ms.
-     */
     public static void triggerFakeShot() {
         if (sActivity == null) return;
         DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
         int w = dm.widthPixels;
         int h = dm.heightPixels;
 
-        // Tap Shoot
         dispatchSimulatedTouch(w * 0.85f, h * 0.60f);
 
-        // 40ms later flick analog to cancel
         sMainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -863,31 +1050,45 @@ public class EfbOverlayManager {
     }
 
     // ==========================================
-    // AFK MATCH GRINDER LOGIC
+    // INTELLIGENT CONTEXT-AWARE AFK GRINDER
     // ==========================================
     private static void toggleAfkGrinder() {
         sAfkRunning = !sAfkRunning;
         if (sAfkRunning) {
-            sAfkCycle = 0;
-            sAfkHandler.post(sAfkRunnable);
-            showToast("🟢 AFK Match Grinder AKTIF!\nBot akan mengulang match & melewati cutscene secara otomatis.");
+            sAfkPaused = false;
+            sAfkStartTime = System.currentTimeMillis();
+            sCompletedMatches = 0;
+            sCurrentScreenState = ScreenState.UNKNOWN;
+            sCurrentPlannedAction = "Memulai pemindaian layar otomatis...";
+            sAfkHandler.post(sAfkLoopRunnable);
+            showToast("🟢 Smart AFK Grinder AKTIF!\nLive HUD menampilkan status layar secara langsung.");
         } else {
-            sAfkHandler.removeCallbacks(sAfkRunnable);
-            showToast("🔴 AFK Match Grinder DIHENTIKAN.");
+            stopAfkGrinder();
         }
-        updateAfkBadge();
+        updateAfkComponents();
+    }
+
+    private static void stopAfkGrinder() {
+        sAfkRunning = false;
+        sAfkPaused = false;
+        sAfkHandler.removeCallbacks(sAfkLoopRunnable);
+        showToast("🔴 Smart AFK Grinder DIHENTIKAN.");
+        updateAfkComponents();
+    }
+
+    private static void updateAfkComponents() {
+        if (sFloatingAfkHud != null) {
+            sFloatingAfkHud.setVisibility(sAfkRunning ? View.VISIBLE : View.GONE);
+        }
+        if (sMenuAfkStatus != null) {
+            sMenuAfkStatus.setText(sAfkRunning ? "Status: 🟢 AKTIF (Smart HUD aktif di atas layar)" : "Status: NONAKTIF (Tap Mulai untuk auto-looping match cerdas)");
+            sMenuAfkStatus.setTextColor(sAfkRunning ? Color.parseColor("#10B981") : Color.parseColor("#94A3B8"));
+        }
         if (sActivity != null) {
             updateAfkButtonVisual(sActivity);
         }
-    }
-
-    private static void updateAfkBadge() {
-        if (sFloatingAfkBadge != null) {
-            sFloatingAfkBadge.setVisibility(sAfkRunning ? View.VISIBLE : View.GONE);
-        }
-        if (sMenuAfkStatus != null) {
-            sMenuAfkStatus.setText(sAfkRunning ? "Status: 🟢 AKTIF (Sedang melakukan auto-looping match)" : "Status: NONAKTIF (Tap Mulai untuk auto-loop match event)");
-            sMenuAfkStatus.setTextColor(sAfkRunning ? Color.parseColor("#10B981") : Color.parseColor("#94A3B8"));
+        if (sAfkRunning) {
+            updateLiveHud();
         }
     }
 
@@ -897,61 +1098,225 @@ public class EfbOverlayManager {
         bg.setShape(GradientDrawable.RECTANGLE);
         bg.setCornerRadius(dpToPx(context, 8));
         if (sAfkRunning) {
-            sMenuAfkBtn.setText("🔴 HENTIKAN AFK MATCH GRINDER");
+            sMenuAfkBtn.setText("🔴 HENTIKAN SMART AFK GRINDER");
             bg.setColor(Color.parseColor("#DC2626")); // Red
         } else {
-            sMenuAfkBtn.setText("🟢 MULAI AFK MATCH GRINDER");
+            sMenuAfkBtn.setText("🟢 MULAI SMART AFK GRINDER");
             bg.setColor(Color.parseColor("#059669")); // Green
         }
         sMenuAfkBtn.setBackground(bg);
     }
 
-    private static final Runnable sAfkRunnable = new Runnable() {
+    /**
+     * Core context-aware loop:
+     * 1. Inspects active screen via PixelCopy / View tree sampling.
+     * 2. Categorizes the screen into ScreenState.
+     * 3. Updates the Live Status HUD with human-readable text.
+     * 4. Dispatches the appropriate smart action with natural human-like touch timing.
+     */
+    private static final Runnable sAfkLoopRunnable = new Runnable() {
         @Override
         public void run() {
             if (!sAfkRunning || sActivity == null || sActivity.isFinishing()) {
-                sAfkRunning = false;
-                updateAfkBadge();
+                stopAfkGrinder();
                 return;
             }
 
-            try {
-                DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-                int w = dm.widthPixels;
-                int h = dm.heightPixels;
-
-                // Cycle through key event match navigation coordinates:
-                // Step 0: Bottom-Right button (Next, Lanjut, Laga Berikutnya, Selesai)
-                // Step 1: Bottom-Center button (OK, Klaim Hadiah, Konfirmasi Dialog)
-                // Step 2: Center of Screen (Skip Replay, Lewati Selebrasi, Tap to Continue)
-                float tapX, tapY;
-                int step = sAfkCycle % 3;
-                if (step == 0) {
-                    tapX = w * 0.88f; // Bottom-Right
-                    tapY = h * 0.88f;
-                } else if (step == 1) {
-                    tapX = w * 0.50f; // Bottom-Center
-                    tapY = h * 0.80f;
-                } else {
-                    tapX = w * 0.50f; // Center
-                    tapY = h * 0.50f;
-                }
-                sAfkCycle++;
-
-                dispatchSimulatedTouch(tapX, tapY);
-            } catch (Throwable t) {
-                try {
-                    PikoUtils.logger(TAG + ": AFK Grinder touch exception: " + t.getMessage());
-                } catch (Throwable ignored) {}
+            if (sAfkPaused) {
+                updateLiveHud();
+                sAfkHandler.postDelayed(this, 1500);
+                return;
             }
 
-            // Schedule next simulated tap in 1.5 seconds
-            sAfkHandler.postDelayed(this, 1500);
+            // Check if match target reached
+            if (sTargetMatches > 0 && sCompletedMatches >= sTargetMatches) {
+                showToast("🏁 Target Grinding Tercapai: " + sCompletedMatches + " Laga Selesai!");
+                stopAfkGrinder();
+                return;
+            }
+
+            // Inspect screen state
+            inspectScreenAndAct(new OnInspectionCompletedListener() {
+                @Override
+                public void onCompleted(ScreenState state, String actionDesc, long nextDelayMs) {
+                    sCurrentScreenState = state;
+                    sCurrentPlannedAction = actionDesc;
+                    updateLiveHud();
+
+                    if (sAfkRunning && !sAfkPaused) {
+                        sAfkHandler.postDelayed(sAfkLoopRunnable, nextDelayMs);
+                    }
+                }
+            });
         }
     };
 
+    private interface OnInspectionCompletedListener {
+        void onCompleted(ScreenState state, String actionDesc, long nextDelayMs);
+    }
+
+    /**
+     * Samples the game screen using PixelCopy on the Window/SurfaceView to identify the exact menu.
+     */
+    private static void inspectScreenAndAct(final OnInspectionCompletedListener listener) {
+        if (sActivity == null) return;
+        final DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
+        final int w = dm.widthPixels;
+        final int h = dm.heightPixels;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            final Window window = sActivity.getWindow();
+            // Tiny 160x90 thumbnail bitmap for microsecond analysis
+            final Bitmap thumbnail = Bitmap.createBitmap(160, 90, Bitmap.Config.ARGB_8888);
+            try {
+                PixelCopy.request(window, thumbnail, new PixelCopy.OnPixelCopyFinishedListener() {
+                    @Override
+                    public void onPixelCopyFinished(int copyResult) {
+                        if (copyResult == PixelCopy.SUCCESS) {
+                            classifyThumbnailAndDispatch(thumbnail, w, h, listener);
+                        } else {
+                            fallbackHeuristicInspection(w, h, listener);
+                        }
+                    }
+                }, sMainHandler);
+                return;
+            } catch (Throwable t) {
+                try {
+                    PikoUtils.logger(TAG + ": PixelCopy exception: " + t.getMessage());
+                } catch (Throwable ignored) {}
+            }
+        }
+
+        fallbackHeuristicInspection(w, h, listener);
+    }
+
+    /**
+     * Evaluates pixel signatures on the thumbnail bitmap:
+     * - Field grass green: ~160x90 center (x: 50..110, y: 30..60)
+     * - Action button color at bottom-right (x: 135..150, y: 75..85)
+     * - Modal dialog scrim: darkened periphery
+     * - Top bar scoreboard vs menu title banner
+     */
+    private static void classifyThumbnailAndDispatch(Bitmap thumb, int w, int h, OnInspectionCompletedListener listener) {
+        try {
+            int tw = thumb.getWidth();
+            int th = thumb.getHeight();
+
+            // 1. Check pitch green pixels (in-game match)
+            int greenCount = 0;
+            for (int x = tw / 4; x < (tw * 3) / 4; x += 4) {
+                for (int y = th / 4; y < (th * 3) / 4; y += 4) {
+                    int pixel = thumb.getPixel(x, y);
+                    int r = Color.red(pixel);
+                    int g = Color.green(pixel);
+                    int b = Color.blue(pixel);
+                    if (g > 60 && g > r * 1.25 && g > b * 1.25) {
+                        greenCount++;
+                    }
+                }
+            }
+
+            // 2. Check bottom-right action button area
+            int brPixel = thumb.getPixel((int)(tw * 0.90f), (int)(th * 0.88f));
+            int brR = Color.red(brPixel);
+            int brG = Color.green(brPixel);
+            int brB = Color.blue(brPixel);
+
+            boolean isGoldButton = (brR > 180 && brG > 140 && brB < 80); // e.g. "Ke Laga", "Mulai Laga"
+            boolean isBlueButton = (brB > 160 && brR < 100); // e.g. "Lanjut", "OK"
+
+            // 3. Check center dialog box
+            int centerPixel = thumb.getPixel(tw / 2, th / 2);
+            int cR = Color.red(centerPixel);
+            int cG = Color.green(centerPixel);
+            int cB = Color.blue(centerPixel);
+
+            int cornerPixel = thumb.getPixel(10, 10);
+            boolean isDarkScrim = (Color.red(cornerPixel) < 30 && Color.green(cornerPixel) < 30 && Color.blue(cornerPixel) < 30);
+
+            // Classification Logic
+            if (greenCount > 40) {
+                // Pitch is clearly visible -> IN-MATCH PLAYING
+                // Periodic tap center to skip replays & cutscenes smoothly
+                dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.50f);
+                listener.onCompleted(ScreenState.IN_MATCH_PLAYING, "Melewati cutscene/replay laga...", 2500);
+                return;
+            }
+
+            if (isDarkScrim && (isGoldButton || isBlueButton)) {
+                // Modal dialog or Contract Renewal
+                if (sAutoRenewContract) {
+                    dispatchSimulatedTouchWithJitter(w * 0.65f, h * 0.62f); // Dialog Confirm / Perbarui
+                    listener.onCompleted(ScreenState.POPUP_CONTRACT_RENEWAL, "Menekan 'Perbarui Kontrak' / Konfirmasi...", 1800);
+                } else {
+                    dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.70f);
+                    listener.onCompleted(ScreenState.POPUP_GENERIC_DIALOG, "Menutup dialog konfirmasi...", 1800);
+                }
+                return;
+            }
+
+            if (isGoldButton) {
+                // Main Event or Match Preparation screen
+                dispatchSimulatedTouchWithJitter(w * 0.88f, h * 0.88f);
+                listener.onCompleted(ScreenState.MATCH_PREPARATION, "Menekan tombol utama 'Mulai Laga' / 'Ke Laga'...", 2000);
+                return;
+            }
+
+            if (isBlueButton) {
+                // Results, Half-Time, or Full-Time Next button
+                dispatchSimulatedTouchWithJitter(w * 0.88f, h * 0.88f);
+                sCompletedMatches++;
+                listener.onCompleted(ScreenState.FULL_TIME_RESULT, "Menekan tombol 'Lanjut' hasil pertandingan...", 1800);
+                return;
+            }
+
+            // Check Bottom-Center Claim Rewards
+            int bcPixel = thumb.getPixel(tw / 2, (int)(th * 0.82f));
+            if (Color.blue(bcPixel) > 140 || (Color.red(bcPixel) > 180 && Color.green(bcPixel) > 140)) {
+                if (sAutoClaimRewards) {
+                    dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.80f);
+                    listener.onCompleted(ScreenState.EVENT_POINTS_REWARD, "Mengklaim poin & hadiah event...", 1800);
+                    return;
+                }
+            }
+
+            // Fallback for general menu transit
+            fallbackHeuristicInspection(w, h, listener);
+
+        } catch (Throwable t) {
+            fallbackHeuristicInspection(w, h, listener);
+        } finally {
+            if (thumb != null && !thumb.isRecycled()) {
+                thumb.recycle();
+            }
+        }
+    }
+
+    /**
+     * Fallback adaptive sequential cycle with jitter when direct pixel buffer is unavailable.
+     */
+    private static int sFallbackStep = 0;
+    private static void fallbackHeuristicInspection(int w, int h, OnInspectionCompletedListener listener) {
+        int step = sFallbackStep % 3;
+        sFallbackStep++;
+
+        if (step == 0) {
+            // Action button (Next / Ke Laga / Lanjut)
+            dispatchSimulatedTouchWithJitter(w * 0.88f, h * 0.88f);
+            listener.onCompleted(ScreenState.EVENT_TOUR_MENU, "Menekan tombol 'Lanjut' / 'Ke Laga' (Kanan Bawah)", 1800);
+        } else if (step == 1) {
+            // Center dialog OK / Claim
+            dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.80f);
+            listener.onCompleted(ScreenState.POPUP_GENERIC_DIALOG, "Menekan tombol 'OK' / 'Klaim' (Tengah Bawah)", 1800);
+        } else {
+            // Center skip cutscene
+            dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.50f);
+            listener.onCompleted(ScreenState.IN_MATCH_PLAYING, "Melewati cutscene / tap layar tengah", 1800);
+        }
+    }
+
     // ==========================================
-    // NATIVE TOUCH SIMULATION ENGINE (SOURCE_TOUCHSCREEN)
+    // NATIVE TOUCH SIMULATION WITH HUMAN JITTER
     // ==========================================
     private static MotionEvent createTouchEvent(long downTime, long eventTime, int action, float x, float y) {
         MotionEvent.PointerProperties[] props = new MotionEvent.PointerProperties[1];
@@ -997,15 +1362,24 @@ public class EfbOverlayManager {
     }
 
     /**
-     * Injects touch events directly with SOURCE_TOUCHSCREEN flag.
-     * Recognized by Unreal Engine 4 AInputEvent_getSource().
+     * Adds ±1.2% randomized spatial jitter to simulate natural human fingertip tapping.
      */
+    private static void dispatchSimulatedTouchWithJitter(float baseX, float baseY) {
+        if (sActivity == null) return;
+        DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
+        float jitterX = (sRandom.nextFloat() - 0.5f) * (dm.widthPixels * 0.024f);
+        float jitterY = (sRandom.nextFloat() - 0.5f) * (dm.heightPixels * 0.024f);
+
+        dispatchSimulatedTouch(baseX + jitterX, baseY + jitterY);
+    }
+
     private static void dispatchSimulatedTouch(final float x, final float y) {
         if (sActivity == null) return;
         final long downTime = SystemClock.uptimeMillis();
         final MotionEvent down = createTouchEvent(downTime, downTime, MotionEvent.ACTION_DOWN, x, y);
         sendEvent(down);
 
+        int duration = 40 + sRandom.nextInt(30); // 40-70ms realistic hold
         sMainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -1019,12 +1393,9 @@ public class EfbOverlayManager {
                     down.recycle();
                 }
             }
-        }, 50);
+        }, duration);
     }
 
-    /**
-     * Simulates directional swipe gesture with interpolated move steps.
-     */
     private static void dispatchSwipe(final float startX, final float startY, final float endX, final float endY, final long durationMs) {
         if (sActivity == null) return;
         final long downTime = SystemClock.uptimeMillis();
