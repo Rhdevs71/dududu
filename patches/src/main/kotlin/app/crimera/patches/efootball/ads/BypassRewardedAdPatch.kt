@@ -47,7 +47,8 @@ val bypassRewardedAdPatch =
                     )
                 }
 
-                // 3. Hook Show(Context)V to immediately set reward earned and show completed
+                // 3. Hook Show(Context)V to immediately set reward earned and status to SHOWEND
+                // Method Show has 5 registers (v0..v3 locals, v4 parameter). Using only v0, v1, v2 is strictly safe.
                 adMobRewardClass.methods.firstOrNull { it.name == "Show" && it.returnType == "V" }?.let { method ->
                     method.addInstructions(
                         0,
@@ -55,50 +56,15 @@ val bypassRewardedAdPatch =
                         const/4 v0, 0x1
                         sput-boolean v0, $ADMOB_REWARD_CLASS->s_isEarnedReward:Z
                         sput-boolean v0, $ADMOB_REWARD_CLASS->s_isCMP_Show_End:Z
-                        const v1, 0x7fffffff
-                        sput v1, $ADMOB_REWARD_CLASS->s_errorCodeByShow:I
-                        sget-object v2, $ADMOB_REWARD_CLASS->s_adStatusList:[Ljp/konami/AdMobReward${'$'}AdStatus;
-                        if-eqz v2, :skip_status
-                        const/4 v3, 0x0
-                        sget-object v4, Ljp/konami/AdMobReward${'$'}AdStatus;->SHOWEND:Ljp/konami/AdMobReward${'$'}AdStatus;
-                        aput-object v4, v2, v3
+                        const v0, 0x7fffffff
+                        sput v0, $ADMOB_REWARD_CLASS->s_errorCodeByShow:I
+                        sget-object v0, $ADMOB_REWARD_CLASS->s_adStatusList:[Ljp/konami/AdMobReward${'$'}AdStatus;
+                        if-eqz v0, :skip_status
+                        const/4 v1, 0x0
+                        sget-object v2, Ljp/konami/AdMobReward${'$'}AdStatus;->SHOWEND:Ljp/konami/AdMobReward${'$'}AdStatus;
+                        aput-object v2, v0, v1
                         :skip_status
                         return-void
-                        """.trimIndent(),
-                    )
-                }
-
-                // 4. Hook ShowFunc(Context)V as fallback
-                adMobRewardClass.methods.firstOrNull { it.name == "ShowFunc" && it.returnType == "V" }?.let { method ->
-                    method.addInstructions(
-                        0,
-                        """
-                        const/4 v0, 0x1
-                        sput-boolean v0, $ADMOB_REWARD_CLASS->s_isEarnedReward:Z
-                        sput-boolean v0, $ADMOB_REWARD_CLASS->s_isCMP_Show_End:Z
-                        const v1, 0x7fffffff
-                        sput v1, $ADMOB_REWARD_CLASS->s_errorCodeByShow:I
-                        sget-object v2, $ADMOB_REWARD_CLASS->s_adStatusList:[Ljp/konami/AdMobReward${'$'}AdStatus;
-                        if-eqz v2, :skip_status_func
-                        const/4 v3, 0x0
-                        sget-object v4, Ljp/konami/AdMobReward${'$'}AdStatus;->SHOWEND:Ljp/konami/AdMobReward${'$'}AdStatus;
-                        aput-object v4, v2, v3
-                        :skip_status_func
-                        return-void
-                        """.trimIndent(),
-                    )
-                }
-
-                // 5. Hook IsShowEnd()I to return 1 when reward was triggered by Show(), and 0 otherwise (resets after game claims)
-                adMobRewardClass.methods.firstOrNull { it.name == "IsShowEnd" && it.returnType == "I" }?.let { method ->
-                    method.addInstructions(
-                        0,
-                        """
-                        sget-boolean v0, $ADMOB_REWARD_CLASS->s_isEarnedReward:Z
-                        if-eqz v0, :cond_check_status
-                        const/4 v0, 0x1
-                        return v0
-                        :cond_check_status
                         """.trimIndent(),
                     )
                 }
