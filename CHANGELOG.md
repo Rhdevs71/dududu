@@ -1,3 +1,9 @@
+## [1.23.0](https://github.com/Rhdevs71/dududu/compare/v1.22.1...v1.23.0) (2026-09-22)
+
+### ✨ New Features
+
+* **efootball:** revamp AFK match grinder with SurfaceView touch dispatch, calibrated coordinates, and purge obsolete features ([f5b1ccf](https://github.com/Rhdevs71/dududu/commit/f5b1ccf1ee7c9a0f156790a9dfbb893bcb74f29d))
+
 ## [1.22.1](https://github.com/Rhdevs71/dududu/compare/v1.22.0...v1.22.1) (2026-09-22)
 
 ### 🐛 Bug Fixes
