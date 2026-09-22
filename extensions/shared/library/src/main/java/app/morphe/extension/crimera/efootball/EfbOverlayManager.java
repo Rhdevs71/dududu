@@ -46,11 +46,10 @@ import app.morphe.extension.crimera.PikoUtils;
 /**
  * In-game Overlay Mod Menu for eFootball Mobile (PES Android).
  * Features:
- * 1. Intelligent Context-Aware AFK Match Grinder with Precision UI & Menu Recognition
- * 2. Instant Rewarded Ad Claimer (Bypass Tonton Iklan)
- * 3. 1-Tap Smart Skill-Moves Draggable Overlay (Double Touch, Stunning Shot, Fake Shot)
- * 4. Precision Camera FOV with Default Reset (fov 0), Broadcast, Stadium, and Stepper [-]/[+]
- * 5. 3D Free-Roam Camera (ToggleDebugCamera)
+ * 1. Intelligent AFK Match Grinder with Precision Calibrated UI Touch & HUD
+ * 2. Instant Rewarded Ad Claimer (Bypass Tonton Iklan: Inbox, Shop, Special Player)
+ * 3. Precision Camera FOV with Default Reset (fov 0), Broadcast, Stadium, and Stepper [-]/[+]
+ * 4. 3D Free-Roam Camera (ToggleDebugCamera)
  */
 @SuppressWarnings("unused")
 public class EfbOverlayManager {
@@ -61,24 +60,13 @@ public class EfbOverlayManager {
     private static View sFloatingBall = null;
     private static View sMenuModal = null;
 
-    // Smart Skill-Moves Floating Overlay State
-    private static View sFloatingSkillPad = null;
-    private static boolean sSkillsPadEnabled = false;
-    private static Button sMenuSkillsBtn = null;
-    private static TextView sMenuSkillsStatus = null;
-
     // Smart AFK Grinder State & Components
     public enum ScreenState {
-        STAGE_1_EVENT_TOUR("1. Menu Acara Tur (Ke Laga)", "#38BDF8"),
-        STAGE_2_MATCHMAKING("2. Pencarian Lawan (Tunggu)", "#F59E0B"),
-        STAGE_3_SELECT_JERSEY("3. Pilih Jersey (Berikut)", "#10B981"),
-        STAGE_4_SQUAD_GAMEPLAN("4. Setup Formasi (Ke Laga)", "#6366F1"),
-        STAGE_5_MATCH_HALF_1("5. Laga Babak 1 (AI Main)", "#22C55E"),
-        STAGE_6_HALFTIME("6. Jeda Babak (Mulai Babak 2)", "#EC4899"),
-        STAGE_7_MATCH_HALF_2("7. Laga Babak 2 (AI Main)", "#22C55E"),
-        STAGE_8_POST_MATCH("8. Hasil Laga (Klaim Poin)", "#A855F7"),
-        POPUP_CONTRACT_RENEWAL("Peringatan Kontrak Pemain", "#EF4444"),
-        POPUP_GENERIC_DIALOG("Pop-Up Konfirmasi Dialog", "#06B6D4");
+        PHASE_MENU("1. Navigasi Menu (Ke Laga / Berikut)", "#38BDF8"),
+        PHASE_MATCH_HALF_1("2. Laga Babak 1 (AI Main)", "#22C55E"),
+        PHASE_HALFTIME("3. Jeda Babak (Mulai Babak 2)", "#EC4899"),
+        PHASE_MATCH_HALF_2("4. Laga Babak 2 (AI Main)", "#22C55E"),
+        PHASE_POST_MATCH("5. Hasil Laga (Klaim Poin)", "#A855F7");
 
         final String displayName;
         final String hexColor;
@@ -103,13 +91,13 @@ public class EfbOverlayManager {
     private static boolean sAfkRunning = false;
     private static boolean sAfkPaused = false;
     private static GrindingMode sGrindMode = GrindingMode.TOUR_EVENT;
-    private static boolean sAutoRenewContract = true;
-    private static boolean sAutoClaimRewards = true;
     private static int sTargetMatches = 0; // 0 = unlimited
     private static int sCompletedMatches = 0;
     private static long sAfkStartTime = 0;
-    private static ScreenState sCurrentStage = ScreenState.STAGE_1_EVENT_TOUR;
-    private static int sStageSubStep = 0;
+    private static ScreenState sCurrentStage = ScreenState.PHASE_MENU;
+    private static int sMenuTapCount = 0;
+    private static int sHalftimeStep = 0;
+    private static int sPostMatchStep = 0;
     private static long sMatchStartTime = 0;
     private static String sCurrentPlannedAction = "Menunggu start...";
 
@@ -162,6 +150,8 @@ public class EfbOverlayManager {
         }
 
         sRootOverlay = new FrameLayout(activity);
+        sRootOverlay.setClickable(false);
+        sRootOverlay.setFocusable(false);
         FrameLayout.LayoutParams rootParams = new FrameLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT
@@ -177,12 +167,7 @@ public class EfbOverlayManager {
         sFloatingAfkHud.setVisibility(View.GONE);
         sRootOverlay.addView(sFloatingAfkHud);
 
-        // 3. Floating Skill Moves Pad (Draggable)
-        sFloatingSkillPad = createFloatingSkillPad(activity);
-        sFloatingSkillPad.setVisibility(View.GONE);
-        sRootOverlay.addView(sFloatingSkillPad);
-
-        // 4. Modal Menu (initially hidden)
+        // 3. Modal Menu (initially hidden)
         sMenuModal = createMenuModal(activity);
         sMenuModal.setVisibility(View.GONE);
         sRootOverlay.addView(sMenuModal);
@@ -509,114 +494,6 @@ public class EfbOverlayManager {
         });
     }
 
-    /**
-     * Floating Draggable Skill Pad Widget.
-     * Contains 3 macro buttons: Double Touch (DT), Stunning Shot (SHOT), Fake Shot (FEINT).
-     */
-    private static View createFloatingSkillPad(final Activity activity) {
-        final LinearLayout pad = new LinearLayout(activity);
-        pad.setOrientation(LinearLayout.HORIZONTAL);
-        pad.setGravity(Gravity.CENTER_VERTICAL);
-        pad.setPadding(dpToPx(activity, 6), dpToPx(activity, 4), dpToPx(activity, 6), dpToPx(activity, 4));
-
-        GradientDrawable padBg = new GradientDrawable();
-        padBg.setShape(GradientDrawable.RECTANGLE);
-        padBg.setCornerRadius(dpToPx(activity, 20));
-        padBg.setColor(Color.parseColor("#E60B1120")); // Dark slate 90%
-        padBg.setStroke(dpToPx(activity, 1), Color.parseColor("#38BDF8")); // Cyan border
-        pad.setBackground(padBg);
-        pad.setElevation(dpToPx(activity, 12));
-
-        FrameLayout.LayoutParams padParams = new FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        padParams.gravity = Gravity.TOP | Gravity.START;
-        padParams.leftMargin = dpToPx(activity, 50);
-        padParams.topMargin = dpToPx(activity, 150);
-        pad.setLayoutParams(padParams);
-
-        // Drag Handle
-        TextView dragHandle = new TextView(activity);
-        dragHandle.setText("⠿");
-        dragHandle.setTextColor(Color.parseColor("#94A3B8"));
-        dragHandle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        dragHandle.setPadding(dpToPx(activity, 4), 0, dpToPx(activity, 6), 0);
-        pad.addView(dragHandle);
-
-        // Button 1: Double Touch (DT)
-        pad.addView(createSkillPadButton(activity, "⚡ DT", "#0284C7", () -> triggerDoubleTouch()));
-
-        // Button 2: Stunning Shot (SHOT)
-        pad.addView(createSkillPadButton(activity, "🚀 SHOT", "#D97706", () -> triggerStunningShot()));
-
-        // Button 3: Fake Shot (FEINT)
-        pad.addView(createSkillPadButton(activity, "🎯 FEINT", "#7C3AED", () -> triggerFakeShot()));
-
-        View.OnTouchListener dragListener = new View.OnTouchListener() {
-            private float dX, dY;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getActionMasked()) {
-                    case MotionEvent.ACTION_DOWN:
-                        dX = pad.getX() - event.getRawX();
-                        dY = pad.getY() - event.getRawY();
-                        return true;
-
-                    case MotionEvent.ACTION_MOVE:
-                        float newX = event.getRawX() + dX;
-                        float newY = event.getRawY() + dY;
-
-                        ViewGroup parent = (ViewGroup) pad.getParent();
-                        if (parent != null) {
-                            newX = Math.max(0, Math.min(newX, parent.getWidth() - pad.getWidth()));
-                            newY = Math.max(0, Math.min(newY, parent.getHeight() - pad.getHeight()));
-                        }
-
-                        pad.setX(newX);
-                        pad.setY(newY);
-                        return true;
-                }
-                return false;
-            }
-        };
-
-        dragHandle.setOnTouchListener(dragListener);
-        return pad;
-    }
-
-    private static Button createSkillPadButton(Context context, String label, String hexBg, final Runnable action) {
-        Button btn = new Button(context);
-        btn.setText(label);
-        btn.setTextColor(Color.WHITE);
-        btn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
-        btn.setTypeface(Typeface.DEFAULT_BOLD);
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(Color.parseColor(hexBg));
-        bg.setCornerRadius(dpToPx(context, 14));
-        bg.setStroke(dpToPx(context, 1), Color.parseColor("#334155"));
-        btn.setBackground(bg);
-        btn.setPadding(dpToPx(context, 8), dpToPx(context, 2), dpToPx(context, 8), dpToPx(context, 2));
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                dpToPx(context, 54),
-                dpToPx(context, 34)
-        );
-        params.setMargins(dpToPx(context, 2), 0, dpToPx(context, 2), 0);
-        btn.setLayoutParams(params);
-
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (action != null) action.run();
-            }
-        });
-
-        return btn;
-    }
-
     private static View createMenuModal(final Activity activity) {
         final FrameLayout backdrop = new FrameLayout(activity);
         FrameLayout.LayoutParams backdropParams = new FrameLayout.LayoutParams(
@@ -800,19 +677,7 @@ public class EfbOverlayManager {
         });
         contentLayout.addView(targetRow);
 
-        // Switch Opsi Otomasi Lanjutan
-        addFeatureLabel(activity, contentLayout, "Otomasi Penanganan Layar:");
-        LinearLayout optionsRow = new LinearLayout(activity);
-        optionsRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, optionsRow, sAutoRenewContract ? "✅ Auto-Perbarui Kontrak" : "❌ Auto-Perbarui Kontrak", sAutoRenewContract ? "#059669" : "#64748B", () -> {
-            sAutoRenewContract = !sAutoRenewContract;
-            showToast("Auto-Renew Kontrak: " + (sAutoRenewContract ? "AKTIF" : "NONAKTIF"));
-        });
-        addOptionButton(activity, optionsRow, sAutoClaimRewards ? "✅ Auto-Klaim Hadiah" : "❌ Auto-Klaim Hadiah", sAutoClaimRewards ? "#059669" : "#64748B", () -> {
-            sAutoClaimRewards = !sAutoClaimRewards;
-            showToast("Auto-Klaim Hadiah: " + (sAutoClaimRewards ? "AKTIF" : "NONAKTIF"));
-        });
-        contentLayout.addView(optionsRow);
+
 
         // ==========================================
         // SECTION 2: BYPASS TONTON IKLAN (3 TIPE HADIAH)
@@ -927,45 +792,6 @@ public class EfbOverlayManager {
         contentLayout.addView(freeCamRow);
 
         // ==========================================
-        // SECTION 4: SMART SKILL-MOVES PAD
-        // ==========================================
-        addSectionHeader(activity, contentLayout, "⚡ SMART SKILL-MOVES PAD (TOMBOL KONTROL)");
-
-        sMenuSkillsStatus = new TextView(activity);
-        sMenuSkillsStatus.setText("Status: NONAKTIF (Tap tombol untuk tampilkan di layar)");
-        sMenuSkillsStatus.setTextColor(Color.parseColor("#94A3B8"));
-        sMenuSkillsStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        contentLayout.addView(sMenuSkillsStatus);
-
-        sMenuSkillsBtn = new Button(activity);
-        sMenuSkillsBtn.setText("🟢 AKTIFKAN FLOATING SKILL PAD DI LAYAR");
-        sMenuSkillsBtn.setTextColor(Color.WHITE);
-        sMenuSkillsBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        sMenuSkillsBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        updateSkillsButtonVisual(activity);
-        sMenuSkillsBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                toggleSkillsPad();
-            }
-        });
-        LinearLayout.LayoutParams skillBtnParams = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                dpToPx(activity, 40)
-        );
-        skillBtnParams.setMargins(0, dpToPx(activity, 6), 0, dpToPx(activity, 4));
-        sMenuSkillsBtn.setLayoutParams(skillBtnParams);
-        contentLayout.addView(sMenuSkillsBtn);
-
-        // Quick Test Row
-        LinearLayout skillTestRow = new LinearLayout(activity);
-        skillTestRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, skillTestRow, "⚡ Test DT", "#0284C7", () -> triggerDoubleTouch());
-        addOptionButton(activity, skillTestRow, "🚀 Test Shot", "#D97706", () -> triggerStunningShot());
-        addOptionButton(activity, skillTestRow, "🎯 Test Feint", "#7C3AED", () -> triggerFakeShot());
-        contentLayout.addView(skillTestRow);
-
-        // ==========================================
         // SECTION 5: STATUS SISTEM
         // ==========================================
         addSectionHeader(activity, contentLayout, "🛡️ STATUS SISTEM");
@@ -1038,86 +864,7 @@ public class EfbOverlayManager {
     }
 
     // ==========================================
-    // SMART SKILL-MOVES MACRO LOGIC
-    // ==========================================
-    private static void toggleSkillsPad() {
-        sSkillsPadEnabled = !sSkillsPadEnabled;
-        if (sFloatingSkillPad != null) {
-            sFloatingSkillPad.setVisibility(sSkillsPadEnabled ? View.VISIBLE : View.GONE);
-        }
-        if (sMenuSkillsStatus != null) {
-            sMenuSkillsStatus.setText(sSkillsPadEnabled ? "Status: 🟢 AKTIF (Pad ditampilkan di layar)" : "Status: NONAKTIF (Tap tombol untuk tampilkan di layar)");
-            sMenuSkillsStatus.setTextColor(sSkillsPadEnabled ? Color.parseColor("#10B981") : Color.parseColor("#94A3B8"));
-        }
-        if (sActivity != null) {
-            updateSkillsButtonVisual(sActivity);
-        }
-        showToast("⚡ Smart Skill-Moves Pad: " + (sSkillsPadEnabled ? "DITAMPILKAN di Layar" : "DISEMBUNYIKAN"));
-    }
-
-    private static void updateSkillsButtonVisual(Context context) {
-        if (sMenuSkillsBtn == null) return;
-        GradientDrawable bg = new GradientDrawable();
-        bg.setShape(GradientDrawable.RECTANGLE);
-        bg.setCornerRadius(dpToPx(context, 8));
-        if (sSkillsPadEnabled) {
-            sMenuSkillsBtn.setText("🔴 SEMBUNYIKAN FLOATING SKILL PAD");
-            bg.setColor(Color.parseColor("#DC2626")); // Red
-        } else {
-            sMenuSkillsBtn.setText("🟢 AKTIFKAN FLOATING SKILL PAD DI LAYAR");
-            bg.setColor(Color.parseColor("#059669")); // Green
-        }
-        sMenuSkillsBtn.setBackground(bg);
-    }
-
-    public static void triggerDoubleTouch() {
-        if (sActivity == null) return;
-        DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-        int w = dm.widthPixels;
-        int h = dm.heightPixels;
-
-        dispatchSwipe(w * 0.18f, h * 0.72f, w * 0.26f, h * 0.72f, 60);
-
-        sMainHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dispatchSimulatedTouch(w * 0.88f, h * 0.82f);
-            }
-        }, 30);
-
-        showToast("⚡ Double Touch (La Croqueta)!");
-    }
-
-    public static void triggerStunningShot() {
-        if (sActivity == null) return;
-        DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-        int w = dm.widthPixels;
-        int h = dm.heightPixels;
-
-        dispatchSwipe(w * 0.85f, h * 0.60f, w * 0.95f, h * 0.60f, 80);
-        showToast("🚀 Stunning Shot (Power Shot)!");
-    }
-
-    public static void triggerFakeShot() {
-        if (sActivity == null) return;
-        DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-        int w = dm.widthPixels;
-        int h = dm.heightPixels;
-
-        dispatchSimulatedTouch(w * 0.85f, h * 0.60f);
-
-        sMainHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                dispatchSwipe(w * 0.18f, h * 0.72f, w * 0.10f, h * 0.72f, 40);
-            }
-        }, 40);
-
-        showToast("🎯 Fake Shot (Tipuan Tembak)!");
-    }
-
-    // ==========================================
-    // INTELLIGENT CONTEXT-AWARE AFK GRINDER
+    // INTELLIGENT AFK MATCH GRINDER
     // ==========================================
     private static void toggleAfkGrinder() {
         sAfkRunning = !sAfkRunning;
@@ -1125,12 +872,14 @@ public class EfbOverlayManager {
             sAfkPaused = false;
             sAfkStartTime = System.currentTimeMillis();
             sMatchStartTime = 0;
-            sStageSubStep = 0;
+            sMenuTapCount = 0;
+            sHalftimeStep = 0;
+            sPostMatchStep = 0;
             sCompletedMatches = 0;
-            sCurrentStage = ScreenState.STAGE_1_EVENT_TOUR;
-            sCurrentPlannedAction = "Memulai dari Tahap 1: Menu Acara Tur...";
+            sCurrentStage = ScreenState.PHASE_MENU;
+            sCurrentPlannedAction = "Memulai: Menavigasi Menu ('Ke Laga >')...";
             sAfkHandler.post(sAfkLoopRunnable);
-            showToast("🟢 Smart AFK Grinder AKTIF!\nAlur 8 tahap eFootball berjalan.");
+            showToast("🟢 Smart AFK Grinder AKTIF!\nMenavigasi ke laga secara otomatis.");
         } else {
             stopAfkGrinder();
         }
@@ -1144,47 +893,30 @@ public class EfbOverlayManager {
         int h = dm.heightPixels;
 
         switch (sCurrentStage) {
-            case STAGE_1_EVENT_TOUR:
-                dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
-                sCurrentStage = ScreenState.STAGE_2_MATCHMAKING;
-                sStageSubStep = 0;
-                break;
-            case STAGE_2_MATCHMAKING:
-                sCurrentStage = ScreenState.STAGE_3_SELECT_JERSEY;
-                sStageSubStep = 0;
-                break;
-            case STAGE_3_SELECT_JERSEY:
-                dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
-                sCurrentStage = ScreenState.STAGE_4_SQUAD_GAMEPLAN;
-                sStageSubStep = 0;
-                break;
-            case STAGE_4_SQUAD_GAMEPLAN:
-                dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
-                sCurrentStage = ScreenState.STAGE_5_MATCH_HALF_1;
+            case PHASE_MENU:
+                sCurrentStage = ScreenState.PHASE_MATCH_HALF_1;
                 sMatchStartTime = System.currentTimeMillis();
-                sStageSubStep = 0;
                 break;
-            case STAGE_5_MATCH_HALF_1:
-                sCurrentStage = ScreenState.STAGE_6_HALFTIME;
-                sStageSubStep = 0;
+            case PHASE_MATCH_HALF_1:
+                sCurrentStage = ScreenState.PHASE_HALFTIME;
+                sHalftimeStep = 0;
                 break;
-            case STAGE_6_HALFTIME:
-                dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
-                sCurrentStage = ScreenState.STAGE_7_MATCH_HALF_2;
+            case PHASE_HALFTIME:
+                sCurrentStage = ScreenState.PHASE_MATCH_HALF_2;
                 sMatchStartTime = System.currentTimeMillis();
-                sStageSubStep = 0;
                 break;
-            case STAGE_7_MATCH_HALF_2:
-                sCurrentStage = ScreenState.STAGE_8_POST_MATCH;
-                sStageSubStep = 0;
+            case PHASE_MATCH_HALF_2:
+                sCurrentStage = ScreenState.PHASE_POST_MATCH;
+                sPostMatchStep = 0;
                 break;
-            case STAGE_8_POST_MATCH:
+            case PHASE_POST_MATCH:
                 sCompletedMatches++;
-                sCurrentStage = ScreenState.STAGE_1_EVENT_TOUR;
-                sStageSubStep = 0;
+                sCurrentStage = ScreenState.PHASE_MENU;
+                sMenuTapCount = 0;
                 break;
             default:
-                sCurrentStage = ScreenState.STAGE_1_EVENT_TOUR;
+                sCurrentStage = ScreenState.PHASE_MENU;
+                sMenuTapCount = 0;
                 break;
         }
         showToast("⏭️ Maju ke: " + sCurrentStage.displayName);
@@ -1192,9 +924,11 @@ public class EfbOverlayManager {
     }
 
     public static void resetStageFlow() {
-        sCurrentStage = ScreenState.STAGE_1_EVENT_TOUR;
-        sStageSubStep = 0;
+        sCurrentStage = ScreenState.PHASE_MENU;
+        sMenuTapCount = 0;
         sMatchStartTime = 0;
+        sHalftimeStep = 0;
+        sPostMatchStep = 0;
         showToast("🔄 Alur AFK Direset ke: " + sCurrentStage.displayName);
         updateLiveHud();
     }
@@ -1202,8 +936,9 @@ public class EfbOverlayManager {
     public static void forceTapActionButton() {
         if (sActivity == null) return;
         DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-        dispatchSimulatedTouchWithJitter(dm.widthPixels * 0.85f, dm.heightPixels * 0.93f);
-        showToast("⚡ Tap Paksa Kanan Bawah ('Ke Laga' / 'Berikut')!");
+        // Calibrated Bottom-Right Coordinate: 82.5% X, 91.5% Y
+        dispatchSimulatedTouchWithJitter(dm.widthPixels * 0.825f, dm.heightPixels * 0.915f);
+        showToast("⚡ Tap Tombol Kanan Bawah ('Ke Laga' / 'Berikut')!");
     }
 
     private static void stopAfkGrinder() {
@@ -1246,15 +981,13 @@ public class EfbOverlayManager {
     }
 
     /**
-     * Deterministic 8-Stage AFK Grinder Loop strictly adhering to eFootball match flow:
-     * 1. Menu Acara Tur: Tap 'Ke Laga >' (0.85w, 0.93h)
-     * 2. Pencarian Lawan: Wait/idle for matchmaking (no cancel)
-     * 3. Pilih Jersey: Tap 'Berikut >' (0.85w, 0.93h)
-     * 4. Setup Formasi: Tap 'Ke Laga >' (0.85w, 0.93h)
-     * 5. Babak 1: Monitor AI match, periodic tap center (0.50w, 0.50h) to skip replays
-     * 6. Jeda Babak: Tap 'Mulai Babak Kedua >' (0.85w, 0.93h)
-     * 7. Babak 2: Monitor AI match, periodic tap center (0.50w, 0.50h) to skip replays
-     * 8. Post-Match: Sequential tap 'Berikut >' (0.85w, 0.93h) for stats, EXP, event points, return to menu.
+     * Precision AFK Grinder Loop strictly adhering to eFootball match flow:
+     * 1. PHASE_MENU: Repeatedly taps 'Ke Laga >' / 'Berikut >' (0.825w, 0.915h) every 2.8s.
+     *    Passes Event Lobby -> Matchmaking -> Jersey -> Game Plan Kickoff.
+     * 2. PHASE_MATCH_HALF_1: Monitor 1st half match (~190s). Taps center (0.50w, 0.50h) every 5.5s to skip replays.
+     * 3. PHASE_HALFTIME: Taps 'Mulai Babak Kedua >' (0.825w, 0.915h).
+     * 4. PHASE_MATCH_HALF_2: Monitor 2nd half match (~190s). Taps center (0.50w, 0.50h) every 5.5s to skip replays.
+     * 5. PHASE_POST_MATCH: Sequential tap 'Berikut >' (0.825w, 0.915h) for stats, EXP, event points, return to lobby.
      */
     private static final Runnable sAfkLoopRunnable = new Runnable() {
         @Override
@@ -1281,105 +1014,108 @@ public class EfbOverlayManager {
             final int w = dm.widthPixels;
             final int h = dm.heightPixels;
 
-            long nextDelayMs = 3500;
+            long nextDelayMs = 2800;
 
             switch (sCurrentStage) {
-                case STAGE_1_EVENT_TOUR:
-                    // Stage 1: Menu Acara Tur (VS AI)
-                    dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
-                    sCurrentPlannedAction = "Menekan 'Ke Laga >' (Kanan Bawah)...";
-                    sCurrentStage = ScreenState.STAGE_2_MATCHMAKING;
-                    sStageSubStep = 0;
-                    nextDelayMs = 4500;
+                case PHASE_MENU:
+                    sMenuTapCount++;
+                    // Tap Bottom-Right 'Ke Laga >' / 'Berikut >'
+                    dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                    sCurrentPlannedAction = "Menekan 'Ke Laga / Berikut' (Kanan Bawah) [#" + sMenuTapCount + "]...";
+
+                    // After 6 taps (~17 seconds of menu cycle: Lobby -> Matchmaking -> Jersey -> Gameplan),
+                    // kickoff has started; transition to match monitoring
+                    if (sMenuTapCount >= 6) {
+                        sCurrentStage = ScreenState.PHASE_MATCH_HALF_1;
+                        sMatchStartTime = System.currentTimeMillis();
+                        nextDelayMs = 4500;
+                    } else {
+                        nextDelayMs = 2800;
+                    }
                     break;
 
-                case STAGE_2_MATCHMAKING:
-                    // Stage 2: Pencarian Lawan (Matchmaking)
-                    // DO NOT tap anything!
-                    sCurrentPlannedAction = "⏳ Mencari lawan... Menunggu sistem matchmaking";
-                    sCurrentStage = ScreenState.STAGE_3_SELECT_JERSEY;
-                    sStageSubStep = 0;
-                    nextDelayMs = 5000;
-                    break;
-
-                case STAGE_3_SELECT_JERSEY:
-                    // Stage 3: Pilih Jersey
-                    dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
-                    sCurrentPlannedAction = "👕 Jersey Terpilih: Menekan 'Berikut >' (Kanan Bawah)...";
-                    sCurrentStage = ScreenState.STAGE_4_SQUAD_GAMEPLAN;
-                    sStageSubStep = 0;
-                    nextDelayMs = 3500;
-                    break;
-
-                case STAGE_4_SQUAD_GAMEPLAN:
-                    // Stage 4: Setup Formasi / Taktik
-                    dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
-                    sCurrentPlannedAction = "📋 Formasi Siap: Menekan 'Ke Laga >' untuk kickoff...";
-                    sCurrentStage = ScreenState.STAGE_5_MATCH_HALF_1;
-                    sMatchStartTime = System.currentTimeMillis();
-                    sStageSubStep = 0;
-                    nextDelayMs = 5000;
-                    break;
-
-                case STAGE_5_MATCH_HALF_1:
-                    // Stage 5: Laga Babak 1
-                    dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.50f);
+                case PHASE_MATCH_HALF_1:
+                    // Tap center to skip cutscene / replay
+                    dispatchSimulatedTouchWithJitter(w * 0.500f, h * 0.500f);
                     long elapsedH1 = (System.currentTimeMillis() - sMatchStartTime) / 1000;
-                    long remainH1 = Math.max(0, 200 - elapsedH1);
-                    sCurrentPlannedAction = "⚽ Babak 1: Skip replay/cutscene (" + remainH1 + "s tersisa)";
-                    if (elapsedH1 >= 200) {
-                        sCurrentStage = ScreenState.STAGE_6_HALFTIME;
-                        sStageSubStep = 0;
+                    long remainH1 = Math.max(0, 190 - elapsedH1);
+                    sCurrentPlannedAction = "⚽ Babak 1: Skip cutscene / replay (" + remainH1 + "s tersisa)";
+
+                    // Periodic safety tap on bottom-right every ~25s in case early half-time
+                    if (elapsedH1 > 0 && elapsedH1 % 25 < 6) {
+                        dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                    }
+
+                    if (elapsedH1 >= 190) {
+                        sCurrentStage = ScreenState.PHASE_HALFTIME;
+                        sHalftimeStep = 0;
                         nextDelayMs = 3500;
                     } else {
                         nextDelayMs = 5500;
                     }
                     break;
 
-                case STAGE_6_HALFTIME:
-                    // Stage 6: Jeda Babak (Half Time)
-                    dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
-                    sCurrentPlannedAction = "⏸️ Jeda Babak Usai: Menekan 'Mulai Babak Kedua >'...";
-                    sCurrentStage = ScreenState.STAGE_7_MATCH_HALF_2;
-                    sMatchStartTime = System.currentTimeMillis();
-                    sStageSubStep = 0;
-                    nextDelayMs = 4500;
+                case PHASE_HALFTIME:
+                    // Half-Time transition: Tap 'Mulai Babak Kedua >'
+                    dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                    sHalftimeStep++;
+                    sCurrentPlannedAction = "⏸️ Jeda Babak: Menekan 'Mulai Babak Kedua >' (" + sHalftimeStep + "/2)...";
+                    if (sHalftimeStep >= 2) {
+                        sCurrentStage = ScreenState.PHASE_MATCH_HALF_2;
+                        sMatchStartTime = System.currentTimeMillis();
+                        nextDelayMs = 4500;
+                    } else {
+                        nextDelayMs = 3000;
+                    }
                     break;
 
-                case STAGE_7_MATCH_HALF_2:
-                    // Stage 7: Laga Babak 2
-                    dispatchSimulatedTouchWithJitter(w * 0.50f, h * 0.50f);
+                case PHASE_MATCH_HALF_2:
+                    // Tap center to skip cutscene / replay
+                    dispatchSimulatedTouchWithJitter(w * 0.500f, h * 0.500f);
                     long elapsedH2 = (System.currentTimeMillis() - sMatchStartTime) / 1000;
-                    long remainH2 = Math.max(0, 200 - elapsedH2);
-                    sCurrentPlannedAction = "⚽ Babak 2: Skip replay/cutscene (" + remainH2 + "s tersisa)";
-                    if (elapsedH2 >= 200) {
-                        sCurrentStage = ScreenState.STAGE_8_POST_MATCH;
-                        sStageSubStep = 0;
+                    long remainH2 = Math.max(0, 190 - elapsedH2);
+                    sCurrentPlannedAction = "⚽ Babak 2: Skip cutscene / replay (" + remainH2 + "s tersisa)";
+
+                    // Periodic safety tap on bottom-right every ~25s in case early full-time
+                    if (elapsedH2 > 0 && elapsedH2 % 25 < 6) {
+                        dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                    }
+
+                    if (elapsedH2 >= 190) {
+                        sCurrentStage = ScreenState.PHASE_POST_MATCH;
+                        sPostMatchStep = 0;
                         nextDelayMs = 3500;
                     } else {
                         nextDelayMs = 5500;
                     }
                     break;
 
-                case STAGE_8_POST_MATCH:
-                    // Stage 8: Hasil Pertandingan & Klaim Hadiah
-                    dispatchSimulatedTouchWithJitter(w * 0.85f, h * 0.93f);
-                    sStageSubStep++;
-                    sCurrentPlannedAction = "🏆 Laga Selesai: Menekan 'Berikut >' & Klaim Hadiah (Langkah " + sStageSubStep + "/4)...";
-                    if (sStageSubStep >= 4) {
+                case PHASE_POST_MATCH:
+                    // Post-match result screens: Sequential tap 'Berikut >' for EXP, stats, event points
+                    dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                    sPostMatchStep++;
+                    sCurrentPlannedAction = "🏆 Selesai Laga: Menekan 'Berikut >' untuk Klaim Poin (" + sPostMatchStep + "/5)...";
+                    if (sPostMatchStep >= 5) {
                         sCompletedMatches++;
                         showToast("🎉 Laga ke-" + sCompletedMatches + " Selesai! Memulai laga berikutnya...");
-                        sCurrentStage = ScreenState.STAGE_1_EVENT_TOUR;
-                        sStageSubStep = 0;
-                        nextDelayMs = 4000;
+                        if (sTargetMatches > 0 && sCompletedMatches >= sTargetMatches) {
+                            showToast("🏁 Target Grinding Tercapai: " + sCompletedMatches + " Laga Selesai!");
+                            stopAfkGrinder();
+                            return;
+                        } else {
+                            sCurrentStage = ScreenState.PHASE_MENU;
+                            sMenuTapCount = 0;
+                            nextDelayMs = 4000;
+                        }
                     } else {
-                        nextDelayMs = 3500;
+                        nextDelayMs = 2600;
                     }
                     break;
 
                 default:
-                    sCurrentStage = ScreenState.STAGE_1_EVENT_TOUR;
-                    nextDelayMs = 3000;
+                    sCurrentStage = ScreenState.PHASE_MENU;
+                    sMenuTapCount = 0;
+                    nextDelayMs = 2800;
                     break;
             }
 
@@ -1392,8 +1128,69 @@ public class EfbOverlayManager {
     };
 
     // ==========================================
-    // NATIVE TOUCH SIMULATION WITH HUMAN JITTER
+    // SURFACEVIEW DETECTION & NATIVE TOUCH SIMULATION
     // ==========================================
+    private static SurfaceView findSurfaceView(View root) {
+        if (root == null) return null;
+        if (root instanceof SurfaceView) {
+            return (SurfaceView) root;
+        }
+        if (root instanceof ViewGroup) {
+            ViewGroup vg = (ViewGroup) root;
+            for (int i = 0; i < vg.getChildCount(); i++) {
+                View child = vg.getChildAt(i);
+                if (child == sRootOverlay) continue;
+                SurfaceView sv = findSurfaceView(child);
+                if (sv != null) return sv;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Shows a lightweight visual touch ripple ring on screen so user can see exactly where clicks land.
+     */
+    private static void showTouchRipple(final float x, final float y) {
+        if (sActivity == null || sRootOverlay == null) return;
+        sMainHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    final int size = dpToPx(sActivity, 38);
+                    final View ripple = new View(sActivity);
+                    FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(size, size);
+                    params.leftMargin = (int) (x - size / 2f);
+                    params.topMargin = (int) (y - size / 2f);
+                    ripple.setLayoutParams(params);
+
+                    GradientDrawable shape = new GradientDrawable();
+                    shape.setShape(GradientDrawable.OVAL);
+                    shape.setColor(Color.parseColor("#6600E5FF")); // 40% cyan
+                    shape.setStroke(dpToPx(sActivity, 2), Color.parseColor("#FFFFFF"));
+                    ripple.setBackground(shape);
+                    ripple.setElevation(dpToPx(sActivity, 20));
+
+                    sRootOverlay.addView(ripple);
+
+                    ripple.animate()
+                            .scaleX(1.4f)
+                            .scaleY(1.4f)
+                            .alpha(0.0f)
+                            .setDuration(400)
+                            .withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    try {
+                                        sRootOverlay.removeView(ripple);
+                                    } catch (Throwable ignored) {}
+                                }
+                            })
+                            .start();
+                } catch (Throwable ignored) {}
+            }
+        });
+    }
+
     private static MotionEvent createTouchEvent(long downTime, long eventTime, int action, float x, float y) {
         MotionEvent.PointerProperties[] props = new MotionEvent.PointerProperties[1];
         props[0] = new MotionEvent.PointerProperties();
@@ -1428,27 +1225,20 @@ public class EfbOverlayManager {
     private static void sendEvent(MotionEvent event) {
         if (sActivity == null || event == null) return;
 
-        // 1. Dispatch directly to ViewRootImpl (reaches NativeActivity's native AInputQueue!)
+        // 1. Direct dispatch to SurfaceView (UE4 graphics viewport)
         try {
-            View decor = sActivity.getWindow().getDecorView();
-            if (decor != null) {
-                Method getVrMethod = decor.getClass().getMethod("getViewRootImpl");
-                getVrMethod.setAccessible(true);
-                Object viewRoot = getVrMethod.invoke(decor);
-                if (viewRoot != null) {
-                    Method dispatchMethod = viewRoot.getClass().getMethod("dispatchInputEvent", InputEvent.class);
-                    dispatchMethod.setAccessible(true);
-                    dispatchMethod.invoke(viewRoot, event);
-                }
+            SurfaceView sv = findSurfaceView(sActivity.getWindow().getDecorView());
+            if (sv != null) {
+                sv.dispatchTouchEvent(event);
             }
         } catch (Throwable ignored) {}
 
-        // 2. Dispatch to Activity
+        // 2. Direct GameActivity onTouchEvent (UE4 nativeOnTouch bridge)
         try {
-            sActivity.dispatchTouchEvent(event);
+            sActivity.onTouchEvent(event);
         } catch (Throwable ignored) {}
 
-        // 3. Dispatch to DecorView
+        // 3. Fallback: DecorView dispatch
         try {
             View decor = sActivity.getWindow().getDecorView();
             if (decor != null) decor.dispatchTouchEvent(event);
@@ -1456,24 +1246,28 @@ public class EfbOverlayManager {
     }
 
     /**
-     * Adds ±1.2% randomized spatial jitter to simulate natural human fingertip tapping.
+     * Adds ±1.0% randomized spatial jitter to simulate natural human fingertip tapping.
      */
     private static void dispatchSimulatedTouchWithJitter(float baseX, float baseY) {
         if (sActivity == null) return;
         DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-        float jitterX = (sRandom.nextFloat() - 0.5f) * (dm.widthPixels * 0.024f);
-        float jitterY = (sRandom.nextFloat() - 0.5f) * (dm.heightPixels * 0.024f);
+        float jitterX = (sRandom.nextFloat() - 0.5f) * (dm.widthPixels * 0.020f);
+        float jitterY = (sRandom.nextFloat() - 0.5f) * (dm.heightPixels * 0.020f);
 
         dispatchSimulatedTouch(baseX + jitterX, baseY + jitterY);
     }
 
     private static void dispatchSimulatedTouch(final float x, final float y) {
         if (sActivity == null) return;
+
+        // Visual indicator on screen
+        showTouchRipple(x, y);
+
         final long downTime = SystemClock.uptimeMillis();
         final MotionEvent down = createTouchEvent(downTime, downTime, MotionEvent.ACTION_DOWN, x, y);
         sendEvent(down);
 
-        // Small micro-move at 30ms so touch drivers register gesture intent
+        // Micro-move at 30ms so touch drivers register gesture intent
         sMainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
