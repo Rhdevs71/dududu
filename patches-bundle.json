@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-21T22:26:01",
-  "description": "## [1.22.0](https://github.com/Rhdevs71/dududu/compare/v1.21.0...v1.22.0) (2026-09-21)\n\n### ✨ New Features\n\n* **efootball:** implement 8-stage deterministic AFK grinder, 3 rewarded ad types bypass, and clean git tracking ([29edf83](https://github.com/Rhdevs71/dududu/commit/29edf831774fa5667cb2cd3f385ef721b29f3839))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.22.0/patches-1.22.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.22.0/patches-1.22.0.mpp.asc",
-  "version": "1.22.0"
+  "created_at": "2026-09-22T17:27:05",
+  "description": "## [1.22.1](https://github.com/Rhdevs71/dududu/compare/v1.22.0...v1.22.1) (2026-09-22)\n\n### 🐛 Bug Fixes\n\n* **efootball:** fix AdMobReward register allocation to prevent JNI abort crash ([6145d50](https://github.com/Rhdevs71/dududu/commit/6145d50a4246d490bf2e8abb38cb75c555fab89e))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.22.1/patches-1.22.1.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.22.1/patches-1.22.1.mpp.asc",
+  "version": "1.22.1"
 }

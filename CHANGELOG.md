@@ -1,3 +1,9 @@
+## [1.22.1](https://github.com/Rhdevs71/dududu/compare/v1.22.0...v1.22.1) (2026-09-22)
+
+### 🐛 Bug Fixes
+
+* **efootball:** fix AdMobReward register allocation to prevent JNI abort crash ([6145d50](https://github.com/Rhdevs71/dududu/commit/6145d50a4246d490bf2e8abb38cb75c555fab89e))
+
 ## [1.22.0](https://github.com/Rhdevs71/dududu/compare/v1.21.0...v1.22.0) (2026-09-21)
 
 ### ✨ New Features
