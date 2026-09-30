@@ -1028,8 +1028,19 @@ public class EfbOverlayManager {
                 case PHASE_POST_MATCH:
                     // Hasil Laga: Tekan 'Berikut >' di KANAN BAWAH untuk klaim EXP, rating, poin acara
                     dispatchActionTap(w * 0.850f, h * 0.925f);
+                    // Ketukan konfirmasi pop-up dialog hadiah milestone acara (tengah bawah) jika muncul dialog modal
+                    sMainHandler.postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                int sw = getScreenWidth();
+                                int sh = getScreenHeight();
+                                dispatchActionTap(sw * 0.500f, sh * 0.760f);
+                            } catch (Throwable ignored) {}
+                        }
+                    }, 500);
                     sPostMatchStep++;
-                    sCurrentPlannedAction = "🏆 Selesai Laga: Menekan 'Berikut >' (Kanan Bawah) [" + sPostMatchStep + "/6]...";
+                    sCurrentPlannedAction = "🏆 Selesai Laga & Klaim Hadiah: Menekan 'Berikut' [" + sPostMatchStep + "/6]...";
 
                     if (sPostMatchStep >= 6) {
                         sCompletedMatches++;
