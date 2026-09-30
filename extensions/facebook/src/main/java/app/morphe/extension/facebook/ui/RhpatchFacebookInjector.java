@@ -39,7 +39,6 @@ public class RhpatchFacebookInjector {
         if (application == null || sAppLifecycleRegistered) return;
         try {
             Utils.setContext(application);
-            PikoUtils.setContext(application);
 
             application.registerActivityLifecycleCallbacks(new Application.ActivityLifecycleCallbacks() {
                 @Override
@@ -119,7 +118,6 @@ public class RhpatchFacebookInjector {
         try {
             // Update Activity dan Context global
             Utils.setActivity(activity);
-            PikoUtils.setContext(activity.getApplicationContext());
 
             // 1. Eksekusi App Lock Biometrik jika aktif
             FacebookAppLockManager.onActivityResumed(activity);
