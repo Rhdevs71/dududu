@@ -1,3 +1,9 @@
+## [1.24.0](https://github.com/Rhdevs71/dududu/compare/v1.23.0...v1.24.0) (2026-09-30)
+
+### ✨ New Features
+
+* **efootball:** re-engineer AFK grinder with ViewRootImpl native input injection, remove redundant ad menu, and add graphics/HUD features ([45ad962](https://github.com/Rhdevs71/dududu/commit/45ad962875b2a4d87b1edc17260b822a0c2623ac))
+
 ## [1.23.0](https://github.com/Rhdevs71/dududu/compare/v1.22.1...v1.23.0) (2026-09-22)
 
 ### ✨ New Features
