@@ -21,8 +21,8 @@ import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
-import android.view.WindowManager;
-import android.widget.CompoundButton;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -36,6 +36,7 @@ import java.util.List;
 import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.crimera.settings.BooleanSetting;
 import app.morphe.extension.crimera.sharedPreference.SharedPref;
+import app.morphe.extension.facebook.patches.FacebookMediaDownloader;
 import app.morphe.extension.facebook.settings.FacebookSettings;
 
 public class RhpatchFacebookDialog {
@@ -111,7 +112,7 @@ public class RhpatchFacebookDialog {
             new SettingItem[] {
                 new SettingItem(
                     "Reels Downloader",
-                    "Tambahkan opsi tombol unduh langsung di menu titik tiga postingan Facebook Reels.",
+                    "Tambahkan opsi tombol unduh langsung di menu postingan Facebook Reels.",
                     FacebookSettings.DOWNLOAD_REELS
                 ),
                 new SettingItem(
@@ -186,7 +187,7 @@ public class RhpatchFacebookDialog {
         new CategoryGroup(
             "ui",
             "🎨 Kustomisasi",
-            "Tema Amoled Black dan Tombol Profil",
+            "Tema Amoled Black dan Tombol Mengambang",
             new SettingItem[] {
                 new SettingItem(
                     "Dark Mode Hitam Pekat (Amoled Black)",
@@ -194,36 +195,31 @@ public class RhpatchFacebookDialog {
                     FacebookSettings.AMOLED_DARK_MODE
                 ),
                 new SettingItem(
-                    "Tampilkan Tombol Kapsul [RHpatch] di Profil",
-                    "Tampilkan tombol mengambang [RHpatch] di halaman Profil untuk membuka menu mod ini.",
+                    "Tampilkan Tombol Mengambang [RHpatch]",
+                    "Tampilkan tombol mengambang [RHpatch] di layar untuk membuka menu mod ini.",
                     FacebookSettings.SHOW_PROFILE_CAPSULE
-                ),
-                new SettingItem(
-                    "Tampilkan Tombol [RHpatch] di Semua Layar",
-                    "Aktifkan tombol mengambang di seluruh halaman Facebook (bukan hanya di profil).",
-                    FacebookSettings.ALWAYS_SHOW_FLOATING_BUTTON
                 ),
             }
         ),
 
         new CategoryGroup(
-            "utility",
-            "🛠️ Utilitas & Bypass",
-            "Bypass Link Shim dan Akses Browser Eksternal",
+            "utils",
+            "🔗 Utilitas & Bypass",
+            "Bypass Link Shim, Browser Eksternal, Text Selection",
             new SettingItem[] {
                 new SettingItem(
-                    "Bypass Link Shim (Buka Link Langsung)",
-                    "Hapus pengalihan pelacak l.facebook.com dan parameter fbclid untuk privasi berselancar.",
+                    "Bypass Pelacakan Link Shim Facebook",
+                    "Hapus parameter pelacak 'l.facebook.com' dan 'fbclid' saat membuka tautan.",
                     FacebookSettings.BYPASS_LINK_SHIM
                 ),
                 new SettingItem(
-                    "Buka Link Selalu di Browser Eksternal",
-                    "Buka tautan eksternal langsung menggunakan Chrome atau browser bawaan HP Anda.",
+                    "Buka Tautan Langsung di Browser Eksternal",
+                    "Lewati in-app browser bawaan Facebook dan buka langsung tautan ke browser pilihan Anda (Chrome/Firefox/Brave).",
                     FacebookSettings.OPEN_EXTERNAL_BROWSER
                 ),
                 new SettingItem(
-                    "Bebas Salin Teks Postingan & Komentar",
-                    "Buka proteksi salin teks agar Anda bisa meng-copy teks postingan dan komentar dengan leluasa.",
+                    "Izinkan Salin Teks di Semua Bagian",
+                    "Bebaskan pemilihan teks (text selection) pada postingan, komentar, dan status.",
                     FacebookSettings.ENABLE_TEXT_SELECTION
                 ),
             }
@@ -233,33 +229,36 @@ public class RhpatchFacebookDialog {
     private static int sSelectedCategoryIndex = 0;
 
     public static void show(final Activity activity) {
-        if (activity == null || activity.isFinishing()) return;
+        if (activity == null || activity.isFinishing()) {
+            return;
+        }
 
         try {
             final Dialog dialog = new Dialog(activity);
             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
             DisplayMetrics dm = activity.getResources().getDisplayMetrics();
-            float density = dm.density;
+            final float density = dm.density;
             int screenWidth = dm.widthPixels;
             int screenHeight = dm.heightPixels;
 
-            // Main root container
+            // Root Container
             LinearLayout root = new LinearLayout(activity);
             root.setOrientation(LinearLayout.VERTICAL);
-            root.setBackgroundColor(Color.parseColor("#0F141C")); // Dark Navy Slate
-            root.setPadding((int) (16 * density), (int) (14 * density), (int) (16 * density), (int) (16 * density));
+            root.setBackgroundColor(Color.parseColor("#0F172A")); // Deep Slate / Obsidian Dark
+            root.setPadding((int) (16 * density), (int) (14 * density), (int) (16 * density), (int) (14 * density));
 
-            // Header Row: Title & Close Button
+            GradientDrawable rootBg = new GradientDrawable();
+            rootBg.setColor(Color.parseColor("#0F172A"));
+            rootBg.setCornerRadius(20 * density);
+            rootBg.setStroke((int) (1.5f * density), Color.parseColor("#1E293B"));
+            root.setBackground(rootBg);
+
+            // Header: Title & Close Button
             LinearLayout header = new LinearLayout(activity);
             header.setOrientation(LinearLayout.HORIZONTAL);
             header.setGravity(Gravity.CENTER_VERTICAL);
-            LinearLayout.LayoutParams headerLp = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            headerLp.bottomMargin = (int) (10 * density);
-            header.setLayoutParams(headerLp);
+            header.setPadding(0, 0, 0, (int) (10 * density));
 
             LinearLayout titleCol = new LinearLayout(activity);
             titleCol.setOrientation(LinearLayout.VERTICAL);
@@ -353,6 +352,112 @@ public class RhpatchFacebookDialog {
                 banner.setLayoutParams(bannerLp);
                 itemsContainer.addView(banner);
 
+                // Khusus kategori Downloader: Pasang Interactive Downloader Card!
+                if ("downloader".equals(group.id)) {
+                    LinearLayout dlCard = new LinearLayout(activity);
+                    dlCard.setOrientation(LinearLayout.VERTICAL);
+                    dlCard.setPadding((int) (14 * density), (int) (12 * density), (int) (14 * density), (int) (12 * density));
+
+                    GradientDrawable dlCardBg = new GradientDrawable();
+                    dlCardBg.setColor(Color.parseColor("#1E293B"));
+                    dlCardBg.setCornerRadius(12 * density);
+                    dlCardBg.setStroke((int) (1.5f * density), Color.parseColor(ACCENT_COLOR));
+                    dlCard.setBackground(dlCardBg);
+
+                    LinearLayout.LayoutParams dlCardLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                    dlCardLp.bottomMargin = (int) (14 * density);
+                    dlCard.setLayoutParams(dlCardLp);
+
+                    TextView dlCardTitle = new TextView(activity);
+                    dlCardTitle.setText("⚡ Pusat Unduh Video & Reels (HD)");
+                    dlCardTitle.setTextColor(Color.WHITE);
+                    dlCardTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13.5f);
+                    dlCardTitle.setTypeface(Typeface.DEFAULT_BOLD);
+                    dlCard.addView(dlCardTitle);
+
+                    TextView dlCardSub = new TextView(activity);
+                    dlCardSub.setText("Tempel tautan video/reels publik Facebook untuk mengunduh langsung format MP4 HD ke galeri.");
+                    dlCardSub.setTextColor(Color.parseColor("#94A3B8"));
+                    dlCardSub.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
+                    dlCardSub.setPadding(0, (int) (2 * density), 0, (int) (8 * density));
+                    dlCard.addView(dlCardSub);
+
+                    final EditText urlInput = new EditText(activity);
+                    urlInput.setHint("https://www.facebook.com/reel/...");
+                    urlInput.setHintTextColor(Color.parseColor("#64748B"));
+                    urlInput.setTextColor(Color.WHITE);
+                    urlInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12.5f);
+                    urlInput.setSingleLine(true);
+                    urlInput.setPadding((int) (10 * density), (int) (8 * density), (int) (10 * density), (int) (8 * density));
+
+                    GradientDrawable inputBg = new GradientDrawable();
+                    inputBg.setColor(Color.parseColor("#0F172A"));
+                    inputBg.setCornerRadius(8 * density);
+                    inputBg.setStroke((int) (1 * density), Color.parseColor("#334155"));
+                    urlInput.setBackground(inputBg);
+
+                    // Auto-fill jika ada link Facebook di papan klip
+                    String clipUrl = FacebookMediaDownloader.getClipboardFacebookUrl(activity);
+                    if (clipUrl != null) {
+                        urlInput.setText(clipUrl);
+                    }
+                    dlCard.addView(urlInput);
+
+                    // Action buttons row
+                    LinearLayout btnRow = new LinearLayout(activity);
+                    btnRow.setOrientation(LinearLayout.HORIZONTAL);
+                    btnRow.setPadding(0, (int) (8 * density), 0, 0);
+
+                    // Tombol Tempel
+                    Button pasteBtn = new Button(activity);
+                    pasteBtn.setText("📋 Tempel");
+                    pasteBtn.setTextColor(Color.parseColor("#38BDF8"));
+                    pasteBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f);
+                    pasteBtn.setTypeface(Typeface.DEFAULT_BOLD);
+                    GradientDrawable pasteBg = new GradientDrawable();
+                    pasteBg.setColor(Color.parseColor("#140284C7"));
+                    pasteBg.setCornerRadius(8 * density);
+                    pasteBtn.setBackground(pasteBg);
+                    LinearLayout.LayoutParams pasteLp = new LinearLayout.LayoutParams(0, (int) (38 * density), 1.0f);
+                    pasteLp.rightMargin = (int) (6 * density);
+                    pasteBtn.setLayoutParams(pasteLp);
+                    pasteBtn.setOnClickListener(v -> {
+                        String clip = FacebookMediaDownloader.getClipboardFacebookUrl(activity);
+                        if (clip != null) {
+                            urlInput.setText(clip);
+                            Toast.makeText(activity, "Tautan berhasil ditempel!", Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(activity, "Tidak ada tautan Facebook di papan klip.", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                    btnRow.addView(pasteBtn);
+
+                    // Tombol Unduh HD
+                    Button dlBtn = new Button(activity);
+                    dlBtn.setText("📥 Unduh Video HD");
+                    dlBtn.setTextColor(Color.WHITE);
+                    dlBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11.5f);
+                    dlBtn.setTypeface(Typeface.DEFAULT_BOLD);
+                    GradientDrawable dlBtnBg = new GradientDrawable();
+                    dlBtnBg.setColor(Color.parseColor(ACCENT_COLOR));
+                    dlBtnBg.setCornerRadius(8 * density);
+                    dlBtn.setBackground(dlBtnBg);
+                    LinearLayout.LayoutParams dlLp = new LinearLayout.LayoutParams(0, (int) (38 * density), 1.6f);
+                    dlBtn.setLayoutParams(dlLp);
+                    dlBtn.setOnClickListener(v -> {
+                        String targetUrl = urlInput.getText().toString().trim();
+                        if (targetUrl.isEmpty()) {
+                            Toast.makeText(activity, "Silakan masukkan atau tempel link video terlebih dahulu!", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        FacebookMediaDownloader.startDownload(activity, targetUrl);
+                    });
+                    btnRow.addView(dlBtn);
+
+                    dlCard.addView(btnRow);
+                    itemsContainer.addView(dlCard);
+                }
+
                 // Render each setting item card
                 for (final SettingItem item : group.items) {
                     LinearLayout card = new LinearLayout(activity);
@@ -386,16 +491,17 @@ public class RhpatchFacebookDialog {
 
                     TextView itemDesc = new TextView(activity);
                     itemDesc.setText(item.description);
-                    itemDesc.setTextColor(Color.parseColor("#94A3B8"));
+                    itemDesc.setTextColor(Color.parseColor("#94A3B8")); // Slate-400
                     itemDesc.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+                    itemDesc.setPadding(0, (int) (2 * density), 0, 0);
                     textCol.addView(itemDesc);
 
                     card.addView(textCol);
 
-                    // Switch widget
-                    final Switch sw = new Switch(activity);
-                    boolean isChecked = SharedPref.getBooleanPref(item.setting);
-                    sw.setChecked(isChecked);
+                    // Switch toggle
+                    Switch sw = new Switch(activity);
+                    boolean currentVal = SharedPref.getBooleanPref(item.setting);
+                    sw.setChecked(currentVal);
 
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         int[][] states = new int[][]{

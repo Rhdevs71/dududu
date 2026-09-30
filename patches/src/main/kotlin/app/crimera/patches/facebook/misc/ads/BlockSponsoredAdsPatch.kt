@@ -18,17 +18,38 @@ internal object SponsoredLabelPluginA00Fingerprint : Fingerprint(
     definingClass = "Lcom/facebook/feed/plugins/header/subtitle/impl/sponsoredlabel/SponsoredLabelPlugin;",
 )
 
+internal object SponsoredLabelPluginA01Fingerprint : Fingerprint(
+    name = "A01",
+    definingClass = "Lcom/facebook/feed/plugins/header/subtitle/impl/sponsoredlabel/SponsoredLabelPlugin;",
+)
+
+internal object LX2SuA03Fingerprint : Fingerprint(
+    name = "A03",
+    definingClass = "LX/2Su;",
+)
+
+internal object LX2SuA04Fingerprint : Fingerprint(
+    name = "A04",
+    definingClass = "LX/2Su;",
+)
+
+internal object LX2SuA05Fingerprint : Fingerprint(
+    name = "A05",
+    definingClass = "LX/2Su;",
+)
+
 @Suppress("unused")
 val blockSponsoredAdsPatch =
     bytecodePatch(
         name = "Block Sponsored Ads",
-        description = "Blocks and neutralizes sponsored advertisements and promotional labels in Facebook feed.",
+        description = "Blocks and neutralizes sponsored advertisements and promotional labels in Facebook feed and video stream.",
         default = true,
     ) {
         compatibleWith(COMPATIBILITY_FACEBOOK)
         dependsOn(facebookExtensionPatch)
 
         execute {
+            // 1. SponsoredLabelPlugin.A00(GraphQLStory)Z
             runCatching {
                 SponsoredLabelPluginA00Fingerprint.method.apply {
                     addInstruction(
@@ -36,15 +57,91 @@ val blockSponsoredAdsPatch =
                         """
                         invoke-static {}, $PREF_CLASS->isBlockSponsoredAds()Z
                         move-result v0
-                        if-eqz v0, :cond_bypass_ad
+                        if-eqz v0, :cond_bypass_label_a00
                         const/4 v0, 0x0
                         return v0
-                        :cond_bypass_ad
+                        :cond_bypass_label_a00
                         """.trimIndent(),
                     )
                 }
             }.onFailure { e ->
                 println("[BlockSponsoredAdsPatch] Error hooking SponsoredLabelPlugin.A00: ${e.message}")
+            }
+
+            // 2. SponsoredLabelPlugin.A01(3Zl)CharSequence
+            runCatching {
+                SponsoredLabelPluginA01Fingerprint.method.apply {
+                    addInstruction(
+                        0,
+                        """
+                        invoke-static {}, $PREF_CLASS->isBlockSponsoredAds()Z
+                        move-result v0
+                        if-eqz v0, :cond_bypass_label_a01
+                        const/4 v0, 0x0
+                        return-object v0
+                        :cond_bypass_label_a01
+                        """.trimIndent(),
+                    )
+                }
+            }.onFailure { e ->
+                println("[BlockSponsoredAdsPatch] Error hooking SponsoredLabelPlugin.A01: ${e.message}")
+            }
+
+            // 3. LX/2Su.A03(2QD)Z
+            runCatching {
+                LX2SuA03Fingerprint.method.apply {
+                    addInstruction(
+                        0,
+                        """
+                        invoke-static {}, $PREF_CLASS->isBlockSponsoredAds()Z
+                        move-result v0
+                        if-eqz v0, :cond_bypass_2su_a03
+                        const/4 v0, 0x0
+                        return v0
+                        :cond_bypass_2su_a03
+                        """.trimIndent(),
+                    )
+                }
+            }.onFailure { e ->
+                println("[BlockSponsoredAdsPatch] Error hooking LX/2Su.A03: ${e.message}")
+            }
+
+            // 4. LX/2Su.A04(2NV)Z
+            runCatching {
+                LX2SuA04Fingerprint.method.apply {
+                    addInstruction(
+                        0,
+                        """
+                        invoke-static {}, $PREF_CLASS->isBlockSponsoredAds()Z
+                        move-result v0
+                        if-eqz v0, :cond_bypass_2su_a04
+                        const/4 v0, 0x0
+                        return v0
+                        :cond_bypass_2su_a04
+                        """.trimIndent(),
+                    )
+                }
+            }.onFailure { e ->
+                println("[BlockSponsoredAdsPatch] Error hooking LX/2Su.A04: ${e.message}")
+            }
+
+            // 5. LX/2Su.A05(GraphQLStory)Z
+            runCatching {
+                LX2SuA05Fingerprint.method.apply {
+                    addInstruction(
+                        0,
+                        """
+                        invoke-static {}, $PREF_CLASS->isBlockSponsoredAds()Z
+                        move-result v0
+                        if-eqz v0, :cond_bypass_2su_a05
+                        const/4 v0, 0x0
+                        return v0
+                        :cond_bypass_2su_a05
+                        """.trimIndent(),
+                    )
+                }
+            }.onFailure { e ->
+                println("[BlockSponsoredAdsPatch] Error hooking LX/2Su.A05: ${e.message}")
             }
         }
     }
