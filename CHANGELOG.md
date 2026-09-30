@@ -1,3 +1,9 @@
+## [1.27.0](https://github.com/Rhdevs71/dududu/compare/v1.26.0...v1.27.0) (2026-09-30)
+
+### ✨ New Features
+
+* **facebook:** add RHpatch Facebook mod module with profile overlay capsule, categorized settings dialog, and sponsored ads blocker ([2c8d5c5](https://github.com/Rhdevs71/dududu/commit/2c8d5c5edf0df6958f180e194921db4e33cb06f7))
+
 ## [1.26.0](https://github.com/Rhdevs71/dududu/compare/v1.25.1...v1.26.0) (2026-09-30)
 
 ### ✨ New Features

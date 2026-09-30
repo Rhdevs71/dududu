@@ -1,6 +1,6 @@
 {
   "NOTE": "Do NOT manually edit this file. This file is automatically updated when semantic release (release.yml) runs. Manually editing this file can break your releases and break third party tools that use this file.",
-  "version": "1.26.0",
+  "version": "1.27.0",
   "patches": [
     {
       "name": "Add ability to copy media link",
@@ -300,6 +300,36 @@
                 "ARMEABI_V7A": 159,
                 "X86_64": 159,
                 "X86": 159
+              },
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "Block Sponsored Ads",
+      "description": "Blocks and neutralizes sponsored advertisements and promotional labels in Facebook feed.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.facebook.katana",
+          "name": "Facebook",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#1877F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "582.0.0.0.30",
+              "versionCodes": {
+                "ARM64_V8A": 475404750
               },
               "isExperimental": false,
               "minSdk": null,
@@ -4308,6 +4338,36 @@
             {
               "version": "12.19.1-release.0",
               "versionCodes": null,
+              "isExperimental": false,
+              "minSdk": null,
+              "description": null
+            }
+          ]
+        }
+      ],
+      "options": []
+    },
+    {
+      "name": "RHpatch Facebook Mod Menu",
+      "description": "Adds the [RHpatch] floating button on Profile screen and categorized mod menu dialog for Ghost Mode, Downloader, Ad-blocker, and Utilities.",
+      "default": true,
+      "dependencies": [
+        "BytecodePatch"
+      ],
+      "compatiblePackages": [
+        {
+          "packageName": "com.facebook.katana",
+          "name": "Facebook",
+          "description": null,
+          "apkFileType": "APK",
+          "appIconColor": "#1877F2",
+          "signatures": null,
+          "targets": [
+            {
+              "version": "582.0.0.0.30",
+              "versionCodes": {
+                "ARM64_V8A": 475404750
+              },
               "isExperimental": false,
               "minSdk": null,
               "description": null

@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.26.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.26.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;162 patches total
+> **[v1.27.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.27.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;164 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -292,6 +292,22 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 | [Hide Typing & Recording Status](#hide-typing-recording-status) | Prevents broadcasting typing and audio recording indicators to chat recipients. |  |
 | [Status & Media Downloader](#status-media-downloader) | Adds the capability to download status photos/videos and media directly to storage (/sdcard/Download/Piko/WhatsApp/). |  |
 | [Unlock WhatsApp Plus (Nova)](#unlock-whatsapp-plus-nova) | Unlocks official Meta Nova / WhatsApp Plus features including Custom App Themes, Custom App Icons, Pinned Chats Limit increase, and exclusive stickers. |  |
+
+</details>
+
+<details>
+<summary>📦 Facebook&nbsp;&nbsp;•&nbsp;&nbsp;2 patches</summary>
+<br>
+
+**🎯 Supported versions:**
+
+| 582.0.0.0.30 |
+| :---: |
+
+| 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
+|----------|----------------|-----------|
+| [Block Sponsored Ads](#block-sponsored-ads) | Blocks and neutralizes sponsored advertisements and promotional labels in Facebook feed. |  |
+| [RHpatch Facebook Mod Menu](#rhpatch-facebook-mod-menu) | Adds the [RHpatch] floating button on Profile screen and categorized mod menu dialog for Ghost Mode, Downloader, Ad-blocker, and Utilities. |  |
 
 </details>
 

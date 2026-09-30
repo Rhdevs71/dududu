@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-30T06:31:31",
-  "description": "## [1.26.0](https://github.com/Rhdevs71/dududu/compare/v1.25.1...v1.26.0) (2026-09-30)\n\n### ✨ New Features\n\n* **efootball:** add dual-target post-match reward claimer for dialog modals ([3cace87](https://github.com/Rhdevs71/dududu/commit/3cace8787b68b4d9e458543ef72052003c5481ac))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.26.0/patches-1.26.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.26.0/patches-1.26.0.mpp.asc",
-  "version": "1.26.0"
+  "created_at": "2026-09-30T13:58:02",
+  "description": "## [1.27.0](https://github.com/Rhdevs71/dududu/compare/v1.26.0...v1.27.0) (2026-09-30)\n\n### ✨ New Features\n\n* **facebook:** add RHpatch Facebook mod module with profile overlay capsule, categorized settings dialog, and sponsored ads blocker ([2c8d5c5](https://github.com/Rhdevs71/dududu/commit/2c8d5c5edf0df6958f180e194921db4e33cb06f7))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.27.0/patches-1.27.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.27.0/patches-1.27.0.mpp.asc",
+  "version": "1.27.0"
 }
