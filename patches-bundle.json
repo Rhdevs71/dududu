@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-30T13:58:02",
-  "description": "## [1.27.0](https://github.com/Rhdevs71/dududu/compare/v1.26.0...v1.27.0) (2026-09-30)\n\n### ✨ New Features\n\n* **facebook:** add RHpatch Facebook mod module with profile overlay capsule, categorized settings dialog, and sponsored ads blocker ([2c8d5c5](https://github.com/Rhdevs71/dududu/commit/2c8d5c5edf0df6958f180e194921db4e33cb06f7))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.27.0/patches-1.27.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.27.0/patches-1.27.0.mpp.asc",
-  "version": "1.27.0"
+  "created_at": "2026-09-30T15:13:13",
+  "description": "## [1.27.1](https://github.com/Rhdevs71/dududu/compare/v1.27.0...v1.27.1) (2026-09-30)\n\n### 🐛 Bug Fixes\n\n* **facebook:** fix overlay menu activity lifecycle, add working HD video downloader, and deep sponsored ad blocking ([291fa52](https://github.com/Rhdevs71/dududu/commit/291fa52a2bae3853a4d43cc25e1b9981c79c007f))\n* **facebook:** fix PikoUtils setContext compilation error in injector ([d5bc358](https://github.com/Rhdevs71/dududu/commit/d5bc35819ba49c795409f620ab8487dbf6c23c54))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.27.1/patches-1.27.1.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.27.1/patches-1.27.1.mpp.asc",
+  "version": "1.27.1"
 }

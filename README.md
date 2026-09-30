@@ -69,7 +69,7 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 ## ⚙️ Patch Details
 
 <!-- PATCHES_START -->
-> **[v1.27.0](https://github.com/Rhdevs71/dududu/releases/tag/v1.27.0)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;164 patches total
+> **[v1.27.1](https://github.com/Rhdevs71/dududu/releases/tag/v1.27.1)**&nbsp;&nbsp;•&nbsp;&nbsp;`main`&nbsp;&nbsp;•&nbsp;&nbsp;164 patches total
 <details>
 <summary>📦 Twitter&nbsp;&nbsp;•&nbsp;&nbsp;74 patches</summary>
 <br>
@@ -306,8 +306,8 @@ To patch with Twitter/X version 11.88 to 12.4, you must include patches from ano
 
 | 💊&nbsp;Patch | 📜&nbsp;Description | ⚙️&nbsp;Options |
 |----------|----------------|-----------|
-| [Block Sponsored Ads](#block-sponsored-ads) | Blocks and neutralizes sponsored advertisements and promotional labels in Facebook feed. |  |
-| [RHpatch Facebook Mod Menu](#rhpatch-facebook-mod-menu) | Adds the [RHpatch] floating button on Profile screen and categorized mod menu dialog for Ghost Mode, Downloader, Ad-blocker, and Utilities. |  |
+| [Block Sponsored Ads](#block-sponsored-ads) | Blocks and neutralizes sponsored advertisements and promotional labels in Facebook feed and video stream. |  |
+| [RHpatch Facebook Mod Menu](#rhpatch-facebook-mod-menu) | Adds global Activity lifecycle tracking, floating capsule mod button, categorized settings dialog, external browser redirect, and HD video downloader. |  |
 
 </details>
 

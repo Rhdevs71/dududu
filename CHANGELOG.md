@@ -1,3 +1,10 @@
+## [1.27.1](https://github.com/Rhdevs71/dududu/compare/v1.27.0...v1.27.1) (2026-09-30)
+
+### 🐛 Bug Fixes
+
+* **facebook:** fix overlay menu activity lifecycle, add working HD video downloader, and deep sponsored ad blocking ([291fa52](https://github.com/Rhdevs71/dududu/commit/291fa52a2bae3853a4d43cc25e1b9981c79c007f))
+* **facebook:** fix PikoUtils setContext compilation error in injector ([d5bc358](https://github.com/Rhdevs71/dududu/commit/d5bc35819ba49c795409f620ab8487dbf6c23c54))
+
 ## [1.27.0](https://github.com/Rhdevs71/dududu/compare/v1.26.0...v1.27.0) (2026-09-30)
 
 ### ✨ New Features
