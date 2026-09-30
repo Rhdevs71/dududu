@@ -117,12 +117,26 @@ public class EfbOverlayManager {
     private static int sCurrentFov = 0; // 0 = default
     private static TextView sFovIndicator = null;
 
+    // Graphics & Performance State
+    private static boolean sStatFpsActive = false;
+    private static boolean sStatUnitActive = false;
+    private static boolean sBroadcastModeActive = false;
+    private static String sCurrentGraphicsLabel = "Default";
+
+    // Multi-tier Native Input Dispatcher State
+    private static Method sDispatchInputEventMethod = null;
+    private static Object sViewRootImpl = null;
+    private static boolean sHiddenApiUnsealed = false;
+
     public static void init(final Activity activity) {
         if (activity == null) return;
         sActivity = activity;
 
+        unsealHiddenApi();
+        initInputDispatcher();
+
         try {
-            PikoUtils.logger(TAG + ": Inisialisasi eFootball Smart Overlay Mod Suite v4 on " + activity.getClass().getName());
+            PikoUtils.logger(TAG + ": Inisialisasi eFootball Smart Overlay Mod Suite v5 on " + activity.getClass().getName());
         } catch (Throwable ignored) {}
 
         sMainHandler.postDelayed(new Runnable() {
@@ -553,7 +567,7 @@ public class EfbOverlayManager {
         titleLayout.addView(titleView);
 
         TextView subtitleView = new TextView(activity);
-        subtitleView.setText("Piko • Smart AFK Grinder & Instant Ad Claimer");
+        subtitleView.setText("Piko • Smart AFK Grinder, Graphics & Visual Studio");
         subtitleView.setTextColor(Color.parseColor("#94A3B8"));
         subtitleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         titleLayout.addView(subtitleView);
@@ -679,85 +693,80 @@ public class EfbOverlayManager {
 
 
 
-        // ==========================================
-        // SECTION 2: BYPASS TONTON IKLAN (3 TIPE HADIAH)
-        // ==========================================
-        addSectionHeader(activity, contentLayout, "🎁 BYPASS TONTON IKLAN (3 TIPE HADIAH INSTAN)");
-
-        TextView adInfo = new TextView(activity);
-        adInfo.setText("Semua iklan video di 3 kategori eFootball dilewati 0 detik tanpa menunggu 30 detik. Hadiah langsung cair seketika saat tombol ditekan!");
-        adInfo.setTextColor(Color.parseColor("#94A3B8"));
-        adInfo.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        contentLayout.addView(adInfo);
-
-        // Type 1: Kotak Masuk
-        addFeatureLabel(activity, contentLayout, "1. Kotak Masuk (Inbox): 2 Hadiah/Hari (Random GP/Exp/Item)");
-        Button inboxAdBtn = new Button(activity);
-        inboxAdBtn.setText("🎁 KLAIM IKLAN KOTAK MASUK");
-        inboxAdBtn.setTextColor(Color.WHITE);
-        inboxAdBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        inboxAdBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        GradientDrawable inBg = new GradientDrawable();
-        inBg.setColor(Color.parseColor("#0284C7"));
-        inBg.setCornerRadius(dpToPx(activity, 8));
-        inboxAdBtn.setBackground(inBg);
-        LinearLayout.LayoutParams inParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(activity, 38));
-        inParams.setMargins(0, dpToPx(activity, 4), 0, dpToPx(activity, 6));
-        inboxAdBtn.setLayoutParams(inParams);
-        inboxAdBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                claimAdRewardInstantly(activity, 0);
-            }
-        });
-        contentLayout.addView(inboxAdBtn);
-
-        // Type 2: Toko Koin
-        addFeatureLabel(activity, contentLayout, "2. Toko Koin (Shop): 2 Hadiah/Hari (+5 Koin eFootball per iklan)");
-        Button coinAdBtn = new Button(activity);
-        coinAdBtn.setText("🪙 KLAIM IKLAN TOKO KOIN (+5 KOIN)");
-        coinAdBtn.setTextColor(Color.WHITE);
-        coinAdBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        coinAdBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        GradientDrawable coinBg = new GradientDrawable();
-        coinBg.setColor(Color.parseColor("#D97706"));
-        coinBg.setCornerRadius(dpToPx(activity, 8));
-        coinAdBtn.setBackground(coinBg);
-        LinearLayout.LayoutParams coinParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(activity, 38));
-        coinParams.setMargins(0, dpToPx(activity, 4), 0, dpToPx(activity, 6));
-        coinAdBtn.setLayoutParams(coinParams);
-        coinAdBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                claimAdRewardInstantly(activity, 1);
-            }
-        });
-        contentLayout.addView(coinAdBtn);
-
-        // Type 3: Kontrak Pemain Spesial
-        addFeatureLabel(activity, contentLayout, "3. Kontrak Pemain Spesial: 2 Hadiah/Event (Free Gacha Chance Deal)");
-        Button gachaAdBtn = new Button(activity);
-        gachaAdBtn.setText("🌟 KLAIM IKLAN GACHA PEMAIN SPESIAL");
-        gachaAdBtn.setTextColor(Color.WHITE);
-        gachaAdBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        gachaAdBtn.setTypeface(Typeface.DEFAULT_BOLD);
-        GradientDrawable gachaBg = new GradientDrawable();
-        gachaBg.setColor(Color.parseColor("#7C3AED"));
-        gachaBg.setCornerRadius(dpToPx(activity, 8));
-        gachaAdBtn.setBackground(gachaBg);
-        LinearLayout.LayoutParams gachaParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dpToPx(activity, 38));
-        gachaParams.setMargins(0, dpToPx(activity, 4), 0, dpToPx(activity, 8));
-        gachaAdBtn.setLayoutParams(gachaParams);
-        gachaAdBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                claimAdRewardInstantly(activity, 2);
-            }
-        });
-        contentLayout.addView(gachaAdBtn);
+        // Manual Action Triggers
+        addFeatureLabel(activity, contentLayout, "Aksi Cepat / Uji Coba Sentuhan:");
+        LinearLayout actionButtonsRow = new LinearLayout(activity);
+        actionButtonsRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, actionButtonsRow, "⚡ TEST TAP", "#0284C7", () -> forceTapActionButton());
+        addOptionButton(activity, actionButtonsRow, "⏭️ MAJU TAHAP", "#7C3AED", () -> advanceStageManually());
+        addOptionButton(activity, actionButtonsRow, "🔄 RESET ALUR", "#475569", () -> resetStageFlow());
+        contentLayout.addView(actionButtonsRow);
 
         // ==========================================
-        // SECTION 3: KAMERA & SUDUT PANDANG (FOV)
+        // SECTION 2: STUDIO GRAFIS & VISUAL (UE4)
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "🎮 STUDIO GRAFIS & VISUAL (UE4 GRAPHICS)");
+        final TextView gfxStatus = new TextView(activity);
+        gfxStatus.setText("Preset Grafis: " + sCurrentGraphicsLabel);
+        gfxStatus.setTextColor(Color.parseColor("#38BDF8"));
+        gfxStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
+        gfxStatus.setTypeface(Typeface.DEFAULT_BOLD);
+        contentLayout.addView(gfxStatus);
+
+        LinearLayout gfxRow1 = new LinearLayout(activity);
+        gfxRow1.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, gfxRow1, "💎 Ultra 2K HD", "#059669", () -> {
+            applyGraphicsPreset("Ultra 2K HD", "r.ScreenPercentage 125", "r.PostProcessAAQuality 4");
+            gfxStatus.setText("Preset Grafis: Ultra 2K HD");
+        });
+        addOptionButton(activity, gfxRow1, "🖥️ Native 1080p", "#0284C7", () -> {
+            applyGraphicsPreset("Native 1080p", "r.ScreenPercentage 100", "r.PostProcessAAQuality 2");
+            gfxStatus.setText("Preset Grafis: Native 1080p");
+        });
+        addOptionButton(activity, gfxRow1, "⚡ Anti-Blur Vision", "#7C3AED", () -> {
+            applyGraphicsPreset("Anti-Blur Vision", "r.MotionBlurQuality 0", "r.DepthOfFieldQuality 0");
+            gfxStatus.setText("Preset Grafis: Anti-Blur Vision");
+        });
+        contentLayout.addView(gfxRow1);
+
+        LinearLayout gfxRow2 = new LinearLayout(activity);
+        gfxRow2.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, gfxRow2, "❄️ Mode Dingin (Hemat)", "#0284C7", () -> {
+            applyGraphicsPreset("Mode Dingin (Hemat Baterai)", "r.MobileShadowQuality 0");
+            gfxStatus.setText("Preset Grafis: Mode Dingin");
+        });
+        addOptionButton(activity, gfxRow2, "⚡ Zero Latency", "#D97706", () -> {
+            applyGraphicsPreset("Zero Input Latency", "r.VSync 0");
+            gfxStatus.setText("Preset Grafis: Zero Latency");
+        });
+        addOptionButton(activity, gfxRow2, "🔄 Reset Grafis", "#334155", () -> {
+            applyGraphicsPreset("Default Bawaan", "r.ScreenPercentage 0", "r.PostProcessAAQuality 2", "r.MotionBlurQuality 3", "r.DepthOfFieldQuality 2", "r.MobileShadowQuality 2", "r.VSync 1");
+            gfxStatus.setText("Preset Grafis: Default Bawaan");
+        });
+        contentLayout.addView(gfxRow2);
+
+        // ==========================================
+        // SECTION 3: ENGINE MONITOR & PERFORMA
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "📊 ENGINE MONITOR & PERFORMA");
+        LinearLayout monRow = new LinearLayout(activity);
+        monRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, monRow, "🟢 TOGGLE STAT FPS", "#059669", () -> toggleStatFps());
+        addOptionButton(activity, monRow, "📈 TOGGLE STAT UNIT", "#0284C7", () -> toggleStatUnit());
+        contentLayout.addView(monRow);
+
+        // ==========================================
+        // SECTION 4: MODE BROADCAST TV & SINEMATIK
+        // ==========================================
+        addSectionHeader(activity, contentLayout, "📺 MODE BROADCAST TV (CLEAN UI)");
+        addFeatureLabel(activity, contentLayout, "Sembunyikan semua tombol virtual, radar, dan nama pemain:");
+        LinearLayout broadcastRow = new LinearLayout(activity);
+        broadcastRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, broadcastRow, "📺 TOGGLE BROADCAST MODE (ShowHUD)", "#7C3AED", () -> toggleBroadcastMode());
+        contentLayout.addView(broadcastRow);
+
+        // ==========================================
+        // SECTION 5: KAMERA & SUDUT PANDANG (FOV)
         // ==========================================
         addSectionHeader(activity, contentLayout, "🎥 KAMERA & SUDUT PANDANG (FOV)");
 
@@ -792,12 +801,12 @@ public class EfbOverlayManager {
         contentLayout.addView(freeCamRow);
 
         // ==========================================
-        // SECTION 5: STATUS SISTEM
+        // SECTION 6: STATUS SISTEM
         // ==========================================
         addSectionHeader(activity, contentLayout, "🛡️ STATUS SISTEM");
         addStatusBadge(activity, contentLayout, "✅ Google Play License: PROTECTED (Status: LICENSED)");
-        addStatusBadge(activity, contentLayout, "✅ Instant Ad Reward Bypass: AKTIF (AdMob Bypassed)");
-        addStatusBadge(activity, contentLayout, "✅ Precision Context-Aware AFK: READY");
+        addStatusBadge(activity, contentLayout, "✅ In-Game Ad Reward: AUTO-BYPASSED (AdMob Rewarded)");
+        addStatusBadge(activity, contentLayout, "✅ AFK Match Grinder V5: READY (Multi-Tier In-Process Dispatch)");
 
         scrollView.addView(contentLayout);
         card.addView(scrollView);
@@ -813,39 +822,30 @@ public class EfbOverlayManager {
         return backdrop;
     }
 
-    /**
-     * Instantly claims rewarded ad rewards by invoking Konami's AdMobReward controller for specific kind.
-     * kind 0 = Kotak Masuk (Random gift GP/Exp)
-     * kind 1 = Toko Koin (+5 eFootball coins)
-     * kind 2 = Kontrak Pemain Spesial (Chance Deal free gacha pull)
-     */
-    public static void claimAdRewardInstantly(final Context context, int kind) {
-        if (context == null) return;
-        try {
-            Class<?> adMobClass = Class.forName("jp.konami.AdMobReward");
-            try {
-                Field kindField = adMobClass.getDeclaredField("s_reserveRewardedAdIDs_kind");
-                kindField.setAccessible(true);
-                kindField.setInt(null, kind);
-            } catch (Throwable ignored) {}
-
-            Method showMethod = adMobClass.getDeclaredMethod("Show", Context.class);
-            showMethod.setAccessible(true);
-            showMethod.invoke(null, context);
-
-            String label = (kind == 0) ? "Kotak Masuk (GP/Exp)" : (kind == 1) ? "Toko Koin (+5 Koin)" : "Kontrak Spesial (Free Gacha)";
-            showToast("🎁 Reward Iklan [" + label + "] Berhasil Dipicu!");
-        } catch (Throwable t) {
-            try {
-                Class<?> adMobClass = Class.forName("jp.konami.AdMobReward");
-                Method showFunc = adMobClass.getDeclaredMethod("ShowFunc", Context.class);
-                showFunc.setAccessible(true);
-                showFunc.invoke(null, context);
-                showToast("🎁 Reward Iklan Berhasil Dipicu!");
-            } catch (Throwable t2) {
-                showToast("Info: Buka menu iklan di game, tombol tonton otomatis mencairkan hadiah seketika!");
-            }
+    public static void applyGraphicsPreset(String label, String... commands) {
+        sCurrentGraphicsLabel = label;
+        for (String cmd : commands) {
+            executeCommand(cmd);
         }
+        showToast("🎮 Grafis: " + label + " Diterapkan!");
+    }
+
+    public static void toggleStatFps() {
+        sStatFpsActive = !sStatFpsActive;
+        executeCommand("stat fps");
+        showToast(sStatFpsActive ? "🟢 Stat FPS Diaktifkan di Layar" : "🔴 Stat FPS Dinonaktifkan");
+    }
+
+    public static void toggleStatUnit() {
+        sStatUnitActive = !sStatUnitActive;
+        executeCommand("stat unit");
+        showToast(sStatUnitActive ? "🟢 Stat Unit Latensi Diaktifkan" : "🔴 Stat Unit Dinonaktifkan");
+    }
+
+    public static void toggleBroadcastMode() {
+        sBroadcastModeActive = !sBroadcastModeActive;
+        executeCommand("ShowHUD");
+        showToast(sBroadcastModeActive ? "📺 Mode Broadcast TV Aktif (Semua UI Sembunyi)" : "📺 UI Game Normal Ditampilkan");
     }
 
     private static void applyFov(int fov, String label) {
@@ -935,10 +935,10 @@ public class EfbOverlayManager {
 
     public static void forceTapActionButton() {
         if (sActivity == null) return;
-        DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-        // Calibrated Bottom-Right Coordinate: 82.5% X, 91.5% Y
-        dispatchSimulatedTouchWithJitter(dm.widthPixels * 0.825f, dm.heightPixels * 0.915f);
-        showToast("⚡ Tap Tombol Kanan Bawah ('Ke Laga' / 'Berikut')!");
+        int w = getScreenWidth();
+        int h = getScreenHeight();
+        dispatchDualActionPulse(w * 0.850f, h * 0.925f);
+        showToast("⚡ Tap Tombol Kanan Bawah ('Ke Laga' / 'Berikut') + Pulse Dialog!");
     }
 
     private static void stopAfkGrinder() {
@@ -982,12 +982,12 @@ public class EfbOverlayManager {
 
     /**
      * Precision AFK Grinder Loop strictly adhering to eFootball match flow:
-     * 1. PHASE_MENU: Repeatedly taps 'Ke Laga >' / 'Berikut >' (0.825w, 0.915h) every 2.8s.
+     * 1. PHASE_MENU: Repeatedly pulses 'Ke Laga >' / 'Berikut >' (0.850w, 0.925h) & dialog OK (0.500w, 0.760h) every 2.8s.
      *    Passes Event Lobby -> Matchmaking -> Jersey -> Game Plan Kickoff.
-     * 2. PHASE_MATCH_HALF_1: Monitor 1st half match (~190s). Taps center (0.50w, 0.50h) every 5.5s to skip replays.
-     * 3. PHASE_HALFTIME: Taps 'Mulai Babak Kedua >' (0.825w, 0.915h).
-     * 4. PHASE_MATCH_HALF_2: Monitor 2nd half match (~190s). Taps center (0.50w, 0.50h) every 5.5s to skip replays.
-     * 5. PHASE_POST_MATCH: Sequential tap 'Berikut >' (0.825w, 0.915h) for stats, EXP, event points, return to lobby.
+     * 2. PHASE_MATCH_HALF_1: Monitor 1st half match (~190s). Taps center (0.50w, 0.50h) every 5.0s to skip replays.
+     * 3. PHASE_HALFTIME: Pulses 'Mulai Babak Kedua >' (0.850w, 0.925h) & dialog OK.
+     * 4. PHASE_MATCH_HALF_2: Monitor 2nd half match (~190s). Taps center (0.50w, 0.50h) every 5.0s to skip replays.
+     * 5. PHASE_POST_MATCH: Sequential pulses 'Berikut >' (0.850w, 0.925h) for stats, EXP, event points, return to lobby.
      */
     private static final Runnable sAfkLoopRunnable = new Runnable() {
         @Override
@@ -1010,22 +1010,21 @@ public class EfbOverlayManager {
                 return;
             }
 
-            DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-            final int w = dm.widthPixels;
-            final int h = dm.heightPixels;
+            final int w = getScreenWidth();
+            final int h = getScreenHeight();
 
             long nextDelayMs = 2800;
 
             switch (sCurrentStage) {
                 case PHASE_MENU:
                     sMenuTapCount++;
-                    // Tap Bottom-Right 'Ke Laga >' / 'Berikut >'
-                    dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                    // Dual-Action Pulse: Primary 'Ke Laga / Berikut' + Safety Dialog Dismissal
+                    dispatchDualActionPulse(w * 0.850f, h * 0.925f);
                     sCurrentPlannedAction = "Menekan 'Ke Laga / Berikut' (Kanan Bawah) [#" + sMenuTapCount + "]...";
 
-                    // After 6 taps (~17 seconds of menu cycle: Lobby -> Matchmaking -> Jersey -> Gameplan),
+                    // After 7 taps (~20 seconds of menu cycle: Lobby -> Matchmaking -> Jersey -> Gameplan),
                     // kickoff has started; transition to match monitoring
-                    if (sMenuTapCount >= 6) {
+                    if (sMenuTapCount >= 7) {
                         sCurrentStage = ScreenState.PHASE_MATCH_HALF_1;
                         sMatchStartTime = System.currentTimeMillis();
                         nextDelayMs = 4500;
@@ -1043,7 +1042,7 @@ public class EfbOverlayManager {
 
                     // Periodic safety tap on bottom-right every ~25s in case early half-time
                     if (elapsedH1 > 0 && elapsedH1 % 25 < 6) {
-                        dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                        dispatchDualActionPulse(w * 0.850f, h * 0.925f);
                     }
 
                     if (elapsedH1 >= 190) {
@@ -1051,16 +1050,16 @@ public class EfbOverlayManager {
                         sHalftimeStep = 0;
                         nextDelayMs = 3500;
                     } else {
-                        nextDelayMs = 5500;
+                        nextDelayMs = 5000;
                     }
                     break;
 
                 case PHASE_HALFTIME:
                     // Half-Time transition: Tap 'Mulai Babak Kedua >'
-                    dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                    dispatchDualActionPulse(w * 0.850f, h * 0.925f);
                     sHalftimeStep++;
-                    sCurrentPlannedAction = "⏸️ Jeda Babak: Menekan 'Mulai Babak Kedua >' (" + sHalftimeStep + "/2)...";
-                    if (sHalftimeStep >= 2) {
+                    sCurrentPlannedAction = "⏸️ Jeda Babak: Menekan 'Mulai Babak Kedua >' (" + sHalftimeStep + "/3)...";
+                    if (sHalftimeStep >= 3) {
                         sCurrentStage = ScreenState.PHASE_MATCH_HALF_2;
                         sMatchStartTime = System.currentTimeMillis();
                         nextDelayMs = 4500;
@@ -1078,7 +1077,7 @@ public class EfbOverlayManager {
 
                     // Periodic safety tap on bottom-right every ~25s in case early full-time
                     if (elapsedH2 > 0 && elapsedH2 % 25 < 6) {
-                        dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                        dispatchDualActionPulse(w * 0.850f, h * 0.925f);
                     }
 
                     if (elapsedH2 >= 190) {
@@ -1086,16 +1085,16 @@ public class EfbOverlayManager {
                         sPostMatchStep = 0;
                         nextDelayMs = 3500;
                     } else {
-                        nextDelayMs = 5500;
+                        nextDelayMs = 5000;
                     }
                     break;
 
                 case PHASE_POST_MATCH:
                     // Post-match result screens: Sequential tap 'Berikut >' for EXP, stats, event points
-                    dispatchSimulatedTouchWithJitter(w * 0.825f, h * 0.915f);
+                    dispatchDualActionPulse(w * 0.850f, h * 0.925f);
                     sPostMatchStep++;
-                    sCurrentPlannedAction = "🏆 Selesai Laga: Menekan 'Berikut >' untuk Klaim Poin (" + sPostMatchStep + "/5)...";
-                    if (sPostMatchStep >= 5) {
+                    sCurrentPlannedAction = "🏆 Selesai Laga: Menekan 'Berikut >' untuk Klaim Poin (" + sPostMatchStep + "/6)...";
+                    if (sPostMatchStep >= 6) {
                         sCompletedMatches++;
                         showToast("🎉 Laga ke-" + sCompletedMatches + " Selesai! Memulai laga berikutnya...");
                         if (sTargetMatches > 0 && sCompletedMatches >= sTargetMatches) {
@@ -1128,8 +1127,107 @@ public class EfbOverlayManager {
     };
 
     // ==========================================
-    // SURFACEVIEW DETECTION & NATIVE TOUCH SIMULATION
+    // MULTI-TIER NATIVE INPUT INJECTION & CALIBRATION
     // ==========================================
+
+    private static void unsealHiddenApi() {
+        if (sHiddenApiUnsealed) return;
+        try {
+            Method forName = Class.class.getDeclaredMethod("forName", String.class);
+            Method getDeclaredMethod = Class.class.getDeclaredMethod("getDeclaredMethod", String.class, Class[].class);
+            Class<?> vmRuntimeClass = (Class<?>) forName.invoke(null, "dalvik.system.VMRuntime");
+            Method getRuntimeMethod = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "getRuntime", new Class<?>[0]);
+            Method setHiddenApiExemptions = (Method) getDeclaredMethod.invoke(vmRuntimeClass, "setHiddenApiExemptions", new Class<?>[]{String[].class});
+            Object vmRuntime = getRuntimeMethod.invoke(null);
+            setHiddenApiExemptions.invoke(vmRuntime, (Object) new String[]{"L"});
+            sHiddenApiUnsealed = true;
+        } catch (Throwable ignored) {}
+    }
+
+    private static void initInputDispatcher() {
+        if (sDispatchInputEventMethod != null) return;
+        unsealHiddenApi();
+        try {
+            Class<?> viewRootImplClass = Class.forName("android.view.ViewRootImpl");
+            sDispatchInputEventMethod = viewRootImplClass.getDeclaredMethod("dispatchInputEvent", InputEvent.class);
+            sDispatchInputEventMethod.setAccessible(true);
+        } catch (Throwable ignored) {}
+    }
+
+    private static int getScreenWidth() {
+        if (sActivity == null) return 1920;
+        try {
+            SurfaceView sv = findSurfaceView(sActivity.getWindow().getDecorView());
+            if (sv != null && sv.getWidth() > 0) {
+                return Math.max(sv.getWidth(), sv.getHeight());
+            }
+        } catch (Throwable ignored) {}
+        try {
+            DisplayMetrics dm = new DisplayMetrics();
+            sActivity.getWindowManager().getDefaultDisplay().getRealMetrics(dm);
+            return Math.max(dm.widthPixels, dm.heightPixels);
+        } catch (Throwable ignored) {
+            DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
+            return Math.max(dm.widthPixels, dm.heightPixels);
+        }
+    }
+
+    private static int getScreenHeight() {
+        if (sActivity == null) return 1080;
+        try {
+            SurfaceView sv = findSurfaceView(sActivity.getWindow().getDecorView());
+            if (sv != null && sv.getHeight() > 0) {
+                return Math.min(sv.getWidth(), sv.getHeight());
+            }
+        } catch (Throwable ignored) {}
+        try {
+            DisplayMetrics dm = new DisplayMetrics();
+            sActivity.getWindowManager().getDefaultDisplay().getRealMetrics(dm);
+            return Math.min(dm.widthPixels, dm.heightPixels);
+        } catch (Throwable ignored) {
+            DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
+            return Math.min(dm.widthPixels, dm.heightPixels);
+        }
+    }
+
+    private static boolean dispatchToViewRoot(MotionEvent event) {
+        if (sActivity == null || event == null) return false;
+        try {
+            View decor = sActivity.getWindow().getDecorView();
+            if (decor == null) return false;
+            Object vri = sViewRootImpl;
+            if (vri == null) {
+                try {
+                    Method getViewRootImpl = View.class.getDeclaredMethod("getViewRootImpl");
+                    getViewRootImpl.setAccessible(true);
+                    vri = getViewRootImpl.invoke(decor);
+                } catch (Throwable t) {
+                    Field f = View.class.getDeclaredField("mAttachInfo");
+                    f.setAccessible(true);
+                    Object attachInfo = f.get(decor);
+                    if (attachInfo != null) {
+                        Field vriField = attachInfo.getClass().getDeclaredField("mViewRootImpl");
+                        vriField.setAccessible(true);
+                        vri = vriField.get(attachInfo);
+                    }
+                }
+                if (vri != null) {
+                    sViewRootImpl = vri;
+                }
+            }
+            if (vri != null) {
+                if (sDispatchInputEventMethod == null) {
+                    initInputDispatcher();
+                }
+                if (sDispatchInputEventMethod != null) {
+                    sDispatchInputEventMethod.invoke(vri, event);
+                    return true;
+                }
+            }
+        } catch (Throwable ignored) {}
+        return false;
+    }
+
     private static SurfaceView findSurfaceView(View root) {
         if (root == null) return null;
         if (root instanceof SurfaceView) {
@@ -1225,7 +1323,10 @@ public class EfbOverlayManager {
     private static void sendEvent(MotionEvent event) {
         if (sActivity == null || event == null) return;
 
-        // 1. Direct dispatch to SurfaceView (UE4 graphics viewport)
+        // Tier 1: Direct injection into Window ViewRootImpl input pipeline (Native AInputQueue for UE4)
+        boolean sentToVri = dispatchToViewRoot(event);
+
+        // Tier 2: Direct dispatch to SurfaceView (UE4 graphics viewport)
         try {
             SurfaceView sv = findSurfaceView(sActivity.getWindow().getDecorView());
             if (sv != null) {
@@ -1233,26 +1334,39 @@ public class EfbOverlayManager {
             }
         } catch (Throwable ignored) {}
 
-        // 2. Direct GameActivity onTouchEvent (UE4 nativeOnTouch bridge)
+        // Tier 3: Direct GameActivity onTouchEvent (UE4 nativeOnTouch bridge)
         try {
             sActivity.onTouchEvent(event);
         } catch (Throwable ignored) {}
 
-        // 3. Fallback: DecorView dispatch
+        // Tier 4: Fallback: DecorView dispatch
         try {
             View decor = sActivity.getWindow().getDecorView();
             if (decor != null) decor.dispatchTouchEvent(event);
         } catch (Throwable ignored) {}
     }
 
-    /**
-     * Adds ±1.0% randomized spatial jitter to simulate natural human fingertip tapping.
-     */
+    public static void dispatchDualActionPulse(final float primaryX, final float primaryY) {
+        dispatchSimulatedTouchWithJitter(primaryX, primaryY);
+        // Pulse popup/dialog OK button 350ms later to dismiss any event/contract alerts
+        sMainHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    int w = getScreenWidth();
+                    int h = getScreenHeight();
+                    dispatchSimulatedTouchWithJitter(w * 0.500f, h * 0.760f);
+                } catch (Throwable ignored) {}
+            }
+        }, 350);
+    }
+
     private static void dispatchSimulatedTouchWithJitter(float baseX, float baseY) {
         if (sActivity == null) return;
-        DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-        float jitterX = (sRandom.nextFloat() - 0.5f) * (dm.widthPixels * 0.020f);
-        float jitterY = (sRandom.nextFloat() - 0.5f) * (dm.heightPixels * 0.020f);
+        int w = getScreenWidth();
+        int h = getScreenHeight();
+        float jitterX = (sRandom.nextFloat() - 0.5f) * (w * 0.015f);
+        float jitterY = (sRandom.nextFloat() - 0.5f) * (h * 0.015f);
 
         dispatchSimulatedTouch(baseX + jitterX, baseY + jitterY);
     }
@@ -1275,7 +1389,6 @@ public class EfbOverlayManager {
                     final long moveTime = SystemClock.uptimeMillis();
                     final MotionEvent move = createTouchEvent(downTime, moveTime, MotionEvent.ACTION_MOVE, x + 1.0f, y + 1.0f);
                     sendEvent(move);
-                    move.recycle();
                 } catch (Throwable ignored) {}
             }
         }, 30);
@@ -1288,11 +1401,7 @@ public class EfbOverlayManager {
                     final long upTime = SystemClock.uptimeMillis();
                     final MotionEvent up = createTouchEvent(downTime, upTime, MotionEvent.ACTION_UP, x + 1.0f, y + 1.0f);
                     sendEvent(up);
-                    up.recycle();
-                } catch (Throwable ignored) {
-                } finally {
-                    down.recycle();
-                }
+                } catch (Throwable ignored) {}
             }
         }, duration);
     }
@@ -1318,12 +1427,9 @@ public class EfbOverlayManager {
                     if (currentStep < steps) {
                         MotionEvent move = createTouchEvent(downTime, eventTime, MotionEvent.ACTION_MOVE, curX, curY);
                         sendEvent(move);
-                        move.recycle();
                     } else {
                         MotionEvent up = createTouchEvent(downTime, eventTime, MotionEvent.ACTION_UP, curX, curY);
                         sendEvent(up);
-                        up.recycle();
-                        down.recycle();
                     }
                 }
             }, stepDelay * i);
