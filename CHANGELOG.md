@@ -1,3 +1,9 @@
+## [1.26.0](https://github.com/Rhdevs71/dududu/compare/v1.25.1...v1.26.0) (2026-09-30)
+
+### ✨ New Features
+
+* **efootball:** add dual-target post-match reward claimer for dialog modals ([3cace87](https://github.com/Rhdevs71/dududu/commit/3cace8787b68b4d9e458543ef72052003c5481ac))
+
 ## [1.25.1](https://github.com/Rhdevs71/dududu/compare/v1.25.0...v1.25.1) (2026-09-30)
 
 ### 🐛 Bug Fixes
