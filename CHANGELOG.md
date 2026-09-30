@@ -1,3 +1,9 @@
+## [1.25.0](https://github.com/Rhdevs71/dududu/compare/v1.24.0...v1.25.0) (2026-09-30)
+
+### ✨ New Features
+
+* **efootball:** direct NDK mCurInputQueue injection, auto-dismiss modal on tap, and purge clutter sections ([c21f61d](https://github.com/Rhdevs71/dududu/commit/c21f61d4a0790b2db53026f584a9112e86e428fa))
+
 ## [1.24.0](https://github.com/Rhdevs71/dududu/compare/v1.23.0...v1.24.0) (2026-09-30)
 
 ### ✨ New Features

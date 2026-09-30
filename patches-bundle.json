@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-30T05:17:52",
-  "description": "## [1.24.0](https://github.com/Rhdevs71/dududu/compare/v1.23.0...v1.24.0) (2026-09-30)\n\n### ✨ New Features\n\n* **efootball:** re-engineer AFK grinder with ViewRootImpl native input injection, remove redundant ad menu, and add graphics/HUD features ([45ad962](https://github.com/Rhdevs71/dududu/commit/45ad962875b2a4d87b1edc17260b822a0c2623ac))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.24.0/patches-1.24.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.24.0/patches-1.24.0.mpp.asc",
-  "version": "1.24.0"
+  "created_at": "2026-09-30T05:51:52",
+  "description": "## [1.25.0](https://github.com/Rhdevs71/dududu/compare/v1.24.0...v1.25.0) (2026-09-30)\n\n### ✨ New Features\n\n* **efootball:** direct NDK mCurInputQueue injection, auto-dismiss modal on tap, and purge clutter sections ([c21f61d](https://github.com/Rhdevs71/dududu/commit/c21f61d4a0790b2db53026f584a9112e86e428fa))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.25.0/patches-1.25.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.25.0/patches-1.25.0.mpp.asc",
+  "version": "1.25.0"
 }
