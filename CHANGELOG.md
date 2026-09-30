@@ -1,3 +1,10 @@
+## [1.27.2](https://github.com/Rhdevs71/dududu/compare/v1.27.1...v1.27.2) (2026-09-30)
+
+### 🐛 Bug Fixes
+
+* **facebook:** deep sponsored ad neutralization, 3-dots post media downloader, and background playback hook ([4e76443](https://github.com/Rhdevs71/dududu/commit/4e764435171ab3aea402cfffada4702d49ad4a4e))
+* **facebook:** import FacebookPostMenuHook in RhpatchFacebookDialog ([499cccc](https://github.com/Rhdevs71/dududu/commit/499ccccf1596a836fc0e3f6fe67b17744d5c1747))
+
 ## [1.27.1](https://github.com/Rhdevs71/dududu/compare/v1.27.0...v1.27.1) (2026-09-30)
 
 ### 🐛 Bug Fixes
