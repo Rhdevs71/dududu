@@ -1,3 +1,9 @@
+## [1.25.1](https://github.com/Rhdevs71/dududu/compare/v1.25.0...v1.25.1) (2026-09-30)
+
+### 🐛 Bug Fixes
+
+* **efootball:** zero in-match touches for AI mode, relaxed menu intervals, and bottom-right half-time navigation ([4628bd3](https://github.com/Rhdevs71/dududu/commit/4628bd3c17d0ec94bc21469357ea3912221c7f23))
+
 ## [1.25.0](https://github.com/Rhdevs71/dududu/compare/v1.24.0...v1.25.0) (2026-09-30)
 
 ### ✨ New Features
