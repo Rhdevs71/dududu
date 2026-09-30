@@ -455,6 +455,87 @@ public class RhpatchFacebookDialog {
                     btnRow.addView(dlBtn);
 
                     dlCard.addView(btnRow);
+
+                    // 2. Tombol Unduh Foto Layar Penuh (Profil / Sampul / Story)
+                    Button screenPhotoBtn = new Button(activity);
+                    screenPhotoBtn.setText("🖼️ Simpan Foto Layar Ini (Profil / Sampul / Story HD)");
+                    screenPhotoBtn.setTextColor(Color.WHITE);
+                    screenPhotoBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
+                    screenPhotoBtn.setTypeface(Typeface.DEFAULT_BOLD);
+                    GradientDrawable photoBg = new GradientDrawable();
+                    photoBg.setColor(Color.parseColor("#4C1D95")); // Deep Purple
+                    photoBg.setCornerRadius(8 * density);
+                    photoBg.setStroke((int) (1 * density), Color.parseColor("#8B5CF6"));
+                    screenPhotoBtn.setBackground(photoBg);
+                    LinearLayout.LayoutParams photoLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (38 * density));
+                    photoLp.topMargin = (int) (8 * density);
+                    screenPhotoBtn.setLayoutParams(photoLp);
+                    screenPhotoBtn.setOnClickListener(v -> {
+                        FacebookMediaDownloader.downloadActiveScreenPhoto(activity);
+                    });
+                    dlCard.addView(screenPhotoBtn);
+
+                    // 3. Tombol Media Terakhir Terdeteksi (jika ada post yang diklik titik 3)
+                    if (FacebookMediaDownloader.sLastActiveMedia != null) {
+                        final FacebookPostMenuHook.PostMediaInfo info = FacebookMediaDownloader.sLastActiveMedia;
+                        final String vUrl = (info.hdVideoUrl != null) ? info.hdVideoUrl : info.sdVideoUrl;
+                        
+                        if (vUrl != null || info.imageUrl != null) {
+                            TextView lastHeader = new TextView(activity);
+                            lastHeader.setText("🎬 Media Postingan Terakhir Terdeteksi:");
+                            lastHeader.setTextColor(Color.parseColor("#38BDF8"));
+                            lastHeader.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
+                            lastHeader.setTypeface(Typeface.DEFAULT_BOLD);
+                            lastHeader.setPadding(0, (int) (10 * density), 0, (int) (4 * density));
+                            dlCard.addView(lastHeader);
+
+                            if (vUrl != null) {
+                                Button vBtn = new Button(activity);
+                                vBtn.setText("⚡ Unduh Video HD Terdeteksi (.mp4)");
+                                vBtn.setTextColor(Color.WHITE);
+                                vBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
+                                vBtn.setTypeface(Typeface.DEFAULT_BOLD);
+                                GradientDrawable vBg = new GradientDrawable();
+                                vBg.setColor(Color.parseColor("#047857")); // Emerald
+                                vBg.setCornerRadius(8 * density);
+                                vBtn.setBackground(vBg);
+                                LinearLayout.LayoutParams vLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (36 * density));
+                                vLp.bottomMargin = (int) (4 * density);
+                                vBtn.setLayoutParams(vLp);
+                                vBtn.setOnClickListener(v -> {
+                                    FacebookMediaDownloader.downloadDirectStream(activity, vUrl, "Facebook_Detected_Video", true);
+                                });
+                                dlCard.addView(vBtn);
+                            }
+
+                            if (info.imageUrl != null) {
+                                Button pBtn = new Button(activity);
+                                pBtn.setText("⚡ Unduh Foto HD Terdeteksi (.jpg)");
+                                pBtn.setTextColor(Color.WHITE);
+                                pBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11f);
+                                pBtn.setTypeface(Typeface.DEFAULT_BOLD);
+                                GradientDrawable pBg = new GradientDrawable();
+                                pBg.setColor(Color.parseColor("#6D28D9"));
+                                pBg.setCornerRadius(8 * density);
+                                pBtn.setBackground(pBg);
+                                LinearLayout.LayoutParams pLp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, (int) (36 * density));
+                                pBtn.setLayoutParams(pLp);
+                                pBtn.setOnClickListener(v -> {
+                                    FacebookMediaDownloader.downloadDirectStream(activity, info.imageUrl, "Facebook_Detected_Photo", false);
+                                });
+                                dlCard.addView(pBtn);
+                            }
+                        }
+                    }
+
+                    // 4. Banner petunjuk menu titik 3
+                    TextView guideText = new TextView(activity);
+                    guideText.setText("💡 CARA TERCEPAT: Anda juga bisa mengunduh langsung dari postingan atau Reels mana pun dengan menekan menu titik 3 (...) di sudut kanan atas postingan!");
+                    guideText.setTextColor(Color.parseColor("#F59E0B")); // Amber
+                    guideText.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10.5f);
+                    guideText.setPadding((int) (4 * density), (int) (8 * density), (int) (4 * density), (int) (2 * density));
+                    dlCard.addView(guideText);
+
                     itemsContainer.addView(dlCard);
                 }
 

@@ -11,8 +11,10 @@ import app.crimera.patches.facebook.utils.Constants.COMPATIBILITY_FACEBOOK
 import app.crimera.patches.facebook.utils.Constants.FB_APPLICATION_CLASS
 import app.crimera.patches.facebook.utils.Constants.FB_FRAGMENT_ACTIVITY_CLASS
 import app.crimera.patches.facebook.utils.Constants.INJECTOR_CLASS
+import app.crimera.patches.facebook.utils.Constants.PREF_CLASS
 import app.morphe.patcher.Fingerprint
 import app.morphe.patcher.extensions.InstructionExtensions.addInstruction
+import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.util.indexOfFirstInstruction
 import com.android.tools.smali.dexlib2.Opcode
@@ -37,11 +39,21 @@ internal object BrowserLiteActivityOnCreateFingerprint : Fingerprint(
     definingClass = "Lcom/facebook/browser/lite/BrowserLiteActivity;",
 )
 
+internal object FeedStoryMenuF2rFingerprint : Fingerprint(
+    name = "F2r",
+    definingClass = "LX/Rbs;",
+)
+
+internal object BgPlaybackManagerOnStopFingerprint : Fingerprint(
+    name = "onActivityStopped",
+    definingClass = "Lcom/facebook/video/bgplayback/manager/BackgroundPlaybackManager;",
+)
+
 @Suppress("unused")
 val facebookSettingsPatch =
     bytecodePatch(
         name = "RHpatch Facebook Mod Menu",
-        description = "Adds global Activity lifecycle tracking, floating capsule mod button, categorized settings dialog, external browser redirect, and HD video downloader.",
+        description = "Adds global Activity lifecycle tracking, floating capsule mod button, categorized settings dialog, external browser redirect, post 3-dots downloader, and background video audio playback.",
         default = true,
     ) {
         compatibleWith(COMPATIBILITY_FACEBOOK)
@@ -105,6 +117,39 @@ val facebookSettingsPatch =
                 }
             }.onFailure { e ->
                 println("[SettingsPatch] Failed to hook BrowserLiteActivity.onCreate: ${e.message}")
+            }
+
+            // 5. Hook LX/Rbs;->F2r to inject post 3-dots media download menu
+            runCatching {
+                FeedStoryMenuF2rFingerprint.method.apply {
+                    val returnObjIndex = indexOfFirstInstruction(Opcode.RETURN_OBJECT)
+                    addInstruction(
+                        returnObjIndex,
+                        """
+                        invoke-static {v0, p1, p2}, Lapp/morphe/extension/facebook/patches/FacebookPostMenuHook;->onPostMenuCreated(Landroid/app/Dialog;Landroid/view/View;Ljava/lang/Object;)V
+                        """.trimIndent(),
+                    )
+                }
+            }.onFailure { e ->
+                println("[SettingsPatch] Failed to hook LX/Rbs;->F2r: ${e.message}")
+            }
+
+            // 6. Hook BackgroundPlaybackManager.onActivityStopped() for background video playback
+            runCatching {
+                BgPlaybackManagerOnStopFingerprint.method.apply {
+                    addInstructions(
+                        0,
+                        """
+                        invoke-static {}, $PREF_CLASS->isBackgroundAudioPlay()Z
+                        move-result v0
+                        if-eqz v0, :cond_normal_stop
+                        return-void
+                        :cond_normal_stop
+                        """.trimIndent(),
+                    )
+                }
+            }.onFailure { e ->
+                println("[SettingsPatch] Failed to hook BackgroundPlaybackManager.onActivityStopped: ${e.message}")
             }
         }
     }
