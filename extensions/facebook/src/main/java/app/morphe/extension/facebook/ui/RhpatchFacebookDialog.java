@@ -37,6 +37,7 @@ import app.morphe.extension.crimera.PikoUtils;
 import app.morphe.extension.crimera.settings.BooleanSetting;
 import app.morphe.extension.crimera.sharedPreference.SharedPref;
 import app.morphe.extension.facebook.patches.FacebookMediaDownloader;
+import app.morphe.extension.facebook.patches.FacebookPostMenuHook;
 import app.morphe.extension.facebook.settings.FacebookSettings;
 
 public class RhpatchFacebookDialog {
