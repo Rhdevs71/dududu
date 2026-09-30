@@ -117,14 +117,10 @@ public class EfbOverlayManager {
     private static int sCurrentFov = 0; // 0 = default
     private static TextView sFovIndicator = null;
 
-    // Graphics & Performance State
-    private static boolean sStatFpsActive = false;
-    private static boolean sStatUnitActive = false;
+    // Broadcast / Clean HUD State
     private static boolean sBroadcastModeActive = false;
-    private static String sCurrentGraphicsLabel = "Default";
 
     // Multi-tier Native Input Dispatcher State
-    private static Method sDispatchInputEventMethod = null;
     private static Object sViewRootImpl = null;
     private static boolean sHiddenApiUnsealed = false;
 
@@ -567,7 +563,7 @@ public class EfbOverlayManager {
         titleLayout.addView(titleView);
 
         TextView subtitleView = new TextView(activity);
-        subtitleView.setText("Piko • Smart AFK Grinder, Graphics & Visual Studio");
+        subtitleView.setText("Piko • Smart AFK Grinder, Broadcast TV & Kamera");
         subtitleView.setTextColor(Color.parseColor("#94A3B8"));
         subtitleView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
         titleLayout.addView(subtitleView);
@@ -703,60 +699,7 @@ public class EfbOverlayManager {
         contentLayout.addView(actionButtonsRow);
 
         // ==========================================
-        // SECTION 2: STUDIO GRAFIS & VISUAL (UE4)
-        // ==========================================
-        addSectionHeader(activity, contentLayout, "🎮 STUDIO GRAFIS & VISUAL (UE4 GRAPHICS)");
-        final TextView gfxStatus = new TextView(activity);
-        gfxStatus.setText("Preset Grafis: " + sCurrentGraphicsLabel);
-        gfxStatus.setTextColor(Color.parseColor("#38BDF8"));
-        gfxStatus.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        gfxStatus.setTypeface(Typeface.DEFAULT_BOLD);
-        contentLayout.addView(gfxStatus);
-
-        LinearLayout gfxRow1 = new LinearLayout(activity);
-        gfxRow1.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, gfxRow1, "💎 Ultra 2K HD", "#059669", () -> {
-            applyGraphicsPreset("Ultra 2K HD", "r.ScreenPercentage 125", "r.PostProcessAAQuality 4");
-            gfxStatus.setText("Preset Grafis: Ultra 2K HD");
-        });
-        addOptionButton(activity, gfxRow1, "🖥️ Native 1080p", "#0284C7", () -> {
-            applyGraphicsPreset("Native 1080p", "r.ScreenPercentage 100", "r.PostProcessAAQuality 2");
-            gfxStatus.setText("Preset Grafis: Native 1080p");
-        });
-        addOptionButton(activity, gfxRow1, "⚡ Anti-Blur Vision", "#7C3AED", () -> {
-            applyGraphicsPreset("Anti-Blur Vision", "r.MotionBlurQuality 0", "r.DepthOfFieldQuality 0");
-            gfxStatus.setText("Preset Grafis: Anti-Blur Vision");
-        });
-        contentLayout.addView(gfxRow1);
-
-        LinearLayout gfxRow2 = new LinearLayout(activity);
-        gfxRow2.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, gfxRow2, "❄️ Mode Dingin (Hemat)", "#0284C7", () -> {
-            applyGraphicsPreset("Mode Dingin (Hemat Baterai)", "r.MobileShadowQuality 0");
-            gfxStatus.setText("Preset Grafis: Mode Dingin");
-        });
-        addOptionButton(activity, gfxRow2, "⚡ Zero Latency", "#D97706", () -> {
-            applyGraphicsPreset("Zero Input Latency", "r.VSync 0");
-            gfxStatus.setText("Preset Grafis: Zero Latency");
-        });
-        addOptionButton(activity, gfxRow2, "🔄 Reset Grafis", "#334155", () -> {
-            applyGraphicsPreset("Default Bawaan", "r.ScreenPercentage 0", "r.PostProcessAAQuality 2", "r.MotionBlurQuality 3", "r.DepthOfFieldQuality 2", "r.MobileShadowQuality 2", "r.VSync 1");
-            gfxStatus.setText("Preset Grafis: Default Bawaan");
-        });
-        contentLayout.addView(gfxRow2);
-
-        // ==========================================
-        // SECTION 3: ENGINE MONITOR & PERFORMA
-        // ==========================================
-        addSectionHeader(activity, contentLayout, "📊 ENGINE MONITOR & PERFORMA");
-        LinearLayout monRow = new LinearLayout(activity);
-        monRow.setOrientation(LinearLayout.HORIZONTAL);
-        addOptionButton(activity, monRow, "🟢 TOGGLE STAT FPS", "#059669", () -> toggleStatFps());
-        addOptionButton(activity, monRow, "📈 TOGGLE STAT UNIT", "#0284C7", () -> toggleStatUnit());
-        contentLayout.addView(monRow);
-
-        // ==========================================
-        // SECTION 4: MODE BROADCAST TV & SINEMATIK
+        // SECTION 2: MODE BROADCAST TV & SINEMATIK
         // ==========================================
         addSectionHeader(activity, contentLayout, "📺 MODE BROADCAST TV (CLEAN UI)");
         addFeatureLabel(activity, contentLayout, "Sembunyikan semua tombol virtual, radar, dan nama pemain:");
@@ -766,7 +709,7 @@ public class EfbOverlayManager {
         contentLayout.addView(broadcastRow);
 
         // ==========================================
-        // SECTION 5: KAMERA & SUDUT PANDANG (FOV)
+        // SECTION 3: KAMERA & SUDUT PANDANG (FOV)
         // ==========================================
         addSectionHeader(activity, contentLayout, "🎥 KAMERA & SUDUT PANDANG (FOV)");
 
@@ -799,15 +742,6 @@ public class EfbOverlayManager {
             showToast("🚁 ToggleDebugCamera Dipicu");
         });
         contentLayout.addView(freeCamRow);
-
-        // ==========================================
-        // SECTION 6: STATUS SISTEM
-        // ==========================================
-        addSectionHeader(activity, contentLayout, "🛡️ STATUS SISTEM");
-        addStatusBadge(activity, contentLayout, "✅ Google Play License: PROTECTED (Status: LICENSED)");
-        addStatusBadge(activity, contentLayout, "✅ In-Game Ad Reward: AUTO-BYPASSED (AdMob Rewarded)");
-        addStatusBadge(activity, contentLayout, "✅ AFK Match Grinder V5: READY (Multi-Tier In-Process Dispatch)");
-
         scrollView.addView(contentLayout);
         card.addView(scrollView);
         backdrop.addView(card);
@@ -820,26 +754,6 @@ public class EfbOverlayManager {
         });
 
         return backdrop;
-    }
-
-    public static void applyGraphicsPreset(String label, String... commands) {
-        sCurrentGraphicsLabel = label;
-        for (String cmd : commands) {
-            executeCommand(cmd);
-        }
-        showToast("🎮 Grafis: " + label + " Diterapkan!");
-    }
-
-    public static void toggleStatFps() {
-        sStatFpsActive = !sStatFpsActive;
-        executeCommand("stat fps");
-        showToast(sStatFpsActive ? "🟢 Stat FPS Diaktifkan di Layar" : "🔴 Stat FPS Dinonaktifkan");
-    }
-
-    public static void toggleStatUnit() {
-        sStatUnitActive = !sStatUnitActive;
-        executeCommand("stat unit");
-        showToast(sStatUnitActive ? "🟢 Stat Unit Latensi Diaktifkan" : "🔴 Stat Unit Dinonaktifkan");
     }
 
     public static void toggleBroadcastMode() {
@@ -869,6 +783,10 @@ public class EfbOverlayManager {
     private static void toggleAfkGrinder() {
         sAfkRunning = !sAfkRunning;
         if (sAfkRunning) {
+            // Tutup modal menu otomatis agar backdrop tidak memblokir input game di bawahnya
+            if (sMenuModal != null) {
+                sMenuModal.setVisibility(View.GONE);
+            }
             sAfkPaused = false;
             sAfkStartTime = System.currentTimeMillis();
             sMatchStartTime = 0;
@@ -935,10 +853,14 @@ public class EfbOverlayManager {
 
     public static void forceTapActionButton() {
         if (sActivity == null) return;
+        // Tutup modal bila terbuka agar tidak memblokir sentuhan ke game di bawahnya
+        if (sMenuModal != null && sMenuModal.getVisibility() == View.VISIBLE) {
+            sMenuModal.setVisibility(View.GONE);
+        }
         int w = getScreenWidth();
         int h = getScreenHeight();
         dispatchDualActionPulse(w * 0.850f, h * 0.925f);
-        showToast("⚡ Tap Tombol Kanan Bawah ('Ke Laga' / 'Berikut') + Pulse Dialog!");
+        showToast("⚡ Tap Tombol Kanan Bawah ('Ke Laga' / 'Berikut')!");
     }
 
     private static void stopAfkGrinder() {
@@ -1145,13 +1067,7 @@ public class EfbOverlayManager {
     }
 
     private static void initInputDispatcher() {
-        if (sDispatchInputEventMethod != null) return;
         unsealHiddenApi();
-        try {
-            Class<?> viewRootImplClass = Class.forName("android.view.ViewRootImpl");
-            sDispatchInputEventMethod = viewRootImplClass.getDeclaredMethod("dispatchInputEvent", InputEvent.class);
-            sDispatchInputEventMethod.setAccessible(true);
-        } catch (Throwable ignored) {}
     }
 
     private static int getScreenWidth() {
@@ -1190,6 +1106,51 @@ public class EfbOverlayManager {
         }
     }
 
+    /**
+     * Direct injection into NativeActivity mCurInputQueue (Unreal Engine 4 native AInputQueue).
+     */
+    private static boolean dispatchToNativeInputQueue(MotionEvent event) {
+        if (sActivity == null || event == null) return false;
+        try {
+            Class<?> actCls = sActivity.getClass();
+            Field f = null;
+            while (actCls != null && f == null) {
+                try {
+                    f = actCls.getDeclaredField("mCurInputQueue");
+                } catch (Throwable ignored) {
+                    actCls = actCls.getSuperclass();
+                }
+            }
+            if (f != null) {
+                f.setAccessible(true);
+                Object q = f.get(sActivity);
+                if (q != null) {
+                    for (Method m : q.getClass().getDeclaredMethods()) {
+                        if ("sendInputEvent".equals(m.getName())) {
+                            m.setAccessible(true);
+                            Class<?>[] pTypes = m.getParameterTypes();
+                            if (pTypes.length == 4) {
+                                m.invoke(q, event, null, false, null);
+                                return true;
+                            } else if (pTypes.length == 1) {
+                                m.invoke(q, event);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            try {
+                PikoUtils.logger(TAG + ": dispatchToNativeInputQueue error: " + t.getMessage());
+            } catch (Throwable ignored) {}
+        }
+        return false;
+    }
+
+    /**
+     * Dispatch through ViewRootImpl pipeline (hits NativePostImeInputStage -> AInputQueue).
+     */
     private static boolean dispatchToViewRoot(MotionEvent event) {
         if (sActivity == null || event == null) return false;
         try {
@@ -1216,15 +1177,58 @@ public class EfbOverlayManager {
                 }
             }
             if (vri != null) {
-                if (sDispatchInputEventMethod == null) {
-                    initInputDispatcher();
+                // Method 1: ViewRootImpl.enqueueInputEvent(InputEvent, receiver, flags, processImmediately)
+                for (Method m : vri.getClass().getDeclaredMethods()) {
+                    String name = m.getName();
+                    if ("enqueueInputEvent".equals(name)) {
+                        m.setAccessible(true);
+                        Class<?>[] params = m.getParameterTypes();
+                        if (params.length == 4) {
+                            m.invoke(vri, event, null, 0, true);
+                            return true;
+                        } else if (params.length == 1) {
+                            m.invoke(vri, event);
+                            return true;
+                        }
+                    } else if ("dispatchInputEvent".equals(name)) {
+                        m.setAccessible(true);
+                        Class<?>[] params = m.getParameterTypes();
+                        if (params.length == 2) {
+                            m.invoke(vri, event, null);
+                            return true;
+                        } else if (params.length == 1) {
+                            m.invoke(vri, event);
+                            return true;
+                        }
+                    }
                 }
-                if (sDispatchInputEventMethod != null) {
-                    sDispatchInputEventMethod.invoke(vri, event);
-                    return true;
-                }
+                // Method 2: ViewRootImpl.mInputQueue.sendInputEvent
+                try {
+                    Field f = vri.getClass().getDeclaredField("mInputQueue");
+                    f.setAccessible(true);
+                    Object q = f.get(vri);
+                    if (q != null) {
+                        for (Method m : q.getClass().getDeclaredMethods()) {
+                            if ("sendInputEvent".equals(m.getName())) {
+                                m.setAccessible(true);
+                                Class<?>[] pTypes = m.getParameterTypes();
+                                if (pTypes.length == 4) {
+                                    m.invoke(q, event, null, false, null);
+                                    return true;
+                                } else if (pTypes.length == 1) {
+                                    m.invoke(q, event);
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                } catch (Throwable ignored) {}
             }
-        } catch (Throwable ignored) {}
+        } catch (Throwable t) {
+            try {
+                PikoUtils.logger(TAG + ": dispatchToViewRoot error: " + t.getMessage());
+            } catch (Throwable ignored) {}
+        }
         return false;
     }
 
@@ -1323,10 +1327,13 @@ public class EfbOverlayManager {
     private static void sendEvent(MotionEvent event) {
         if (sActivity == null || event == null) return;
 
-        // Tier 1: Direct injection into Window ViewRootImpl input pipeline (Native AInputQueue for UE4)
-        boolean sentToVri = dispatchToViewRoot(event);
+        // Channel 1: NativeActivity mCurInputQueue (Direct NDK AInputQueue injection!)
+        boolean sentNative = dispatchToNativeInputQueue(event);
 
-        // Tier 2: Direct dispatch to SurfaceView (UE4 graphics viewport)
+        // Channel 2: ViewRootImpl pipeline (NativePostImeInputStage -> AInputQueue)
+        boolean sentVri = dispatchToViewRoot(event);
+
+        // Channel 3: SurfaceView (UE4 graphics viewport)
         try {
             SurfaceView sv = findSurfaceView(sActivity.getWindow().getDecorView());
             if (sv != null) {
@@ -1334,12 +1341,12 @@ public class EfbOverlayManager {
             }
         } catch (Throwable ignored) {}
 
-        // Tier 3: Direct GameActivity onTouchEvent (UE4 nativeOnTouch bridge)
+        // Channel 4: GameActivity onTouchEvent
         try {
             sActivity.onTouchEvent(event);
         } catch (Throwable ignored) {}
 
-        // Tier 4: Fallback: DecorView dispatch
+        // Channel 5: DecorView
         try {
             View decor = sActivity.getWindow().getDecorView();
             if (decor != null) decor.dispatchTouchEvent(event);
@@ -1381,25 +1388,13 @@ public class EfbOverlayManager {
         final MotionEvent down = createTouchEvent(downTime, downTime, MotionEvent.ACTION_DOWN, x, y);
         sendEvent(down);
 
-        // Micro-move at 30ms so touch drivers register gesture intent
-        sMainHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    final long moveTime = SystemClock.uptimeMillis();
-                    final MotionEvent move = createTouchEvent(downTime, moveTime, MotionEvent.ACTION_MOVE, x + 1.0f, y + 1.0f);
-                    sendEvent(move);
-                } catch (Throwable ignored) {}
-            }
-        }, 30);
-
-        int duration = 80 + sRandom.nextInt(40); // 80-120ms realistic hold
+        int duration = 90 + sRandom.nextInt(30); // 90-120ms natural clean tap hold without move cancel
         sMainHandler.postDelayed(new Runnable() {
             @Override
             public void run() {
                 try {
                     final long upTime = SystemClock.uptimeMillis();
-                    final MotionEvent up = createTouchEvent(downTime, upTime, MotionEvent.ACTION_UP, x + 1.0f, y + 1.0f);
+                    final MotionEvent up = createTouchEvent(downTime, upTime, MotionEvent.ACTION_UP, x, y);
                     sendEvent(up);
                 } catch (Throwable ignored) {}
             }
@@ -1495,29 +1490,6 @@ public class EfbOverlayManager {
         });
 
         parent.addView(btn);
-    }
-
-    private static void addStatusBadge(Context context, LinearLayout parent, String text) {
-        TextView tv = new TextView(context);
-        tv.setText(text);
-        tv.setTextColor(Color.parseColor("#10B981")); // Emerald-500
-        tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
-        tv.setTypeface(Typeface.DEFAULT_BOLD);
-        tv.setPadding(dpToPx(context, 8), dpToPx(context, 4), dpToPx(context, 8), dpToPx(context, 4));
-
-        GradientDrawable bg = new GradientDrawable();
-        bg.setColor(Color.parseColor("#1010B981"));
-        bg.setCornerRadius(dpToPx(context, 6));
-        bg.setStroke(dpToPx(context, 1), Color.parseColor("#2010B981"));
-        tv.setBackground(bg);
-
-        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-        );
-        params.setMargins(0, dpToPx(context, 2), 0, dpToPx(context, 2));
-        tv.setLayoutParams(params);
-        parent.addView(tv);
     }
 
     public static void toggleMenu() {
