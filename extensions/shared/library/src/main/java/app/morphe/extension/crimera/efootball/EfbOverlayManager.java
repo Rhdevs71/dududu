@@ -63,9 +63,9 @@ public class EfbOverlayManager {
     // Smart AFK Grinder State & Components
     public enum ScreenState {
         PHASE_MENU("1. Navigasi Menu (Ke Laga / Berikut)", "#38BDF8"),
-        PHASE_MATCH_HALF_1("2. Laga Babak 1 (AI Main)", "#22C55E"),
+        PHASE_MATCH_HALF_1("2. Laga Babak 1 (AI Main - Layar Diam)", "#22C55E"),
         PHASE_HALFTIME("3. Jeda Babak (Mulai Babak 2)", "#EC4899"),
-        PHASE_MATCH_HALF_2("4. Laga Babak 2 (AI Main)", "#22C55E"),
+        PHASE_MATCH_HALF_2("4. Laga Babak 2 (AI Main - Layar Diam)", "#22C55E"),
         PHASE_POST_MATCH("5. Hasil Laga (Klaim Poin)", "#A855F7");
 
         final String displayName;
@@ -93,6 +93,7 @@ public class EfbOverlayManager {
     private static GrindingMode sGrindMode = GrindingMode.TOUR_EVENT;
     private static int sTargetMatches = 0; // 0 = unlimited
     private static int sCompletedMatches = 0;
+    private static int sMatchHalfDurationSec = 245; // 245s = ~4m 5s per babak (Standar Laga eFootball Tour Event 6 Menit)
     private static long sAfkStartTime = 0;
     private static ScreenState sCurrentStage = ScreenState.PHASE_MENU;
     private static int sMenuTapCount = 0;
@@ -687,9 +688,26 @@ public class EfbOverlayManager {
         });
         contentLayout.addView(targetRow);
 
-
-
-        // Manual Action Triggers
+        // Pilihan Durasi Babak
+        addFeatureLabel(activity, contentLayout, "Durasi Waktu Babak (Per Babak):");
+        LinearLayout durationRow = new LinearLayout(activity);
+        durationRow.setOrientation(LinearLayout.HORIZONTAL);
+        addOptionButton(activity, durationRow, "6 Menit (~4m)", (sMatchHalfDurationSec == 245) ? "#0284C7" : "#1E293B", () -> {
+            sMatchHalfDurationSec = 245;
+            showToast("⏱️ Durasi Laga: 6 Menit (245s per babak)");
+            updateLiveHud();
+        });
+        addOptionButton(activity, durationRow, "8 Menit (~5m)", (sMatchHalfDurationSec == 310) ? "#0284C7" : "#1E293B", () -> {
+            sMatchHalfDurationSec = 310;
+            showToast("⏱️ Durasi Laga: 8 Menit (310s per babak)");
+            updateLiveHud();
+        });
+        addOptionButton(activity, durationRow, "10 Menit (~6m)", (sMatchHalfDurationSec == 380) ? "#0284C7" : "#1E293B", () -> {
+            sMatchHalfDurationSec = 380;
+            showToast("⏱️ Durasi Laga: 10 Menit (380s per babak)");
+            updateLiveHud();
+        });
+        contentLayout.addView(durationRow);
         addFeatureLabel(activity, contentLayout, "Aksi Cepat / Uji Coba Sentuhan:");
         LinearLayout actionButtonsRow = new LinearLayout(activity);
         actionButtonsRow.setOrientation(LinearLayout.HORIZONTAL);
@@ -806,9 +824,6 @@ public class EfbOverlayManager {
 
     public static void advanceStageManually() {
         if (sActivity == null) return;
-        DisplayMetrics dm = sActivity.getResources().getDisplayMetrics();
-        int w = dm.widthPixels;
-        int h = dm.heightPixels;
 
         switch (sCurrentStage) {
             case PHASE_MENU:
@@ -859,7 +874,7 @@ public class EfbOverlayManager {
         }
         int w = getScreenWidth();
         int h = getScreenHeight();
-        dispatchDualActionPulse(w * 0.850f, h * 0.925f);
+        dispatchActionTap(w * 0.850f, h * 0.925f);
         showToast("⚡ Tap Tombol Kanan Bawah ('Ke Laga' / 'Berikut')!");
     }
 
@@ -904,12 +919,12 @@ public class EfbOverlayManager {
 
     /**
      * Precision AFK Grinder Loop strictly adhering to eFootball match flow:
-     * 1. PHASE_MENU: Repeatedly pulses 'Ke Laga >' / 'Berikut >' (0.850w, 0.925h) & dialog OK (0.500w, 0.760h) every 2.8s.
-     *    Passes Event Lobby -> Matchmaking -> Jersey -> Game Plan Kickoff.
-     * 2. PHASE_MATCH_HALF_1: Monitor 1st half match (~190s). Taps center (0.50w, 0.50h) every 5.0s to skip replays.
-     * 3. PHASE_HALFTIME: Pulses 'Mulai Babak Kedua >' (0.850w, 0.925h) & dialog OK.
-     * 4. PHASE_MATCH_HALF_2: Monitor 2nd half match (~190s). Taps center (0.50w, 0.50h) every 5.0s to skip replays.
-     * 5. PHASE_POST_MATCH: Sequential pulses 'Berikut >' (0.850w, 0.925h) for stats, EXP, event points, return to lobby.
+     * 1. PHASE_MENU: Relaxed pulse 'Ke Laga >' / 'Berikut >' (0.850w, 0.925h) every 5-6s.
+     *    Passes Event Lobby -> Matchmaking -> Jersey -> Game Plan -> Stadium Kickoff.
+     * 2. PHASE_MATCH_HALF_1: Silent AI match monitor (245s). ZERO TOUCHES to prevent disrupting AI gameplay!
+     * 3. PHASE_HALFTIME: Pulses 'Mulai Babak Kedua / Berikut' (0.850w, 0.925h) at bottom-right (NO center tap!).
+     * 4. PHASE_MATCH_HALF_2: Silent AI match monitor (245s). ZERO TOUCHES to prevent disrupting AI gameplay!
+     * 5. PHASE_POST_MATCH: Sequential pulses 'Berikut >' (0.850w, 0.925h) every 4.5s for stats, EXP, event points, return to lobby.
      */
     private static final Runnable sAfkLoopRunnable = new Runnable() {
         @Override
@@ -935,90 +950,90 @@ public class EfbOverlayManager {
             final int w = getScreenWidth();
             final int h = getScreenHeight();
 
-            long nextDelayMs = 2800;
+            long nextDelayMs = 4500;
 
             switch (sCurrentStage) {
                 case PHASE_MENU:
                     sMenuTapCount++;
-                    // Dual-Action Pulse: Primary 'Ke Laga / Berikut' + Safety Dialog Dismissal
-                    dispatchDualActionPulse(w * 0.850f, h * 0.925f);
-                    sCurrentPlannedAction = "Menekan 'Ke Laga / Berikut' (Kanan Bawah) [#" + sMenuTapCount + "]...";
+                    // Tap bersih tombol aksi kanan bawah: 'Ke Laga >' / 'Berikut >'
+                    dispatchActionTap(w * 0.850f, h * 0.925f);
 
-                    // After 7 taps (~20 seconds of menu cycle: Lobby -> Matchmaking -> Jersey -> Gameplan),
-                    // kickoff has started; transition to match monitoring
-                    if (sMenuTapCount >= 7) {
+                    if (sMenuTapCount == 1) {
+                        sCurrentPlannedAction = "1/4: Menekan 'Ke Laga >' (Lobby Acara)...";
+                        nextDelayMs = 5000;
+                    } else if (sMenuTapCount == 2) {
+                        sCurrentPlannedAction = "2/4: Menunggu Lawan / Menekan 'Berikut >' (Jersey)...";
+                        nextDelayMs = 5500;
+                    } else if (sMenuTapCount == 3) {
+                        sCurrentPlannedAction = "3/4: Menekan 'Ke Laga >' (Formasi & Taktik)...";
+                        nextDelayMs = 5500;
+                    } else if (sMenuTapCount == 4) {
+                        sCurrentPlannedAction = "4/4: Menekan 'Ke Laga >' (Konfirmasi Masuk Match)...";
+                        nextDelayMs = 6000;
+                    } else {
+                        // Masuk ke lapangan, kick-off babak 1 dimulai!
                         sCurrentStage = ScreenState.PHASE_MATCH_HALF_1;
                         sMatchStartTime = System.currentTimeMillis();
-                        nextDelayMs = 4500;
-                    } else {
-                        nextDelayMs = 2800;
-                    }
-                    break;
-
-                case PHASE_MATCH_HALF_1:
-                    // Tap center to skip cutscene / replay
-                    dispatchSimulatedTouchWithJitter(w * 0.500f, h * 0.500f);
-                    long elapsedH1 = (System.currentTimeMillis() - sMatchStartTime) / 1000;
-                    long remainH1 = Math.max(0, 190 - elapsedH1);
-                    sCurrentPlannedAction = "⚽ Babak 1: Skip cutscene / replay (" + remainH1 + "s tersisa)";
-
-                    // Periodic safety tap on bottom-right every ~25s in case early half-time
-                    if (elapsedH1 > 0 && elapsedH1 % 25 < 6) {
-                        dispatchDualActionPulse(w * 0.850f, h * 0.925f);
-                    }
-
-                    if (elapsedH1 >= 190) {
-                        sCurrentStage = ScreenState.PHASE_HALFTIME;
-                        sHalftimeStep = 0;
-                        nextDelayMs = 3500;
-                    } else {
-                        nextDelayMs = 5000;
-                    }
-                    break;
-
-                case PHASE_HALFTIME:
-                    // Half-Time transition: Tap 'Mulai Babak Kedua >'
-                    dispatchDualActionPulse(w * 0.850f, h * 0.925f);
-                    sHalftimeStep++;
-                    sCurrentPlannedAction = "⏸️ Jeda Babak: Menekan 'Mulai Babak Kedua >' (" + sHalftimeStep + "/3)...";
-                    if (sHalftimeStep >= 3) {
-                        sCurrentStage = ScreenState.PHASE_MATCH_HALF_2;
-                        sMatchStartTime = System.currentTimeMillis();
-                        nextDelayMs = 4500;
-                    } else {
+                        sCurrentPlannedAction = "⚽ Kickoff: Memasuki Babak 1 (AI Mode)...";
                         nextDelayMs = 3000;
                     }
                     break;
 
-                case PHASE_MATCH_HALF_2:
-                    // Tap center to skip cutscene / replay
-                    dispatchSimulatedTouchWithJitter(w * 0.500f, h * 0.500f);
-                    long elapsedH2 = (System.currentTimeMillis() - sMatchStartTime) / 1000;
-                    long remainH2 = Math.max(0, 190 - elapsedH2);
-                    sCurrentPlannedAction = "⚽ Babak 2: Skip cutscene / replay (" + remainH2 + "s tersisa)";
+                case PHASE_MATCH_HALF_1:
+                    // PENTING: ZERO TOUCHES! Layar standby tanpa sentuhan agar tidak mengganggu gameplay AI!
+                    long elapsedH1 = (System.currentTimeMillis() - sMatchStartTime) / 1000;
+                    long remainH1 = Math.max(0, sMatchHalfDurationSec - elapsedH1);
+                    sCurrentPlannedAction = "⚽ Babak 1: AI Sedang Bermain (Layar Diam) • " + remainH1 + "s tersisa";
 
-                    // Periodic safety tap on bottom-right every ~25s in case early full-time
-                    if (elapsedH2 > 0 && elapsedH2 % 25 < 6) {
-                        dispatchDualActionPulse(w * 0.850f, h * 0.925f);
-                    }
-
-                    if (elapsedH2 >= 190) {
-                        sCurrentStage = ScreenState.PHASE_POST_MATCH;
-                        sPostMatchStep = 0;
+                    if (remainH1 <= 0) {
+                        sCurrentStage = ScreenState.PHASE_HALFTIME;
+                        sHalftimeStep = 0;
                         nextDelayMs = 3500;
                     } else {
+                        nextDelayMs = 1000; // Update HUD setiap 1 detik tanpa menyentuh layar
+                    }
+                    break;
+
+                case PHASE_HALFTIME:
+                    // Jeda Babak: Tekan 'Mulai Babak Kedua >' / 'Berikut >' di KANAN BAWAH!
+                    // TIDAK BOLEH KLIK DI TENGAH LAYAR!
+                    dispatchActionTap(w * 0.850f, h * 0.925f);
+                    sHalftimeStep++;
+                    sCurrentPlannedAction = "⏸️ Jeda Babak: Menekan 'Mulai Babak Kedua / Berikut' (Kanan Bawah) [" + sHalftimeStep + "/4]...";
+
+                    if (sHalftimeStep >= 4) {
+                        sCurrentStage = ScreenState.PHASE_MATCH_HALF_2;
+                        sMatchStartTime = System.currentTimeMillis();
                         nextDelayMs = 5000;
+                    } else {
+                        nextDelayMs = 4000;
+                    }
+                    break;
+
+                case PHASE_MATCH_HALF_2:
+                    // PENTING: ZERO TOUCHES! Layar standby tanpa sentuhan agar tidak mengganggu gameplay AI!
+                    long elapsedH2 = (System.currentTimeMillis() - sMatchStartTime) / 1000;
+                    long remainH2 = Math.max(0, sMatchHalfDurationSec - elapsedH2);
+                    sCurrentPlannedAction = "⚽ Babak 2: AI Sedang Bermain (Layar Diam) • " + remainH2 + "s tersisa";
+
+                    if (remainH2 <= 0) {
+                        sCurrentStage = ScreenState.PHASE_POST_MATCH;
+                        sPostMatchStep = 0;
+                        nextDelayMs = 4000;
+                    } else {
+                        nextDelayMs = 1000; // Update HUD setiap 1 detik tanpa menyentuh layar
                     }
                     break;
 
                 case PHASE_POST_MATCH:
-                    // Post-match result screens: Sequential tap 'Berikut >' for EXP, stats, event points
-                    dispatchDualActionPulse(w * 0.850f, h * 0.925f);
+                    // Hasil Laga: Tekan 'Berikut >' di KANAN BAWAH untuk klaim EXP, rating, poin acara
+                    dispatchActionTap(w * 0.850f, h * 0.925f);
                     sPostMatchStep++;
-                    sCurrentPlannedAction = "🏆 Selesai Laga: Menekan 'Berikut >' untuk Klaim Poin (" + sPostMatchStep + "/6)...";
+                    sCurrentPlannedAction = "🏆 Selesai Laga: Menekan 'Berikut >' (Kanan Bawah) [" + sPostMatchStep + "/6]...";
+
                     if (sPostMatchStep >= 6) {
                         sCompletedMatches++;
-                        showToast("🎉 Laga ke-" + sCompletedMatches + " Selesai! Memulai laga berikutnya...");
+                        showToast("🎉 Laga ke-" + sCompletedMatches + " Selesai! Menavigasi ke laga berikutnya...");
                         if (sTargetMatches > 0 && sCompletedMatches >= sTargetMatches) {
                             showToast("🏁 Target Grinding Tercapai: " + sCompletedMatches + " Laga Selesai!");
                             stopAfkGrinder();
@@ -1026,17 +1041,17 @@ public class EfbOverlayManager {
                         } else {
                             sCurrentStage = ScreenState.PHASE_MENU;
                             sMenuTapCount = 0;
-                            nextDelayMs = 4000;
+                            nextDelayMs = 5000;
                         }
                     } else {
-                        nextDelayMs = 2600;
+                        nextDelayMs = 4500;
                     }
                     break;
 
                 default:
                     sCurrentStage = ScreenState.PHASE_MENU;
                     sMenuTapCount = 0;
-                    nextDelayMs = 2800;
+                    nextDelayMs = 4500;
                     break;
             }
 
@@ -1353,29 +1368,14 @@ public class EfbOverlayManager {
         } catch (Throwable ignored) {}
     }
 
-    public static void dispatchDualActionPulse(final float primaryX, final float primaryY) {
-        dispatchSimulatedTouchWithJitter(primaryX, primaryY);
-        // Pulse popup/dialog OK button 350ms later to dismiss any event/contract alerts
-        sMainHandler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    int w = getScreenWidth();
-                    int h = getScreenHeight();
-                    dispatchSimulatedTouchWithJitter(w * 0.500f, h * 0.760f);
-                } catch (Throwable ignored) {}
-            }
-        }, 350);
-    }
-
-    private static void dispatchSimulatedTouchWithJitter(float baseX, float baseY) {
+    public static void dispatchActionTap(final float x, final float y) {
         if (sActivity == null) return;
         int w = getScreenWidth();
         int h = getScreenHeight();
-        float jitterX = (sRandom.nextFloat() - 0.5f) * (w * 0.015f);
-        float jitterY = (sRandom.nextFloat() - 0.5f) * (h * 0.015f);
-
-        dispatchSimulatedTouch(baseX + jitterX, baseY + jitterY);
+        // Jitter natural minimalis (±0.4% layar)
+        float jitterX = (sRandom.nextFloat() - 0.5f) * (w * 0.008f);
+        float jitterY = (sRandom.nextFloat() - 0.5f) * (h * 0.008f);
+        dispatchSimulatedTouch(x + jitterX, y + jitterY);
     }
 
     private static void dispatchSimulatedTouch(final float x, final float y) {
