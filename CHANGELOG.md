@@ -1,3 +1,9 @@
+## [1.28.1](https://github.com/Rhdevs71/dududu/compare/v1.28.0...v1.28.1) (2026-10-01)
+
+### 🐛 Bug Fixes
+
+* **facebook:** resolve register limit and instructions in LX/S2R;->A0i reels hook ([9a91a43](https://github.com/Rhdevs71/dududu/commit/9a91a43e3869b884fb67483f223abb26f77f24d6))
+
 ## [1.28.0](https://github.com/Rhdevs71/dududu/compare/v1.27.2...v1.28.0) (2026-10-01)
 
 ### ✨ New Features

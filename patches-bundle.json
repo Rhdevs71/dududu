@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-10-01T14:06:43",
-  "description": "## [1.28.0](https://github.com/Rhdevs71/dududu/compare/v1.27.2...v1.28.0) (2026-10-01)\n\n### ✨ New Features\n\n* **facebook,efootball:** drop sponsored feed edges, add native reels 3-dots downloader, and implement vision-based efb afk flow ([5871160](https://github.com/Rhdevs71/dududu/commit/5871160b837ffe7081d30d67c24af4783fa0ba5b))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.28.0/patches-1.28.0.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.28.0/patches-1.28.0.mpp.asc",
-  "version": "1.28.0"
+  "created_at": "2026-10-01T14:20:10",
+  "description": "## [1.28.1](https://github.com/Rhdevs71/dududu/compare/v1.28.0...v1.28.1) (2026-10-01)\n\n### 🐛 Bug Fixes\n\n* **facebook:** resolve register limit and instructions in LX/S2R;->A0i reels hook ([9a91a43](https://github.com/Rhdevs71/dududu/commit/9a91a43e3869b884fb67483f223abb26f77f24d6))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.28.1/patches-1.28.1.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.28.1/patches-1.28.1.mpp.asc",
+  "version": "1.28.1"
 }
