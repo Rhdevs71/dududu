@@ -1,7 +1,7 @@
 {
-  "created_at": "2026-09-30T16:18:07",
-  "description": "## [1.27.2](https://github.com/Rhdevs71/dududu/compare/v1.27.1...v1.27.2) (2026-09-30)\n\n### 🐛 Bug Fixes\n\n* **facebook:** deep sponsored ad neutralization, 3-dots post media downloader, and background playback hook ([4e76443](https://github.com/Rhdevs71/dududu/commit/4e764435171ab3aea402cfffada4702d49ad4a4e))\n* **facebook:** import FacebookPostMenuHook in RhpatchFacebookDialog ([499cccc](https://github.com/Rhdevs71/dududu/commit/499ccccf1596a836fc0e3f6fe67b17744d5c1747))",
-  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.27.2/patches-1.27.2.mpp",
-  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.27.2/patches-1.27.2.mpp.asc",
-  "version": "1.27.2"
+  "created_at": "2026-10-01T14:06:43",
+  "description": "## [1.28.0](https://github.com/Rhdevs71/dududu/compare/v1.27.2...v1.28.0) (2026-10-01)\n\n### ✨ New Features\n\n* **facebook,efootball:** drop sponsored feed edges, add native reels 3-dots downloader, and implement vision-based efb afk flow ([5871160](https://github.com/Rhdevs71/dududu/commit/5871160b837ffe7081d30d67c24af4783fa0ba5b))",
+  "download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.28.0/patches-1.28.0.mpp",
+  "signature_download_url": "https://github.com/Rhdevs71/dududu/releases/download/v1.28.0/patches-1.28.0.mpp.asc",
+  "version": "1.28.0"
 }

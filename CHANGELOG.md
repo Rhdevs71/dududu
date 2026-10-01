@@ -1,3 +1,9 @@
+## [1.28.0](https://github.com/Rhdevs71/dududu/compare/v1.27.2...v1.28.0) (2026-10-01)
+
+### ✨ New Features
+
+* **facebook,efootball:** drop sponsored feed edges, add native reels 3-dots downloader, and implement vision-based efb afk flow ([5871160](https://github.com/Rhdevs71/dududu/commit/5871160b837ffe7081d30d67c24af4783fa0ba5b))
+
 ## [1.27.2](https://github.com/Rhdevs71/dududu/compare/v1.27.1...v1.27.2) (2026-09-30)
 
 ### 🐛 Bug Fixes
