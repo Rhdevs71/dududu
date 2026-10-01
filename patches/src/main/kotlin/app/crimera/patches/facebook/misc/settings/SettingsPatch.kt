@@ -167,6 +167,7 @@ val facebookSettingsPatch =
                         .toList()
                         .reversed()
 
+                    var hookCount = 0
                     for (retInst in returnInstructions) {
                         val retIdx = retInst.location.index
                         val retReg = (retInst as OneRegisterInstruction).registerA
@@ -180,8 +181,9 @@ val facebookSettingsPatch =
                             move-result-object v$retReg
                             """.trimIndent(),
                         )
+                        hookCount++
                     }
-                    println("[SettingsPatch] Successfully hooked LX/TXv;->A01 at ${returnInstructions.size} return points")
+                    println("[SettingsPatch] Successfully hooked LX/TXv;->A01 at $hookCount return points")
                 } ?: println("[SettingsPatch] Warning: LX/TXv;->A01 method not found")
             }.onFailure { e ->
                 println("[SettingsPatch] Failed to hook LX/TXv;->A01: ${e.message}")
