@@ -49,6 +49,11 @@ internal object BgPlaybackManagerOnStopFingerprint : Fingerprint(
     definingClass = "Lcom/facebook/video/bgplayback/manager/BackgroundPlaybackManager;",
 )
 
+internal object ReelsVideoMenuA0iFingerprint : Fingerprint(
+    name = "A0i",
+    definingClass = "LX/S2R;",
+)
+
 @Suppress("unused")
 val facebookSettingsPatch =
     bytecodePatch(
@@ -150,6 +155,20 @@ val facebookSettingsPatch =
                 }
             }.onFailure { e ->
                 println("[SettingsPatch] Failed to hook BackgroundPlaybackManager.onActivityStopped: ${e.message}")
+            }
+
+            // 7. Hook LX/S2R;->A0i to inject native Reels 3-dots download menu
+            runCatching {
+                ReelsVideoMenuA0iFingerprint.method.apply {
+                    addInstruction(
+                        0,
+                        """
+                        invoke-static {p1, p2, p3}, Lapp/morphe/extension/facebook/patches/FacebookReelsMenuHook;->onReelsMenuCreated(Landroid/view/Menu;Landroid/view/View;Ljava/lang/Object;)V
+                        """.trimIndent(),
+                    )
+                }
+            }.onFailure { e ->
+                println("[SettingsPatch] Failed to hook LX/S2R;->A0i: ${e.message}")
             }
         }
     }

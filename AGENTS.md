@@ -1092,3 +1092,25 @@ Bab ini mencatat seluruh **sumber acuan (base)**, hasil audit disassembled smali
       - APK **`C:\Users\Administrator\Downloads\facebook_patched.apk`** (118.4 MB) berhasil dipatch via Morphe CLI (memuat 291 class ekstensi).
       - Audit Dalvik bytecode via `VerifyUpdatedFacebook.java` mengonfirmasi 100% dari 7 hook gerbang iklan, post menu 3-dots, dan background audio playback terpasang sempurna tanpa warning dan bebas dari VerifyError.
 
+39. **Tahap 39: Eliminasi Total Postingan Iklan Beranda (Edge-Level Drop), Native Reels 3-Dots Downloader Hook, & Vision-Based Paced AFK Screen Detection eFootball (RHpatch v1.27.3 - Terkini)**
+    - *Analisis Masalah Berdasarkan Pengujian Pengguna*:
+      1. **Iklan Masih Ada (Hanya Teks Bersponsor yang Hilang, Kartu Postingan Tetap Muncul)**:
+         - *Penyebab*: `SponsoredLabelPlugin` dan `LX/2Su` hanya mematikan label teks, namun data container postingan tetap dipasok oleh feed adapter. Di `classes2.dex`, `Lcom/facebook/graphql/model/GraphQLFeedUnitEdge;` memasok unit feed lewat `A03()LX/2NV;` dan `BPb()LX/2NV;`. Enum kategorinya didapatkan lewat `edge.B77()` (`Lcom/crossapp/graphql/facebook/enums/GraphQLFeedStoryCategory;`), di mana `A0E` = `SPONSORED`, `A0C` = `PROMOTION`, `A09` = `HIGH_VALUE_PROMOTION`, `A04` = `FB_SHORTS`, dan `A08` = `FRIENDLY_FEED_MID_CARD`.
+         - *Solusi*: Membuat `FacebookAdFilter.java` dengan method `shouldDropEdge(Object edge)` yang memeriksa `edge.B77()`. Menginjeksi hook di awal `GraphQLFeedUnitEdge->A03()` dan `BPb()` via `BlockSponsoredAdsPatch.kt`: jika `shouldDropEdge` bernilai `true`, langsung `return-object null`. Feed engine Facebook otomatis membuang postingan sponsor secara utuh sehingga tidak pernah di-inflate atau ditampilkan di layar.
+      2. **Reels Downloader Belum Masuk ke Menu Titik 3 Native Reels**:
+         - *Penyebab*: Tampilan Reels (FB Shorts) dan full-screen player menggunakan menu terpisah berbasis `android.view.Menu`, yaitu `LX/S2R;->A0i(Landroid/view/Menu; Landroid/view/View; LX/2QD; ...)V` di `classes12.dex`.
+         - *Solusi*: Membuat `FacebookReelsMenuHook.java` dan menginjeksi hook di awal `LX/S2R;->A0i` via `SettingsPatch.kt`. Menambahkan item menu native langsung ke `android.view.Menu`:
+           - `🎬 [RHpatch] Unduh Reel (HD MP4)`
+           - `🔗 [RHpatch] Salin Tautan Reel`
+           Menu ini 100% native tanpa overlay canggung dan terhubung langsung ke `FacebookMediaDownloader`.
+      3. **eFootball AFK Match Grinder: Transisi Menu Terlalu Cepat & Deteksi Layar Adaptif (Vision)**:
+         - *Penyebab*: Jeda dari matchmaking -> pemilihan jersey -> taktik -> kickoff terlalu terburu-buru sehingga game UE4 lag atau animasi transisi belum selesai. Selain itu, durasi babak sepak bola tidak bisa dipatok waktu mati karena selebrasi, replay, dan tambahan waktu.
+         - *Solusi*:
+           - Memperlambat dan memperluas jeda transisi menu di `EfbOverlayManager.java`:
+             - Tap 1 (Cari Lawan / Laga): 13,000 ms.
+             - Tap 2 (Pilih Jersey): 9,500 ms.
+             - Tap 3 (Menu Taktik): 9,500 ms.
+             - Tap 4 (Konfirmasi Kickoff): 8,000 ms.
+           - Menetapkan jeda standby aman 185 detik (3 menit 5 detik) saat babak pertandingan berjalan di mana layar sama sekali tidak disentuh agar gameplay AI lancar.
+           - Setelah 185 detik, sistem mengaktifkan deteksi berbasis penglihatan layar (`checkScreenVision`) menggunakan Android `PixelCopy` pada `SurfaceView` buffer Unreal Engine 4 untuk mendeteksi warna rumput hijau lapangan vs tombol aksi terang (Putih/Biru) di pojok kanan bawah `(0.850w, 0.925h)`, serta pulsa detak jantung 5,5 detik untuk menangkap jeda babak (Half-Time) dan akhir pertandingan (Full-Time) tanpa risiko terdisinkronisasi.
+

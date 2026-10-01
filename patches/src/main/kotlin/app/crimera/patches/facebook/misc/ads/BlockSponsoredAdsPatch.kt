@@ -48,6 +48,16 @@ internal object LX2SuA05Fingerprint : Fingerprint(
     definingClass = "LX/2Su;",
 )
 
+internal object GraphQLFeedUnitEdgeA03Fingerprint : Fingerprint(
+    name = "A03",
+    definingClass = "Lcom/facebook/graphql/model/GraphQLFeedUnitEdge;",
+)
+
+internal object GraphQLFeedUnitEdgeBPbFingerprint : Fingerprint(
+    name = "BPb",
+    definingClass = "Lcom/facebook/graphql/model/GraphQLFeedUnitEdge;",
+)
+
 @Suppress("unused")
 val blockSponsoredAdsPatch =
     bytecodePatch(
@@ -190,6 +200,44 @@ val blockSponsoredAdsPatch =
                 }
             }.onFailure { e ->
                 println("[BlockSponsoredAdsPatch] Error hooking LX/2Su.A00: ${e.message}")
+            }
+
+            // 8. Total Feed Ad Elimination: GraphQLFeedUnitEdge.A03()LX/2NV; -> return null if sponsored
+            runCatching {
+                GraphQLFeedUnitEdgeA03Fingerprint.method.apply {
+                    addInstructions(
+                        0,
+                        """
+                        invoke-static {p0}, Lapp/morphe/extension/facebook/patches/FacebookAdFilter;->shouldDropEdge(Ljava/lang/Object;)Z
+                        move-result v0
+                        if-eqz v0, :cond_bypass_edge_a03
+                        const/4 v0, 0x0
+                        return-object v0
+                        :cond_bypass_edge_a03
+                        """.trimIndent(),
+                    )
+                }
+            }.onFailure { e ->
+                println("[BlockSponsoredAdsPatch] Error hooking GraphQLFeedUnitEdge.A03: ${e.message}")
+            }
+
+            // 9. Total Feed Ad Elimination: GraphQLFeedUnitEdge.BPb()LX/2NV; -> return null if sponsored
+            runCatching {
+                GraphQLFeedUnitEdgeBPbFingerprint.method.apply {
+                    addInstructions(
+                        0,
+                        """
+                        invoke-static {p0}, Lapp/morphe/extension/facebook/patches/FacebookAdFilter;->shouldDropEdge(Ljava/lang/Object;)Z
+                        move-result v0
+                        if-eqz v0, :cond_bypass_edge_bpb
+                        const/4 v0, 0x0
+                        return-object v0
+                        :cond_bypass_edge_bpb
+                        """.trimIndent(),
+                    )
+                }
+            }.onFailure { e ->
+                println("[BlockSponsoredAdsPatch] Error hooking GraphQLFeedUnitEdge.BPb: ${e.message}")
             }
         }
     }

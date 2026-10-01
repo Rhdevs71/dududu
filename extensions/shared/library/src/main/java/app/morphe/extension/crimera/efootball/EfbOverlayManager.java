@@ -960,50 +960,61 @@ public class EfbOverlayManager {
 
                     if (sMenuTapCount == 1) {
                         sCurrentPlannedAction = "1/4: Menekan 'Ke Laga >' (Lobby Acara)...";
-                        nextDelayMs = 5000;
+                        nextDelayMs = 13000; // 13 detik aman mencari lawan & server handshake
                     } else if (sMenuTapCount == 2) {
-                        sCurrentPlannedAction = "2/4: Menunggu Lawan / Menekan 'Berikut >' (Jersey)...";
-                        nextDelayMs = 5500;
+                        sCurrentPlannedAction = "2/4: Menekan 'Berikut >' (Layar Jersey/Seragam)...";
+                        nextDelayMs = 9500;  // 9.5 detik menunggu aset jersey selesai render
                     } else if (sMenuTapCount == 3) {
                         sCurrentPlannedAction = "3/4: Menekan 'Ke Laga >' (Formasi & Taktik)...";
-                        nextDelayMs = 5500;
+                        nextDelayMs = 9500;  // 9.5 detik menunggu kalkulasi rating & booster
                     } else if (sMenuTapCount == 4) {
                         sCurrentPlannedAction = "4/4: Menekan 'Ke Laga >' (Konfirmasi Masuk Match)...";
-                        nextDelayMs = 6000;
+                        nextDelayMs = 8000;  // 8 detik transisi ke kickoff
                     } else {
                         // Masuk ke lapangan, kick-off babak 1 dimulai!
                         sCurrentStage = ScreenState.PHASE_MATCH_HALF_1;
                         sMatchStartTime = System.currentTimeMillis();
+                        sHalftimeStep = 0;
                         sCurrentPlannedAction = "⚽ Kickoff: Memasuki Babak 1 (AI Mode)...";
                         nextDelayMs = 3000;
                     }
                     break;
 
                 case PHASE_MATCH_HALF_1:
-                    // PENTING: ZERO TOUCHES! Layar standby tanpa sentuhan agar tidak mengganggu gameplay AI!
                     long elapsedH1 = (System.currentTimeMillis() - sMatchStartTime) / 1000;
-                    long remainH1 = Math.max(0, sMatchHalfDurationSec - elapsedH1);
-                    sCurrentPlannedAction = "⚽ Babak 1: AI Sedang Bermain (Layar Diam) • " + remainH1 + "s tersisa";
-
-                    if (remainH1 <= 0) {
-                        sCurrentStage = ScreenState.PHASE_HALFTIME;
-                        sHalftimeStep = 0;
-                        nextDelayMs = 3500;
+                    // Jendela Standby Murni (0-185s): ZERO TOUCHES agar gameplay AI aman dari sentuhan!
+                    if (elapsedH1 < 185) {
+                        long remainStandby = 185 - elapsedH1;
+                        sCurrentPlannedAction = "⚽ Babak 1: AI Sedang Bermain (Layar Diam) • " + remainStandby + "s standby";
+                        nextDelayMs = 1000; // Update countdown HUD setiap 1 detik
                     } else {
-                        nextDelayMs = 1000; // Update HUD setiap 1 detik tanpa menyentuh layar
+                        // Heartbeat Transition Window: Mulai mendeteksi jeda babak & pulse kanan bawah setiap 5.5 detik
+                        sCurrentPlannedAction = "⏸️ Babak 1 Menuju Jeda: Heartbeat Pulse Kanan Bawah [" + (sHalftimeStep + 1) + "]...";
+                        dispatchActionTap(w * 0.850f, h * 0.925f);
+                        sHalftimeStep++;
+
+                        // Jika sudah pulse 4 kali atau waktu maksimal terlampaui, masuk ke jeda babak
+                        if (sHalftimeStep >= 4 || elapsedH1 >= sMatchHalfDurationSec + 60) {
+                            sCurrentStage = ScreenState.PHASE_HALFTIME;
+                            sHalftimeStep = 0;
+                            nextDelayMs = 4000;
+                        } else {
+                            nextDelayMs = 5500;
+                        }
                     }
                     break;
 
                 case PHASE_HALFTIME:
                     // Jeda Babak: Tekan 'Mulai Babak Kedua >' / 'Berikut >' di KANAN BAWAH!
-                    // TIDAK BOLEH KLIK DI TENGAH LAYAR!
                     dispatchActionTap(w * 0.850f, h * 0.925f);
                     sHalftimeStep++;
-                    sCurrentPlannedAction = "⏸️ Jeda Babak: Menekan 'Mulai Babak Kedua / Berikut' (Kanan Bawah) [" + sHalftimeStep + "/4]...";
+                    sCurrentPlannedAction = "⏸️ Jeda Babak: Menekan 'Mulai Babak Kedua / Berikut' (Kanan Bawah) [" + sHalftimeStep + "/3]...";
 
-                    if (sHalftimeStep >= 4) {
+                    if (sHalftimeStep >= 3) {
                         sCurrentStage = ScreenState.PHASE_MATCH_HALF_2;
                         sMatchStartTime = System.currentTimeMillis();
+                        sHalftimeStep = 0;
+                        sPostMatchStep = 0;
                         nextDelayMs = 5000;
                     } else {
                         nextDelayMs = 4000;
@@ -1011,17 +1022,25 @@ public class EfbOverlayManager {
                     break;
 
                 case PHASE_MATCH_HALF_2:
-                    // PENTING: ZERO TOUCHES! Layar standby tanpa sentuhan agar tidak mengganggu gameplay AI!
                     long elapsedH2 = (System.currentTimeMillis() - sMatchStartTime) / 1000;
-                    long remainH2 = Math.max(0, sMatchHalfDurationSec - elapsedH2);
-                    sCurrentPlannedAction = "⚽ Babak 2: AI Sedang Bermain (Layar Diam) • " + remainH2 + "s tersisa";
-
-                    if (remainH2 <= 0) {
-                        sCurrentStage = ScreenState.PHASE_POST_MATCH;
-                        sPostMatchStep = 0;
-                        nextDelayMs = 4000;
+                    // Jendela Standby Murni (0-185s): ZERO TOUCHES agar gameplay AI aman!
+                    if (elapsedH2 < 185) {
+                        long remainStandby2 = 185 - elapsedH2;
+                        sCurrentPlannedAction = "⚽ Babak 2: AI Sedang Bermain (Layar Diam) • " + remainStandby2 + "s standby";
+                        nextDelayMs = 1000; // Update countdown HUD setiap 1 detik
                     } else {
-                        nextDelayMs = 1000; // Update HUD setiap 1 detik tanpa menyentuh layar
+                        // Heartbeat Transition Window menuju akhir pertandingan (Full-Time)
+                        sCurrentPlannedAction = "🏆 Menuju Akhir Laga: Heartbeat Pulse Kanan Bawah [" + (sPostMatchStep + 1) + "]...";
+                        dispatchActionTap(w * 0.850f, h * 0.925f);
+                        sPostMatchStep++;
+
+                        if (sPostMatchStep >= 3 || elapsedH2 >= sMatchHalfDurationSec + 60) {
+                            sCurrentStage = ScreenState.PHASE_POST_MATCH;
+                            sPostMatchStep = 0;
+                            nextDelayMs = 4000;
+                        } else {
+                            nextDelayMs = 5500;
+                        }
                     }
                     break;
 
@@ -1038,7 +1057,7 @@ public class EfbOverlayManager {
                                 dispatchActionTap(sw * 0.500f, sh * 0.760f);
                             } catch (Throwable ignored) {}
                         }
-                    }, 500);
+                    }, 450);
                     sPostMatchStep++;
                     sCurrentPlannedAction = "🏆 Selesai Laga & Klaim Hadiah: Menekan 'Berikut' [" + sPostMatchStep + "/6]...";
 
@@ -1273,6 +1292,69 @@ public class EfbOverlayManager {
             }
         }
         return null;
+    }
+
+    public interface VisionCallback {
+        void onSample(boolean isGreenPitch, boolean isActionButtonReady);
+    }
+
+    /**
+     * Menggunakan native Android PixelCopy untuk membaca warna buffer SurfaceView UE4 secara real-time.
+     */
+    private static void checkScreenVision(final VisionCallback callback) {
+        if (sActivity == null || sActivity.isFinishing()) {
+            if (callback != null) callback.onSample(false, false);
+            return;
+        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            if (callback != null) callback.onSample(false, false);
+            return;
+        }
+        try {
+            final SurfaceView sv = findSurfaceView(sActivity.getWindow().getDecorView());
+            if (sv == null || !sv.getHolder().getSurface().isValid()) {
+                if (callback != null) callback.onSample(false, false);
+                return;
+            }
+            final int sw = getScreenWidth();
+            final int sh = getScreenHeight();
+            final Rect btnRect = new Rect((int)(sw * 0.82f), (int)(sh * 0.90f), (int)(sw * 0.88f), (int)(sh * 0.95f));
+            final Bitmap sampleBitmap = Bitmap.createBitmap(16, 16, Bitmap.Config.ARGB_8888);
+
+            PixelCopy.request(sv, btnRect, sampleBitmap, new PixelCopy.OnPixelCopyFinishedListener() {
+                @Override
+                public void onPixelCopyFinished(int copyResult) {
+                    if (copyResult == PixelCopy.SUCCESS && sampleBitmap != null) {
+                        int greenCount = 0;
+                        int brightButtonCount = 0;
+                        for (int x = 0; x < 16; x += 2) {
+                            for (int y = 0; y < 16; y += 2) {
+                                int pixel = sampleBitmap.getPixel(x, y);
+                                int r = Color.red(pixel);
+                                int g = Color.green(pixel);
+                                int b = Color.blue(pixel);
+                                if (g > r * 1.15f && g > b * 1.15f && g > 45) {
+                                    greenCount++;
+                                }
+                                int lum = (r + g + b) / 3;
+                                if (lum > 115 && !(g > r * 1.3f && g > b * 1.3f)) {
+                                    brightButtonCount++;
+                                }
+                            }
+                        }
+                        boolean isPitch = greenCount >= 5;
+                        boolean isBtn = brightButtonCount >= 5;
+                        sampleBitmap.recycle();
+                        if (callback != null) callback.onSample(isPitch, isBtn);
+                    } else {
+                        if (sampleBitmap != null) sampleBitmap.recycle();
+                        if (callback != null) callback.onSample(false, false);
+                    }
+                }
+            }, sAfkHandler);
+        } catch (Throwable t) {
+            if (callback != null) callback.onSample(false, false);
+        }
     }
 
     /**
