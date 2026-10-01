@@ -162,13 +162,14 @@ val facebookSettingsPatch =
             runCatching {
                 val method = mutableClassDefByOrNull("LX/TXv;")?.methods?.firstOrNull { it.name == "A01" }
                 method?.apply {
-                    val returnIndices = instructions
-                        .mapIndexedNotNull { index, inst -> if (inst.opcode == Opcode.RETURN_OBJECT) index else null }
+                    val returnInstructions = instructions
+                        .filter { it.opcode == Opcode.RETURN_OBJECT }
+                        .toList()
                         .reversed()
 
-                    for (retIdx in returnIndices) {
-                        val retInst = getInstruction(retIdx) as OneRegisterInstruction
-                        val retReg = retInst.registerA
+                    for (retInst in returnInstructions) {
+                        val retIdx = retInst.location.index
+                        val retReg = (retInst as OneRegisterInstruction).registerA
 
                         addInstructions(
                             retIdx,
@@ -180,7 +181,7 @@ val facebookSettingsPatch =
                             """.trimIndent(),
                         )
                     }
-                    println("[SettingsPatch] Successfully hooked LX/TXv;->A01 at ${returnIndices.size} return points")
+                    println("[SettingsPatch] Successfully hooked LX/TXv;->A01 at ${returnInstructions.size} return points")
                 } ?: println("[SettingsPatch] Warning: LX/TXv;->A01 method not found")
             }.onFailure { e ->
                 println("[SettingsPatch] Failed to hook LX/TXv;->A01: ${e.message}")
