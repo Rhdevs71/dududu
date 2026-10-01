@@ -18,6 +18,7 @@ import app.morphe.patcher.extensions.InstructionExtensions.addInstructions
 import app.morphe.patcher.patch.bytecodePatch
 import app.morphe.util.indexOfFirstInstruction
 import com.android.tools.smali.dexlib2.Opcode
+import com.android.tools.smali.dexlib2.iface.instruction.OneRegisterInstruction
 
 internal object FbApplicationOnCreateFingerprint : Fingerprint(
     name = "onCreate",
@@ -157,7 +158,35 @@ val facebookSettingsPatch =
                 println("[SettingsPatch] Failed to hook BackgroundPlaybackManager.onActivityStopped: ${e.message}")
             }
 
-            // 7. Hook LX/S2R;->A0i to inject native Reels 3-dots download menu
+            // 7. Hook LX/TXv;->A01()Ljava/util/List; to inject native Reels bottom sheet download row
+            runCatching {
+                val method = mutableClassDefByOrNull("LX/TXv;")?.methods?.firstOrNull { it.name == "A01" }
+                method?.apply {
+                    val returnIndices = instructions
+                        .mapIndexedNotNull { index, inst -> if (inst.opcode == Opcode.RETURN_OBJECT) index else null }
+                        .reversed()
+
+                    for (retIdx in returnIndices) {
+                        val retInst = getInstruction(retIdx) as OneRegisterInstruction
+                        val retReg = retInst.registerA
+
+                        addInstructions(
+                            retIdx,
+                            """
+                            move-object/from16 v1, v$retReg
+                            move-object/from16 v0, p0
+                            invoke-static {v0, v1}, Lapp/morphe/extension/facebook/patches/FacebookReelsMenuHook;->onReelsItemsCreated(Ljava/lang/Object;Ljava/util/List;)Ljava/util/List;
+                            move-result-object v$retReg
+                            """.trimIndent(),
+                        )
+                    }
+                    println("[SettingsPatch] Successfully hooked LX/TXv;->A01 at ${returnIndices.size} return points")
+                } ?: println("[SettingsPatch] Warning: LX/TXv;->A01 method not found")
+            }.onFailure { e ->
+                println("[SettingsPatch] Failed to hook LX/TXv;->A01: ${e.message}")
+            }
+
+            // 8. Legacy fallback hook for LX/S2R;->A0i
             runCatching {
                 val method = mutableClassDefByOrNull("LX/S2R;")?.methods?.firstOrNull { it.name == "A0i" }
                     ?: ReelsVideoMenuA0iFingerprint.methodOrNull
@@ -171,7 +200,7 @@ val facebookSettingsPatch =
                         invoke-static {v0, v1, v2}, Lapp/morphe/extension/facebook/patches/FacebookReelsMenuHook;->onReelsMenuCreated(Landroid/view/Menu;Landroid/view/View;Ljava/lang/Object;)V
                         """.trimIndent(),
                     )
-                } ?: println("[SettingsPatch] Warning: LX/S2R;->A0i method not found")
+                }
             }.onFailure { e ->
                 println("[SettingsPatch] Failed to hook LX/S2R;->A0i: ${e.message}")
             }
