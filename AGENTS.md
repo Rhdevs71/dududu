@@ -527,6 +527,27 @@
         - Menambahkan heuristik non-1-on-1: setiap thread tanpa karakter underscore (`_`) dan panjang string >= 6 dikenali sebagai saluran/grup non-personal sehingga diizinkan menyinkronkan status seen.
         - Memperbarui `Block.java` agar `Pref.hideSuggestedContent()` dievaluasi dinamis dan memblokir netego saluran yang disarankan (`suggested_channels`, `channels_netego`, `suggested_broadcast_channels`).
 
+31. **Tahap 31: Peluncuran Modul Facebook Mod (RHpatch Facebook), Eliminasi Crash Fatal 1uY.AH5, Injeksi Native Reels Downloader Titik 3, & Pembersihan Dialog Overlay (Rilis v1.28.2 - Terkini)**
+    - *Analisis Log Crash Pengguna (`log_termux.txt`)*:
+      - *Masalah*: Facebook mengalami crash seketika saat memuat feed berita:
+        `FATAL EXCEPTION: pando:FBNewsFeedAsyncAdQuery... java.lang.IllegalStateException: Required value was null at X.1uY.AH5(:69)`.
+      - *Penyebab*: Injeksi iklan pada `BlockSponsoredAdsPatch.kt` (hook 8 & 9) mengembalikan `null` pada `GraphQLFeedUnitEdge->A03` dan `BPb`. Arsitektur parser modern Pando News Feed Facebook pada method `1uY.AH5` melakukan validasi ketat `checkNotNull` sehingga pengembalian `null` langsung meledak menjadi `IllegalStateException`.
+      - *Solusi*: Menghapus kedua hook `null` yang destruktif tersebut di `BlockSponsoredAdsPatch.kt` dan menyingkirkan fingerprint yang bersangkutan. Penindasan iklan dialihkan 100% aman pada model filtering level feed `LX/2Su;->A04` (`isBlockSponsoredAds`) dan UI adapter.
+    - *Injeksi Native Downloader di Menu Titik 3 Facebook Reels (`FacebookReelsMenuHook.java` & `SettingsPatch.kt`)*:
+      - *Masalah*: Tombol unduh Reels tidak muncul di menu titik 3 bawaan Facebook Reels (bottom sheet).
+      - *Hasil Reverse Engineering Bytecode (`fb.apk`)*:
+        1. Bottom sheet Reels dibangun oleh method `LX/TXv;->A01()Ljava/util/List;` di `classes12.dex`.
+        2. Setiap baris item di bottom sheet adalah instance `LX/S0a;` dengan field `A02` (judul), `A00` (ikon `LX/Tfe;`), dan listener `LX/Uaq;` (`void DIJ()`).
+        3. Model `LX/S0a;` memiliki factory method `public static LX/S0a;->A00(LX/Uaq, LX/Tfe, CharSequence, CharSequence)LX/S0a;`.
+      - *Implementasi Hook Smali & Ekstensi*:
+        1. Di `SettingsPatch.kt`, seluruh titik keluar `Opcode.RETURN_OBJECT` pada `LX/TXv;->A01()` di-hook menggunakan register bridge `move-object/from16` untuk memanggil `FacebookReelsMenuHook.onReelsItemsCreated(p0, items)`.
+        2. Di `FacebookReelsMenuHook.java`, item menu `🎬 [RHpatch] Unduh Reel (HD MP4)` dibuat via `LX/S0a.A00` dengan Dynamic Proxy `LX/Uaq` dan disisipkan di posisi paling atas (`index 0`).
+        3. Saat item disentuh (`DIJ`), URL video HD/SD diekstrak dari objek feed/media (`LX/Rdi;` pada field `A05` instance `LX/TXv;`) dan langsung diteruskan ke `FacebookMediaDownloader.downloadDirectStream` untuk diunduh otomatis ke galeri via Android `DownloadManager`.
+    - *Pembersihan Dialog Overlay (`RhpatchFacebookDialog.java`)*:
+      - Menghapus komponen "Pusat Unduh Video & Reels" (`dlCard`) dari modal dialog overlay. Dialog kini murni berfungsi sebagai dashboard toggle pengaturan RHpatch, sementara seluruh fungsi unduhan media terintegrasi langsung secara native pada menu titik 3 postingan dan Reels persis seperti Instagram.
+    - *Penyempurnaan Integrasi Lifecycle Activity (`RhpatchFacebookInjector.java`)*:
+      - Menambahkan getter `getCurrentActivity()` yang mengembalikan `Utils.getActivity()` dengan fallback aman ke `Utils.getContext()`.
+
 ## 3. Arsitektur Sistem Debug Logging (`piko_debug.log`)
 
 File log berada di penyimpanan internal perangkat:
