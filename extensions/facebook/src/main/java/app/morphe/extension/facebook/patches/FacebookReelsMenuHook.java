@@ -24,9 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import app.morphe.extension.crimera.PikoUtils;
-import app.morphe.extension.crimera.sharedPreference.SharedPref;
+import app.morphe.extension.facebook.settings.FacebookPref;
 import app.morphe.extension.facebook.settings.FacebookSettings;
 import app.morphe.extension.facebook.ui.RhpatchFacebookInjector;
+import app.morphe.extension.shared.Utils;
 
 public class FacebookReelsMenuHook {
 
@@ -42,7 +43,7 @@ public class FacebookReelsMenuHook {
         if (items == null) return items;
         try {
             // Cek apakah fitur downloader Reels diaktifkan di pengaturan
-            if (!SharedPref.getBoolean(FacebookSettings.DOWNLOAD_REELS, true)) {
+            if (!FacebookPref.isDownloadReels()) {
                 return items;
             }
 
@@ -123,7 +124,8 @@ public class FacebookReelsMenuHook {
                     @Override
                     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
                         if ("DIJ".equals(method.getName())) {
-                            Context context = RhpatchFacebookInjector.getCurrentActivity();
+                            Context context = RhpatchFacebookInjector.getCurrentActivity() != null ?
+                                RhpatchFacebookInjector.getCurrentActivity() : Utils.getContext();
                             FacebookPostMenuHook.PostMediaInfo current = targetMedia != null ? targetMedia : FacebookMediaDownloader.sLastActiveMedia;
                             String videoUrl = (current != null && current.hdVideoUrl != null) ? current.hdVideoUrl : (current != null ? current.sdVideoUrl : null);
 
@@ -196,7 +198,8 @@ public class FacebookReelsMenuHook {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     try {
-                        Context ctx = context != null ? context : RhpatchFacebookInjector.getCurrentActivity();
+                        Context ctx = context != null ? context : (RhpatchFacebookInjector.getCurrentActivity() != null ?
+                            RhpatchFacebookInjector.getCurrentActivity() : Utils.getContext());
                         FacebookPostMenuHook.PostMediaInfo currentInfo = info != null ? info : FacebookMediaDownloader.sLastActiveMedia;
                         String videoUrl = (currentInfo != null && currentInfo.hdVideoUrl != null) ? currentInfo.hdVideoUrl : (currentInfo != null ? currentInfo.sdVideoUrl : null);
 
@@ -220,7 +223,8 @@ public class FacebookReelsMenuHook {
                 @Override
                 public boolean onMenuItemClick(MenuItem item) {
                     try {
-                        Context ctx = context != null ? context : RhpatchFacebookInjector.getCurrentActivity();
+                        Context ctx = context != null ? context : (RhpatchFacebookInjector.getCurrentActivity() != null ?
+                            RhpatchFacebookInjector.getCurrentActivity() : Utils.getContext());
                         FacebookPostMenuHook.PostMediaInfo currentInfo = info != null ? info : FacebookMediaDownloader.sLastActiveMedia;
                         String link = (currentInfo != null && currentInfo.permalink != null) ? currentInfo.permalink : null;
 

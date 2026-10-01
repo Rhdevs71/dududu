@@ -238,6 +238,10 @@ public class RhpatchFacebookInjector {
         FacebookAppLockManager.onActivityStopped(activity);
     }
 
+    public static Activity getCurrentActivity() {
+        return Utils.getActivity();
+    }
+
     public static void showMenu(Activity activity) {
         if (activity != null && !activity.isFinishing()) {
             try {
