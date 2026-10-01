@@ -1,3 +1,13 @@
+## [1.28.2](https://github.com/Rhdevs71/dududu/compare/v1.28.1...v1.28.2) (2026-10-01)
+
+### 🐛 Bug Fixes
+
+* **facebook:** access instructions via method implementation in SettingsPatch ([0ca2a90](https://github.com/Rhdevs71/dududu/commit/0ca2a90652338094956524e1bdfd353eba16c0d3))
+* **facebook:** count hooked return instructions with Int counter ([af2bf54](https://github.com/Rhdevs71/dududu/commit/af2bf54d77b6411797bbf20f7e678d3f09470abc))
+* **facebook:** fix 1uY.AH5 crash, inject native reels 3-dots downloader, and clean overlay dialog ([8c85620](https://github.com/Rhdevs71/dududu/commit/8c8562074211134dd96009b9efe70e9bb54514aa))
+* **facebook:** fix compilation errors in FacebookReelsMenuHook and add getCurrentActivity in RhpatchFacebookInjector ([2c559a3](https://github.com/Rhdevs71/dududu/commit/2c559a343d2545ae47cce88e1f87d47d1f479833))
+* **facebook:** fix instructions iteration in SettingsPatch LX/TXv hook ([dff2708](https://github.com/Rhdevs71/dududu/commit/dff27082e153119a9ae667f5d33991282e51bad6))
+
 ## [1.28.1](https://github.com/Rhdevs71/dududu/compare/v1.28.0...v1.28.1) (2026-10-01)
 
 ### 🐛 Bug Fixes
