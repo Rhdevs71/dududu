@@ -65,7 +65,7 @@ jobs:
           echo "GPG key setup completed with Key ID: $KEY_ID"
 
       - name: Release
-        uses: cycjimmy/semantic-release-action@v5
+        uses: cycjimmy/semantic-release-action@v6
         id: release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
