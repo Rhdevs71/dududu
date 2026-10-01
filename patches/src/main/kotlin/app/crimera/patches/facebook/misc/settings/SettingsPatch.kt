@@ -159,14 +159,19 @@ val facebookSettingsPatch =
 
             // 7. Hook LX/S2R;->A0i to inject native Reels 3-dots download menu
             runCatching {
-                ReelsVideoMenuA0iFingerprint.method.apply {
-                    addInstruction(
+                val method = mutableClassDefByOrNull("LX/S2R;")?.methods?.firstOrNull { it.name == "A0i" }
+                    ?: ReelsVideoMenuA0iFingerprint.methodOrNull
+                method?.apply {
+                    addInstructions(
                         0,
                         """
-                        invoke-static {p1, p2, p3}, Lapp/morphe/extension/facebook/patches/FacebookReelsMenuHook;->onReelsMenuCreated(Landroid/view/Menu;Landroid/view/View;Ljava/lang/Object;)V
+                        move-object/from16 v0, p1
+                        move-object/from16 v1, p2
+                        move-object/from16 v2, p3
+                        invoke-static {v0, v1, v2}, Lapp/morphe/extension/facebook/patches/FacebookReelsMenuHook;->onReelsMenuCreated(Landroid/view/Menu;Landroid/view/View;Ljava/lang/Object;)V
                         """.trimIndent(),
                     )
-                }
+                } ?: println("[SettingsPatch] Warning: LX/S2R;->A0i method not found")
             }.onFailure { e ->
                 println("[SettingsPatch] Failed to hook LX/S2R;->A0i: ${e.message}")
             }
